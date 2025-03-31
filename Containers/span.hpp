@@ -23,12 +23,12 @@ private:
     size_t size_;
 public:
     span() = delete;
-    span(ptr_t ptr, size_t size)
+    span(ptr_t ptr, size_t size) noexcept
         : ptr_{ptr}
         , size_{size} {}
     template <typename U>
         requires has_data_and_size<U>
-    span(U & container)
+    span(U & container) noexcept
         : ptr_{container.data()}
         , size_{container.size()} {}
 
