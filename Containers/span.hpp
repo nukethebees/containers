@@ -36,11 +36,9 @@ public:
     auto size() const -> size_t {
         return size_;
     }
-    auto data() const -> const_ptr_t {
-        return data_;
-    }
-    auto data() -> ptr_t {
-        return data_;
+    template <typename Self>
+    auto data(this Self&& self) -> ptr_t {
+        return std::forward<Self>(self).data_;
     }
 };
 
