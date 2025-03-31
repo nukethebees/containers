@@ -17,23 +17,30 @@ class span {
 public:
     using value_t = T;
     using ptr_t = T *;
+    using const_ptr_t = T const *;
     using size_t = std::size_t;
 private:
-    ptr_t ptr_;
+    ptr_t data_;
     size_t size_;
 public:
     span() = delete;
     span(ptr_t ptr, size_t size) noexcept
-        : ptr_{ptr}
+        : data_{ptr}
         , size_{size} {}
     template <typename U>
         requires has_data_and_size<U>
     span(U & container) noexcept
-        : ptr_{container.data()}
+        : data_{container.data()}
         , size_{container.size()} {}
 
     auto size() const -> size_t {
         return size_;
+    }
+    auto data() const -> const_ptr_t {
+        return data_;
+    }
+    auto data() -> ptr_t {
+        return data_;
     }
 };
 
