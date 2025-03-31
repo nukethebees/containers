@@ -15,9 +15,13 @@ TEST(span, ptr_size_ctor) {
 
     ASSERT_EQ(size, span.size());
 }
-
 TEST(span, from_array) {
     std::array<int, 5> values{0};
     
     auto span{ml::span(values)};
+}
+TEST(span, const_from_array) {
+    std::array<int, 5> values{0};
+
+    auto span{ml::span<int const>(values)};
 }
