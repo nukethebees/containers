@@ -22,3 +22,10 @@ TEST(array, accumulate_ints) {
 
     ASSERT_EQ(sum, 6);
 }
+TEST(array, constexpr_indexing) {
+    constexpr std::size_t size{3};
+    constexpr ml::array<int, size> values{1, 2, 3};
+    constexpr auto val{values[0]};
+
+    ASSERT_EQ(val, 1);
+}

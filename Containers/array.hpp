@@ -16,18 +16,18 @@ public:
 private:
     T data_[SIZE];
 public:
-    array() = default;
+    constexpr array() = default;
     template <typename... U>
         requires (sizeof...(U) == SIZE)
-    array(U&&... values) 
+    constexpr array(U&&... values)
         : data_{std::forward<U>(values)...}
     {}
 
-    auto size() const -> size_t {
+    constexpr auto size() const -> size_t {
         return SIZE;
     }
     template <typename Self>
-    auto data(this Self && self) -> ptr_t {
+    constexpr auto data(this Self && self) -> ptr_t {
         return std::forward<Self>(self).data_;
     }
 
@@ -39,7 +39,7 @@ public:
     }
 
     // Operators
-    auto operator[](size_t index) const -> value_t {
+    constexpr auto operator[](size_t index) const -> value_t {
         return *(data_ + index);
     }
 };
