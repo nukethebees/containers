@@ -21,6 +21,8 @@ public:
     using value_type = T;
     using pointer = T *;
     using reference = T &;
+    using element_type = T;
+    using iterator_category = std::contiguous_iterator_tag;
 
     // Needed to satisfy the default constructible requirement
     span_iterator() = default;
@@ -34,10 +36,7 @@ public:
     auto operator*() -> reference {
         return *ptr;
     }
-    auto operator->() -> pointer {
-        return ptr;
-    }
-    auto operator->() const -> T const * {
+    auto operator->() const -> T * {
         return ptr;
     }
     auto operator[](difference_type n) const -> reference {
@@ -150,3 +149,4 @@ static_assert(std::incrementable<ml::span_iterator<int>>);
 static_assert(std::forward_iterator<ml::span_iterator<int>>);
 static_assert(std::bidirectional_iterator<ml::span_iterator<int>>);
 static_assert(std::random_access_iterator<ml::span_iterator<int>>);
+static_assert(std::contiguous_iterator<ml::span_iterator<int>>);
