@@ -76,10 +76,13 @@ public:
         auto operator+(difference_type n) const -> Iterator {
             return Iterator(ptr + n);
         }
+        friend auto operator+(difference_type lhs, const Iterator & rhs) ->Iterator {
+            return Iterator(lhs + rhs.ptr);
+        }
         auto operator-(difference_type n) const -> Iterator {
             return Iterator(ptr - n);
         }
-        auto operator-(Iterator const& n) const -> difference_type {
+        auto operator-(Iterator const & n) const -> difference_type {
             return difference_type{ptr - n.ptr};
         }
         auto operator+=(difference_type n) -> Iterator & {
@@ -98,7 +101,7 @@ public:
         auto operator!=(const Iterator & other) const -> bool {
             return ptr != other.ptr;
         }
-        auto operator<=>(Iterator const&) const = default;
+        auto operator<=>(Iterator const &) const = default;
     };
 private:
     ptr_t data_;
@@ -140,4 +143,4 @@ static_assert(std::input_iterator<ml::span<int>::Iterator>);
 static_assert(std::incrementable<ml::span<int>::Iterator>);
 static_assert(std::forward_iterator<ml::span<int>::Iterator>);
 static_assert(std::bidirectional_iterator<ml::span<int>::Iterator>);
-//static_assert(std::random_access_iterator<ml::span<int>::Iterator>);
+static_assert(std::random_access_iterator<ml::span<int>::Iterator>);
