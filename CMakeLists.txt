@@ -1,6 +1,5 @@
 ﻿cmake_minimum_required (VERSION 3.30)
-make_directory(${CMAKE_CURRENT_BINARY_DIR}/asm)
-add_compile_options(/FAs /Fa${CMAKE_CURRENT_BINARY_DIR}/asm\\)
+make_directory(${CMAKE_BINARY_DIR}/asm)
 project ("Containers")
 enable_testing()
 

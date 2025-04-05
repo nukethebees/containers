@@ -1,5 +1,6 @@
 #include <array>
 #include <cstddef>
+#include <numeric>
 
 #include <gtest/gtest.h>
 
@@ -28,6 +29,14 @@ TEST(span, foreach_from_array) {
     for (auto val : span) {
         sum += val;
     }
+
+    ASSERT_EQ(sum, 6);
+}
+TEST(span, accumulate_from_array) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int const>(values)};
+
+    auto sum{std::accumulate(span.begin(), span.end(), 0)};
 
     ASSERT_EQ(sum, 6);
 }
