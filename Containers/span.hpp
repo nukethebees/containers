@@ -35,17 +35,20 @@ public:
 
         // Dereferencing
         // For some reason, a const iterator needs to return T& to meet the iter requirements
-        auto operator*() const -> T & {
+        auto operator*() const -> reference {
             return *ptr;
         }
-        auto operator*() -> T & {
+        auto operator*() -> reference {
             return *ptr;
         }
-        auto operator->() -> T * {
+        auto operator->() -> pointer {
             return ptr;
         }
         auto operator->() const -> T const * {
             return ptr;
+        }
+        auto operator[](difference_type n) const -> reference {
+            return *(ptr + n);
         }
 
         // Increment / decrement
@@ -67,6 +70,25 @@ public:
             Iterator temp{*this};
             --(*this);
             return temp;
+        }
+
+        // Math operators
+        auto operator+(difference_type n) const -> Iterator {
+            return Iterator(ptr + n);
+        }
+        auto operator-(difference_type n) const -> Iterator {
+            return Iterator(ptr - n);
+        }
+        auto operator-(Iterator const& n) const -> difference_type {
+            return difference_type{ptr - n.ptr};
+        }
+        auto operator+=(difference_type n) -> Iterator & {
+            ptr += n;
+            return *this;
+        }
+        auto operator-=(difference_type n) -> Iterator & {
+            ptr -= n;
+            return *this;
         }
 
         // Comparison
@@ -118,3 +140,4 @@ static_assert(std::input_iterator<ml::span<int>::Iterator>);
 static_assert(std::incrementable<ml::span<int>::Iterator>);
 static_assert(std::forward_iterator<ml::span<int>::Iterator>);
 static_assert(std::bidirectional_iterator<ml::span<int>::Iterator>);
+//static_assert(std::random_access_iterator<ml::span<int>::Iterator>);
