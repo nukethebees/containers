@@ -15,3 +15,12 @@ TEST(stack_buffer_allocator, vector_init) {
     int_vec<5> vec;
 }
 
+TEST(stack_buffer_allocator, vector_push_back) {
+    int_vec<5> vec;
+    vec.push_back(1);
+    vec.push_back(2);
+    vec.push_back(3);
+    vec.push_back(4);
+    vec.push_back(5);
+    ASSERT_EQ(vec.size(), 5);
+}
