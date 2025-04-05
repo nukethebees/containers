@@ -10,9 +10,9 @@ private:
     alignas(T) std::array<std::byte, capacity * sizeof(T)> storage{};
     std::size_t index{0};
 public:
-    stack_buffer_allocator() noexcept = default;
+    constexpr stack_buffer_allocator() noexcept = default;
     template <class U>
-    stack_buffer_allocator(const stack_buffer_allocator<U, capacity> &) noexcept {}
+    constexpr stack_buffer_allocator(const stack_buffer_allocator<U, capacity> &) noexcept {}
 
     constexpr T * allocate(std::size_t n) {
         auto const bytes_to_allocate{n * sizeof(T)};
@@ -32,12 +32,12 @@ public:
     }
 
     template <class U>
-    auto operator==(const stack_buffer_allocator<U, capacity> &) const noexcept -> bool {
+    constexpr auto operator==(const stack_buffer_allocator<U, capacity> &) const noexcept -> bool {
         return true;
     }
 
     template <class U>
-    auto operator!=(const stack_buffer_allocator<U, capacity> &) const noexcept -> bool {
+    constexpr auto operator!=(const stack_buffer_allocator<U, capacity> &) const noexcept -> bool {
         return false;
     }
 
