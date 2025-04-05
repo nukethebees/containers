@@ -69,11 +69,14 @@ public:
     auto operator+(difference_type n) const -> span_iterator {
         return span_iterator(ptr + n);
     }
-    friend auto operator+(difference_type lhs, const span_iterator & rhs) ->span_iterator {
+    friend auto operator+(difference_type lhs, const span_iterator & rhs) -> span_iterator {
         return span_iterator(lhs + rhs.ptr);
     }
     auto operator-(difference_type n) const -> span_iterator {
         return span_iterator(ptr - n);
+    }
+    friend auto operator-(difference_type lhs, const span_iterator & rhs) -> span_iterator {
+        return span_iterator(lhs - rhs.ptr);
     }
     auto operator-(span_iterator const & n) const -> difference_type {
         return difference_type{ptr - n.ptr};
