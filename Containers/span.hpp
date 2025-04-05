@@ -136,6 +136,11 @@ public:
     auto end() -> iter_t {
         return iter_t(data_ + size_);
     }
+
+    // Operators
+    auto operator[](size_t index) const -> value_t {
+        return *(data_ + index);
+    }
 };
 
 template <typename T>

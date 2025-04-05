@@ -1,6 +1,6 @@
+#include <numeric>
 #include <array>
 #include <cstddef>
-#include <numeric>
 
 #include <gtest/gtest.h>
 
@@ -39,4 +39,10 @@ TEST(span, accumulate_from_array) {
     auto sum{std::accumulate(span.begin(), span.end(), 0)};
 
     ASSERT_EQ(sum, 6);
+}
+TEST(span, indexing_from_array) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int>(values)};
+
+    ASSERT_EQ(span[0], 1);
 }
