@@ -25,11 +25,15 @@ public:
         T * ptr;
     public:
         using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = T *;
+        using reference = T &;
 
         explicit Iterator(T * ptr) : ptr(ptr) {}
 
         // Iterator
-        auto operator*() const -> T const & {
+        // For some reason, a const iterator needs to return T& to meet the iter requirements
+        auto operator*() const -> T & {
             return *ptr;
         }
         auto operator*() -> T & {
@@ -97,3 +101,4 @@ span(T & iter)->span<std::remove_cvref_t<decltype(*iter.data())>>;
 }
 
 static_assert(std::input_or_output_iterator<ml::span<int>::Iterator>);
+static_assert(std::input_iterator<ml::span<int>::Iterator>);
