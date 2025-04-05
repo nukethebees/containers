@@ -76,6 +76,7 @@ public:
         auto operator!=(const Iterator & other) const -> bool {
             return ptr != other.ptr;
         }
+        auto operator<=>(Iterator const&) const = default;
     };
 private:
     ptr_t data_;
