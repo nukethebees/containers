@@ -22,13 +22,15 @@ public:
 
     class Iterator {
     private:
-        T * ptr;
+        T * ptr{nullptr};
     public:
         using difference_type = std::ptrdiff_t;
         using value_type = T;
         using pointer = T *;
         using reference = T &;
 
+        // Needed to satisfy the default constructible requirement
+        Iterator() = default;
         explicit Iterator(T * ptr) : ptr(ptr) {}
 
         // Iterator
@@ -102,3 +104,5 @@ span(T & iter)->span<std::remove_cvref_t<decltype(*iter.data())>>;
 
 static_assert(std::input_or_output_iterator<ml::span<int>::Iterator>);
 static_assert(std::input_iterator<ml::span<int>::Iterator>);
+static_assert(std::incrementable<ml::span<int>::Iterator>);
+static_assert(std::forward_iterator<ml::span<int>::Iterator>);
