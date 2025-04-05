@@ -13,96 +13,99 @@ concept has_data_and_size = requires (T t) {
 };
 
 template <typename T>
+class span_iterator {
+private:
+    T * ptr{nullptr};
+public:
+    using difference_type = std::ptrdiff_t;
+    using value_type = T;
+    using pointer = T *;
+    using reference = T &;
+
+    // Needed to satisfy the default constructible requirement
+    span_iterator() = default;
+    explicit span_iterator(T * ptr) : ptr(ptr) {}
+
+    // Dereferencing
+    // For some reason, a const iterator needs to return T& to meet the iter requirements
+    auto operator*() const -> reference {
+        return *ptr;
+    }
+    auto operator*() -> reference {
+        return *ptr;
+    }
+    auto operator->() -> pointer {
+        return ptr;
+    }
+    auto operator->() const -> T const * {
+        return ptr;
+    }
+    auto operator[](difference_type n) const -> reference {
+        return *(ptr + n);
+    }
+
+    // Increment / decrement
+    auto operator++() -> span_iterator & {
+        ++ptr;
+        return *this;
+    }
+    auto operator++(int) -> span_iterator {
+        auto temp{*this};
+        ++(*this);
+        return temp;
+    }
+
+    auto operator--() -> span_iterator & {
+        --ptr;
+        return *this;
+    }
+    auto operator--(int) -> span_iterator {
+        auto temp{*this};
+        --(*this);
+        return temp;
+    }
+
+    // Math operators
+    auto operator+(difference_type n) const -> span_iterator {
+        return span_iterator(ptr + n);
+    }
+    friend auto operator+(difference_type lhs, const span_iterator & rhs) ->span_iterator {
+        return span_iterator(lhs + rhs.ptr);
+    }
+    auto operator-(difference_type n) const -> span_iterator {
+        return span_iterator(ptr - n);
+    }
+    auto operator-(span_iterator const & n) const -> difference_type {
+        return difference_type{ptr - n.ptr};
+    }
+    auto operator+=(difference_type n) -> span_iterator & {
+        ptr += n;
+        return *this;
+    }
+    auto operator-=(difference_type n) -> span_iterator & {
+        ptr -= n;
+        return *this;
+    }
+
+    // Comparison
+    auto operator==(const span_iterator & other) const -> bool {
+        return ptr == other.ptr;
+    }
+    auto operator!=(const span_iterator & other) const -> bool {
+        return ptr != other.ptr;
+    }
+    auto operator<=>(span_iterator const &) const = default;
+};
+
+template <typename T>
 class span {
 public:
     using value_t = T;
     using ptr_t = T *;
     using const_ptr_t = T const *;
     using size_t = std::size_t;
+    using iter_t = span_iterator<T>;
 
-    class Iterator {
-    private:
-        T * ptr{nullptr};
-    public:
-        using difference_type = std::ptrdiff_t;
-        using value_type = T;
-        using pointer = T *;
-        using reference = T &;
-
-        // Needed to satisfy the default constructible requirement
-        Iterator() = default;
-        explicit Iterator(T * ptr) : ptr(ptr) {}
-
-        // Dereferencing
-        // For some reason, a const iterator needs to return T& to meet the iter requirements
-        auto operator*() const -> reference {
-            return *ptr;
-        }
-        auto operator*() -> reference {
-            return *ptr;
-        }
-        auto operator->() -> pointer {
-            return ptr;
-        }
-        auto operator->() const -> T const * {
-            return ptr;
-        }
-        auto operator[](difference_type n) const -> reference {
-            return *(ptr + n);
-        }
-
-        // Increment / decrement
-        auto operator++() -> Iterator & {
-            ++ptr;
-            return *this;
-        }
-        auto operator++(int) -> Iterator {
-            Iterator temp{*this};
-            ++(*this);
-            return temp;
-        }
-
-        auto operator--() -> Iterator & {
-            --ptr;
-            return *this;
-        }
-        auto operator--(int) -> Iterator {
-            Iterator temp{*this};
-            --(*this);
-            return temp;
-        }
-
-        // Math operators
-        auto operator+(difference_type n) const -> Iterator {
-            return Iterator(ptr + n);
-        }
-        friend auto operator+(difference_type lhs, const Iterator & rhs) ->Iterator {
-            return Iterator(lhs + rhs.ptr);
-        }
-        auto operator-(difference_type n) const -> Iterator {
-            return Iterator(ptr - n);
-        }
-        auto operator-(Iterator const & n) const -> difference_type {
-            return difference_type{ptr - n.ptr};
-        }
-        auto operator+=(difference_type n) -> Iterator & {
-            ptr += n;
-            return *this;
-        }
-        auto operator-=(difference_type n) -> Iterator & {
-            ptr -= n;
-            return *this;
-        }
-
-        // Comparison
-        auto operator==(const Iterator & other) const -> bool {
-            return ptr == other.ptr;
-        }
-        auto operator!=(const Iterator & other) const -> bool {
-            return ptr != other.ptr;
-        }
-        auto operator<=>(Iterator const &) const = default;
-    };
 private:
     ptr_t data_;
     size_t size_;
@@ -125,11 +128,11 @@ public:
         return std::forward<Self>(self).data_;
     }
 
-    Iterator begin() {
-        return Iterator(data_);
+    auto begin() -> iter_t {
+        return iter_t(data_);
     }
-    Iterator end() {
-        return Iterator(data_ + size_);
+    auto end() -> iter_t {
+        return iter_t(data_ + size_);
     }
 };
 
@@ -138,9 +141,9 @@ template <typename T>
 span(T & iter)->span<std::remove_cvref_t<decltype(*iter.data())>>;
 }
 
-static_assert(std::input_or_output_iterator<ml::span<int>::Iterator>);
-static_assert(std::input_iterator<ml::span<int>::Iterator>);
-static_assert(std::incrementable<ml::span<int>::Iterator>);
-static_assert(std::forward_iterator<ml::span<int>::Iterator>);
-static_assert(std::bidirectional_iterator<ml::span<int>::Iterator>);
-static_assert(std::random_access_iterator<ml::span<int>::Iterator>);
+static_assert(std::input_or_output_iterator<ml::span_iterator<int>>);
+static_assert(std::input_iterator<ml::span_iterator<int>>);
+static_assert(std::incrementable<ml::span_iterator<int>>);
+static_assert(std::forward_iterator<ml::span_iterator<int>>);
+static_assert(std::bidirectional_iterator<ml::span_iterator<int>>);
+static_assert(std::random_access_iterator<ml::span_iterator<int>>);
