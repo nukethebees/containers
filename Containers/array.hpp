@@ -18,6 +18,7 @@ private:
 public:
     array() = default;
     template <typename... U>
+        requires (sizeof...(U) == SIZE)
     array(U&&... values) 
         : data_{std::forward<U>(values)...}
     {}
