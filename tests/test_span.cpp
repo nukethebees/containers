@@ -8,6 +8,15 @@
 
 using size_t = ml::span<int>::size_t;
 
+// span_iterator
+TEST(span_iterator, indexing_from_array) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int>(values).begin()};
+
+    ASSERT_EQ(span[0], 1);
+}
+
+// span
 TEST(span, ptr_size_ctor) {
     int * ptr{nullptr};
     constexpr size_t size{1};
