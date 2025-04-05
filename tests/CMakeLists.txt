@@ -1,4 +1,4 @@
-add_executable(tests test_span.cpp)
+add_executable(tests test_span.cpp "test_array.cpp")
 target_compile_options(tests PRIVATE /FAs /Fa${CMAKE_BINARY_DIR}/asm\\)
 
 include_directories(../)
