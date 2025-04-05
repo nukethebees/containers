@@ -20,3 +20,14 @@ TEST(span, const_from_array) {
     std::array<int, 5> values{0};
     auto span{ml::span<int const>(values)};
 }
+TEST(span, foreach_from_array) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int const>(values)};
+
+    int sum{0};
+    for (auto val : span) {
+        sum += val;
+    }
+
+    ASSERT_EQ(sum, 6);
+}

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <cstddef>
-#include <type_traits>
 #include <concepts>
+#include <cstddef>
+#include <iterator>
+#include <type_traits>
 
 namespace ml {
 template <typename T>
 concept has_data_and_size = requires (T t) {
-
     { t.size() } -> std::same_as<std::size_t>;
     requires std::is_pointer_v<decltype(t.data())>;
 };
@@ -19,6 +19,48 @@ public:
     using ptr_t = T *;
     using const_ptr_t = T const *;
     using size_t = std::size_t;
+
+    class Iterator {
+    private:
+        T * ptr;
+    public:
+        using difference_type = std::ptrdiff_t;
+
+        explicit Iterator(T * ptr) : ptr(ptr) {}
+
+        // Iterator
+        auto operator*() const -> T const & {
+            return *ptr;
+        }
+        auto operator*() -> T & {
+            return *ptr;
+        }
+        auto operator++() -> Iterator & {
+            ++ptr;
+            return *this;
+        }
+
+        // Output Iterator
+        auto operator++(int) -> Iterator {
+            Iterator temp{*this};
+            ++(*this);
+            return temp;
+        }
+
+        // Input iterator
+        auto operator==(const Iterator & other) const -> bool {
+            return ptr == other.ptr;
+        }
+        auto operator!=(const Iterator & other) const -> bool {
+            return ptr != other.ptr;
+        }
+        auto operator->() -> T * {
+            return ptr;
+        }
+        auto operator->() const -> T const * {
+            return ptr;
+        }
+    };
 private:
     ptr_t data_;
     size_t size_;
@@ -37,12 +79,21 @@ public:
         return size_;
     }
     template <typename Self>
-    auto data(this Self&& self) -> ptr_t {
+    auto data(this Self && self) -> ptr_t {
         return std::forward<Self>(self).data_;
+    }
+
+    Iterator begin() {
+        return Iterator(data_);
+    }
+    Iterator end() {
+        return Iterator(data_ + size_);
     }
 };
 
 template <typename T>
     requires has_data_and_size<T>
-span(T& iter) -> span<std::remove_cvref_t<decltype(*iter.data())>>;
+span(T & iter)->span<std::remove_cvref_t<decltype(*iter.data())>>;
 }
+
+static_assert(std::input_or_output_iterator<ml::span<int>::Iterator>);
