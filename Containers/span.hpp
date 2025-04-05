@@ -33,7 +33,7 @@ public:
         Iterator() = default;
         explicit Iterator(T * ptr) : ptr(ptr) {}
 
-        // Iterator
+        // Dereferencing
         // For some reason, a const iterator needs to return T& to meet the iter requirements
         auto operator*() const -> T & {
             return *ptr;
@@ -41,30 +41,40 @@ public:
         auto operator*() -> T & {
             return *ptr;
         }
+        auto operator->() -> T * {
+            return ptr;
+        }
+        auto operator->() const -> T const * {
+            return ptr;
+        }
+
+        // Increment / decrement
         auto operator++() -> Iterator & {
             ++ptr;
             return *this;
         }
-
-        // Output Iterator
         auto operator++(int) -> Iterator {
             Iterator temp{*this};
             ++(*this);
             return temp;
         }
 
-        // Input iterator
+        auto operator--() -> Iterator & {
+            --ptr;
+            return *this;
+        }
+        auto operator--(int) -> Iterator {
+            Iterator temp{*this};
+            --(*this);
+            return temp;
+        }
+
+        // Comparison
         auto operator==(const Iterator & other) const -> bool {
             return ptr == other.ptr;
         }
         auto operator!=(const Iterator & other) const -> bool {
             return ptr != other.ptr;
-        }
-        auto operator->() -> T * {
-            return ptr;
-        }
-        auto operator->() const -> T const * {
-            return ptr;
         }
     };
 private:
@@ -106,3 +116,4 @@ static_assert(std::input_or_output_iterator<ml::span<int>::Iterator>);
 static_assert(std::input_iterator<ml::span<int>::Iterator>);
 static_assert(std::incrementable<ml::span<int>::Iterator>);
 static_assert(std::forward_iterator<ml::span<int>::Iterator>);
+static_assert(std::bidirectional_iterator<ml::span<int>::Iterator>);
