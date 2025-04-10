@@ -2,6 +2,7 @@ add_executable(tests
     "test_span.cpp" 
     "test_array.cpp"
     "test_vector.cpp"
+    "test_arena_allocator.cpp"
 )
 target_compile_options(tests PRIVATE /FAs /Fa${CMAKE_BINARY_DIR}/asm\\)
 

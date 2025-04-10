@@ -1,2 +1,3 @@
-﻿add_library(Containers INTERFACE)
-target_include_directories(Containers INTERFACE .)
+﻿add_library(Containers
+    "arena_allocator.cpp"
+)

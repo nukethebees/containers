@@ -22,3 +22,4 @@ include(GoogleTest)
 # Include sub-projects.
 add_subdirectory ("Containers")
 add_subdirectory ("tests")
+add_subdirectory ("benchmarks")

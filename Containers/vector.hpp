@@ -20,6 +20,11 @@ private:
     }
 public:
     vector() noexcept = default;
+    ~vector() {
+        for (auto i{0uz}; i < size_; ++i) {
+            data_[i].~T();
+        }
+    }
 
     template <typename U>
         requires std::is_same_v<std::remove_cvref_t<U>, T>
@@ -35,6 +40,12 @@ public:
     }
 
     void resize(this vector & self, std::size_t new_size) {
+        if (new_size > self.size_) {
+
+        } else if (new_size < self.size_) {
+            // Call destructors
+        }
+
         //auto * new_data = alloc.allocate(new_size);
         //
         //alloc.deallocate(data_, self.capacity);
