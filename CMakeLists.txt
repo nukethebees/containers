@@ -5,6 +5,9 @@ project (containers
     VERSION 0.1.0
 )
 
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # ASM output
 # ##############################################
 make_directory(${CMAKE_BINARY_DIR}/asm)
