@@ -10,76 +10,67 @@
 
 namespace ml {
 class ArenaMemoryResource {
-  public:
-    using Size = std::size_t;
-
+public:
     class Pool {
-      private:
-        std::byte* buffer{nullptr};
-        Size total_capacity_{0};
-        Size remaining_capacity_{0};
-        void* last_allocation_{nullptr};
-      public:
+    private:
+        std::unique_ptr<std::byte[]> buffer{nullptr};
+        std::size_t total_capacity_{0};
+        std::size_t remaining_capacity_{0};
+        void * last_allocation_{nullptr};
+    public:
         Pool() = delete;
-        explicit Pool(Size capacity);
-        ~Pool();
+        explicit Pool(std::size_t capacity);
 
-        Pool(Pool const& other);
-        Pool(Pool&& other) noexcept;
+        auto total_capacity() const->std::size_t;
+        auto remaining_capacity() const->std::size_t;
+        auto size() const->std::size_t;
 
-        auto operator=(Pool const& other) -> Pool&;
-        auto operator=(Pool&& other) noexcept -> Pool&;
-
-        auto total_capacity() const -> Size;
-        auto remaining_capacity() const -> Size;
-        auto size() const -> Size;
-
-        [[nodiscard]] auto allocate(Size n_bytes, std::size_t alignment) -> void*;
-        [[nodiscard]] auto reallocate(void* alloc, Size new_size_bytes, std::size_t alignment) -> void*;
+        [[nodiscard]] auto allocate(std::size_t n_bytes, std::size_t alignment) -> void *;
+        [[nodiscard]] auto reallocate(void * alloc, std::size_t new_size_bytes, std::size_t alignment) -> void *;
     };
-  private:
+private:
     std::vector<Pool> pools_;
-    Size initial_capacity_{1024};
-  public:
-    static constexpr Size growth_factor{2};
+    std::size_t initial_capacity_{1024};
+public:
+    static constexpr std::size_t growth_factor{2};
 
     ArenaMemoryResource() noexcept = default;
-    ArenaMemoryResource(Size initial_capacity) noexcept;
+    ArenaMemoryResource(std::size_t initial_capacity) noexcept;
 
-    auto get_sufficient_pool(Size n_bytes) -> Pool&;
-    [[nodiscard]] auto allocate(Size n_bytes, std::size_t alignment) -> void*;
-    [[nodiscard]] auto reallocate(void* alloc, Size n_bytes, std::size_t alignment) -> void*;
-    auto initial_capacity() const -> Size;
+    auto get_sufficient_pool(std::size_t n_bytes) -> Pool &;
+    [[nodiscard]] auto allocate(std::size_t n_bytes, std::size_t alignment) -> void *;
+    [[nodiscard]] auto reallocate(void * alloc, std::size_t n_bytes, std::size_t alignment) -> void *;
+    auto initial_capacity() const->std::size_t;
 
     template <typename Self>
-    auto pools(this Self&& self) {
+    auto pools(this Self && self) {
         return std::span<Pool const>(std::forward<Self>(self).pools_);
     }
 };
 
 template <typename T>
 class ArenaAllocator {
-  public:
-    using pointer = T*;
-    using const_pointer = T const*;
+public:
+    using pointer = T *;
+    using const_pointer = T const *;
     using value_type = T;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
     // private:
-    ArenaMemoryResource* resource_{nullptr};
-  public:
+    ArenaMemoryResource * resource_{nullptr};
+public:
     ArenaAllocator() = default;
-    ArenaAllocator(ArenaMemoryResource* resource)
+    ArenaAllocator(ArenaMemoryResource * resource)
         : resource_{resource} {}
 
-    ArenaAllocator(ArenaAllocator const&) = default;
+    ArenaAllocator(ArenaAllocator const &) = default;
     template <typename U>
-    ArenaAllocator(ArenaAllocator<U> const& other)
+    ArenaAllocator(ArenaAllocator<U> const & other)
         : resource_{other.resource_} {}
-    ArenaAllocator(ArenaAllocator&&) = default;
+    ArenaAllocator(ArenaAllocator &&) = default;
 
-    auto operator=(ArenaAllocator const&) -> ArenaAllocator& = default;
-    auto operator=(ArenaAllocator&&) -> ArenaAllocator& = default;
+    auto operator=(ArenaAllocator const &)->ArenaAllocator & = default;
+    auto operator=(ArenaAllocator &&)->ArenaAllocator & = default;
 
     [[nodiscard]] auto allocate(size_type n_elems) -> pointer {
         if (!resource_) {
@@ -110,8 +101,8 @@ class ArenaAllocator {
         new (p) T(std::forward<Args>(args)...);
     }
     template <typename... Args>
-    auto construct_new(Args&&... args) -> T& {
-        auto* ptr{allocate(1)};
+    auto construct_new(Args&&... args) -> T & {
+        auto * ptr{allocate(1)};
         if (!ptr) {
             throw std::bad_alloc{};
         }
@@ -120,6 +111,6 @@ class ArenaAllocator {
         return *emplaced_value;
     }
 
-    auto operator<=>(ArenaAllocator const&) const noexcept = default;
+    auto operator<=>(ArenaAllocator const &) const noexcept = default;
 };
 }
