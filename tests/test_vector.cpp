@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "Containers/vector.hpp"
+#include "containers/vector.hpp"
 
 TEST(vector, init_empty_int_vector) {
     ml::vector<int> values;

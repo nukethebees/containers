@@ -1,8 +1,16 @@
 find_package(benchmark REQUIRED)
 
-include_directories("../")
-add_executable (benchmarks "main.cpp")
-target_link_libraries(benchmarks benchmark::benchmark Containers)
+add_executable (benchmarks)
+add_executable (containers::benchmarks ALIAS benchmarks)
+
+target_sources(benchmarks PRIVATE
+    "main.cpp"
+)
+
+target_link_libraries(benchmarks PRIVATE
+    benchmark::benchmark 
+    containers::containers
+)
 
 if (MSVC)
     target_link_options(benchmarks PRIVATE /DEBUG)

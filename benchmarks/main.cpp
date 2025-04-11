@@ -3,7 +3,7 @@
 
 #include <benchmark/benchmark.h>
 
-#include "Containers/arena_allocator.hpp"
+#include "containers/arena_allocator.hpp"
 
 template <typename T>
 using pool_vec = std::vector<T, ml::ArenaAllocator<T>>;

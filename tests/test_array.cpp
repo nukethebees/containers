@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "Containers/array.hpp"
+#include "containers/array.hpp"
 
 TEST(array, init_empty_int_array) {
     constexpr std::size_t size{3};
