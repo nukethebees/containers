@@ -3,7 +3,7 @@
 
 #include <benchmark/benchmark.h>
 
-#include "containers/arena_allocator.hpp"
+#include "containers/arena_memory_resource.hpp"
 #include "containers/stack_buffer_memory_resource.hpp"
 
 template <typename T>

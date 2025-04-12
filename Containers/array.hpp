@@ -6,42 +6,148 @@
 #include "span_iterator.hpp"
 
 namespace ml {
-template <typename T, std::size_t SIZE>
+template <typename T, std::size_t N>
 class array {
 public:
-    using value_t = T;
-    using ptr_t = T *;
-    using const_ptr_t = T const *;
-    using size_t = std::size_t;
-    using iter_t = span_iterator<T>;
+    using value_type = T;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using reference = T &;
+    using const_reference = T const &;
+    using pointer = T *;
+    using const_pointer = T const *;
+    using iterator = span_iterator<T>;
+    using const_iterator = span_iterator<T const>;
 private:
-    T data_[SIZE];
+    T data_[N];
 public:
     constexpr array() = default;
     template <typename... U>
-        requires (sizeof...(U) == SIZE)
+        requires (sizeof...(U) == N)
     constexpr array(U&&... values)
-        : data_{std::forward<U>(values)...}
-    {}
+        : data_{std::forward<U>(values)...} {}
 
-    constexpr auto size() const -> size_t {
-        return SIZE;
+    // Element access
+    constexpr auto at(size_type index) -> reference {
+        if (index >= N) {
+            throw std::out_of_range{"Index out of range"};
+        }
+        return *(data_ + index);
+    }
+    constexpr auto operator[](size_type index) const -> value_type {
+        return *(data_ + index);
+    }
+    constexpr auto front() -> reference {
+        return *data_;
+    }
+    constexpr auto front() const -> const_reference {
+        return *data_;
+    }
+    constexpr auto back() -> reference {
+        return *(data_ + N - 1);
+    }
+    constexpr auto back() const -> const_reference {
+        return *(data_ + N - 1);
     }
     template <typename Self>
-    constexpr auto data(this Self && self) -> ptr_t {
+    constexpr auto data(this Self && self) -> pointer {
         return std::forward<Self>(self).data_;
     }
 
-    auto begin() -> iter_t {
-        return iter_t(data_);
+    // Iterators
+    auto begin() -> iterator {
+        return iterator(data_);
     }
-    auto end() -> iter_t {
-        return iter_t(data_ + SIZE);
+    auto cbegin() const -> const_iterator {
+        return const_iterator(data_);
+    }
+    auto end() -> iterator {
+        return iterator(data_ + N);
+    }
+    auto cend() const -> const_iterator {
+        return const_iterator(data_ + N);
     }
 
-    // Operators
-    constexpr auto operator[](size_t index) const -> value_t {
-        return *(data_ + index);
+    // Capacity
+    constexpr auto empty() const -> bool {
+        return N == 0;
+    }
+    constexpr auto size_bytes() const -> std::size_t {
+        return N * sizeof(value_type);
+    }
+    constexpr auto size() const -> size_type {
+        return N;
+    }
+    constexpr auto max_size() const -> size_type {
+        return N;
+    }
+};
+
+template <typename T>
+class array<T, 0> {
+public:
+    using value_type = T;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using reference = T &;
+    using const_reference = T const &;
+    using pointer = T *;
+    using const_pointer = T const *;
+    using iterator = span_iterator<T>;
+    using const_iterator = span_iterator<T const>;
+
+    constexpr array() = default;
+
+    // Element access
+    constexpr auto at(size_type) -> reference {
+        throw std::out_of_range{"Index out of range"};
+    }
+    constexpr auto operator[](size_type) const -> value_type {
+        throw std::out_of_range{"Index out of range"};
+    }
+    constexpr auto front() -> reference {
+        throw std::out_of_range{"Array is empty"};
+    }
+    constexpr auto front() const -> const_reference {
+        throw std::out_of_range{"Array is empty"};
+    }
+    constexpr auto back() -> reference {
+        throw std::out_of_range{"Array is empty"};
+    }
+    constexpr auto back() const -> const_reference {
+        throw std::out_of_range{"Array is empty"};
+    }
+    template <typename Self>
+    constexpr auto data(this Self &&) -> pointer {
+        return nullptr;
+    }
+
+    // Iterators
+    auto begin() -> iterator {
+        return iterator(nullptr);
+    }
+    auto cbegin() const -> const_iterator {
+        return const_iterator(nullptr);
+    }
+    auto end() -> iterator {
+        return iterator(nullptr);
+    }
+    auto cend() const -> const_iterator {
+        return const_iterator(nullptr);
+    }
+
+    // Capacity
+    constexpr auto empty() const -> bool {
+        return true;
+    }
+    constexpr auto size_bytes() const -> std::size_t {
+        return 0;
+    }
+    constexpr auto size() const -> size_type {
+        return 0;
+    }
+    constexpr auto max_size() const -> size_type {
+        return 0;
     }
 };
 }
