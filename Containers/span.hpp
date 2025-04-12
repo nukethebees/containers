@@ -18,18 +18,22 @@ concept has_data_and_size = requires (T t) {
 template <typename T>
 class span {
 public:
-    using value_t = T;
-    using ptr_t = T *;
-    using const_ptr_t = T const *;
-    using size_t = std::size_t;
-    using iter_t = span_iterator<T>;
-
+    using element_type = T;
+    using value_type = std::remove_cvref_t<T>;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T *;
+    using const_pointer = T const *;
+    using reference = T &;
+    using const_reference = T const &;
+    using iterator = span_iterator<T>;
+    using const_iterator = span_iterator<T const>;
 private:
-    ptr_t data_;
-    size_t size_;
+    pointer data_;
+    size_type size_;
 public:
     span() = delete;
-    span(ptr_t ptr, size_t size) noexcept
+    span(pointer ptr, size_type size) noexcept
         : data_{ptr}
         , size_{size} {}
     template <typename U>
@@ -38,24 +42,44 @@ public:
         : data_{container.data()}
         , size_{container.size()} {}
 
-    auto size() const -> size_t {
-        return size_;
+    // Iterators
+    auto begin() -> iterator {
+        return iterator(data_);
+    }
+    auto end() -> iterator {
+        return iterator(data_ + size_);
+    }
+
+    // Element access
+    auto front() const -> reference {
+        return *data_;
+    }
+    auto back() const -> reference {
+        return *(data_ + size_ - 1);
+    }
+    auto at(size_type n) const -> reference {
+        if (n >= size_) {
+            throw std::out_of_range{"span::at(): index out of range"};
+        }
+        return *(data_ + n);
+    }
+    auto operator[](size_type index) const -> reference {
+        return *(data_ + index);
     }
     template <typename Self>
-    auto data(this Self && self) -> ptr_t {
+    auto data(this Self && self) -> pointer {
         return std::forward<Self>(self).data_;
     }
 
-    auto begin() -> iter_t {
-        return iter_t(data_);
+    // Observers
+    auto size() const -> size_type {
+        return size_;
     }
-    auto end() -> iter_t {
-        return iter_t(data_ + size_);
+    auto size_bytes() const -> std::size_t {
+        return size_ * sizeof(value_type);
     }
-
-    // Operators
-    auto operator[](size_t index) const -> value_t {
-        return *(data_ + index);
+    auto empty() const -> bool {
+        return size_ == 0;
     }
 };
 
