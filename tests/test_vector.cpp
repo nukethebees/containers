@@ -16,6 +16,30 @@ TEST(vector, emplace_single) {
     EXPECT_EQ(values[0], 1);
     EXPECT_EQ(values.size(), 1);
 }
+TEST(vector, emplace_multiple) {
+    ml::vector<int> values;
+    for (int i = 0; i < 5; ++i) {
+        values.emplace_back(i);
+    }
+    EXPECT_EQ(values.size(), 5);
+    EXPECT_EQ(values[0], 0);
+    EXPECT_EQ(values[1], 1);
+    EXPECT_EQ(values[2], 2);
+    EXPECT_EQ(values[3], 3);
+    EXPECT_EQ(values[4], 4);
+}
+TEST(vector, emplace_struct_three_members) {
+    struct TestStruct {
+        int a;
+        double b;
+        char c;
+    };
+    ml::vector<TestStruct> values;
+    values.emplace_back(1, 2.0, 'a');
+    EXPECT_EQ(values[0].a, 1);
+    EXPECT_EQ(values[0].b, 2.0);
+    EXPECT_EQ(values[0].c, 'a');
+}
 TEST(vector, reserve) {
     ml::vector<int> values;
     values.reserve(5);
@@ -68,7 +92,7 @@ TEST(vector, range_based_for) {
     values.emplace_back(3);
 
     int sum = 0;
-    for (const auto& value : values) {
+    for (const auto & value : values) {
         sum += value;
     }
 

@@ -109,7 +109,9 @@ public:
     auto capacity(this vector const & self) -> std::size_t {
         return self.capacity_;
     }
-
+    void shrink_to_fit(this vector & self) {
+        return;
+    }
 
     // Modifieers
     void clear(this vector & self) {
@@ -118,16 +120,15 @@ public:
         }
         self.size_ = 0;
     }
-    template <typename U>
-        requires std::is_same_v<std::remove_cvref_t<U>, T>
-    void emplace_back(this vector & self, U && element) {
+    template <typename... Args>
+    void emplace_back(this vector & self, Args&&... args) {
         auto const new_size{self.size_ + 1};
 
         if (new_size >= self.capacity_) {
             self.grow();
         }
 
-        new (self.data_ + self.size_) T{std::forward<U>(element)};
+        new (self.data_ + self.size_) T{std::forward<Args>(args)...};
         ++self.size_;
     }
 
