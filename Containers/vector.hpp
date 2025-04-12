@@ -6,9 +6,21 @@
 #include <memory>
 #include <type_traits>
 
+#include "span_iterator.hpp"
+
 namespace ml {
 template <typename T>
 class vector {
+public:
+    using value_type = T;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using reference = T &;
+    using const_reference = T const &;
+    using pointer = T *;
+    using const_pointer = T const *;
+    using iterator = span_iterator<T>;
+    using const_iterator = span_iterator<T const>;
 private:
     T * data_{nullptr};
     std::size_t size_{0};
@@ -24,33 +36,60 @@ public:
         for (auto i{0uz}; i < size_; ++i) {
             data_[i].~T();
         }
+        alloc.deallocate(data_, capacity_);
+        data_ = nullptr;
+        size_ = 0;
+        capacity_ = 0;
     }
 
-    template <typename U>
-        requires std::is_same_v<std::remove_cvref_t<U>, T>
-    void emplace_back(this vector & self, U && element) {
-        auto const new_size{self.size_ + 1};
-
-        if (new_size >= self.capacity_) {
-            self.grow();
+    // Element access
+    template <typename Self>
+    auto && at(this Self && self, std::size_t idx) {
+        if (idx >= self.size_) {
+            throw std::out_of_range{"Index out of range"};
         }
-
-        new (self.data_ + self.size_) T{std::forward<U>(element)};
-        self.size_++;
+        return std::forward<Self>(self).data_[idx];
+    }
+    template <typename Self>
+    auto && operator[](this Self && self, std::size_t idx) {
+        return std::forward<Self>(self).data_[idx];
+    }
+    template <typename Self>
+    auto && front(this Self && self) {
+        return std::forward<Self>(self).data_[0];
+    }
+    template <typename Self>
+    auto && back(this Self && self) {
+        return std::forward<Self>(self).data_[self.size_ - 1];
+    }
+    template <typename Self>
+    auto * data(this Self && self) {
+        return std::forward<Self>(self).data_;
     }
 
-    void resize(this vector & self, std::size_t new_size) {
-        if (new_size > self.size_) {
+    // Iterators
+    auto begin(this vector & self) -> iterator {
+        return iterator(self.data_);
+    }
+    auto cbegin(this vector const & self) -> const_iterator {
+        return const_iterator(self.data_);
+    }
+    auto end(this vector & self) -> iterator {
+        return iterator(self.data_ + self.size_);
+    }
+    auto cend(this vector const & self) -> const_iterator {
+        return const_iterator(self.data_ + self.size_);
+    }
 
-        } else if (new_size < self.size_) {
-            // Call destructors
-        }
-
-        //auto * new_data = alloc.allocate(new_size);
-        //
-        //alloc.deallocate(data_, self.capacity);
-        //self.data_ = new_data;
-        //self.capacity_ = new_size;
+    // Capacity
+    auto empty(this vector const & self) -> bool {
+        return self.size_ == 0;
+    }
+    auto size(this vector const & self) -> std::size_t {
+        return self.size_;
+    }
+    auto max_size(this vector const & self) -> std::size_t {
+        return std::numeric_limits<std::size_t>::max();
     }
     void reserve(this vector & self, std::size_t new_capacity) {
         if (new_capacity <= self.capacity_) {
@@ -67,17 +106,30 @@ public:
         self.data_ = new_data;
         self.capacity_ = new_capacity;
     }
-
-    auto size(this vector const & self) -> std::size_t {
-        return self.size_;
-    }
     auto capacity(this vector const & self) -> std::size_t {
         return self.capacity_;
     }
 
-    template <typename Self>
-    auto operator[](this Self && self, std::size_t idx) {
-        return std::forward<Self>(self).data_[idx];
+
+    // Modifieers
+    void clear(this vector & self) {
+        for (auto i{0uz}; i < self.size_; ++i) {
+            self.data_[i].~T();
+        }
+        self.size_ = 0;
     }
+    template <typename U>
+        requires std::is_same_v<std::remove_cvref_t<U>, T>
+    void emplace_back(this vector & self, U && element) {
+        auto const new_size{self.size_ + 1};
+
+        if (new_size >= self.capacity_) {
+            self.grow();
+        }
+
+        new (self.data_ + self.size_) T{std::forward<U>(element)};
+        ++self.size_;
+    }
+
 };
 }
