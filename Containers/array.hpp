@@ -34,7 +34,10 @@ public:
         }
         return *(data_ + index);
     }
-    constexpr auto operator[](size_type index) const -> value_type {
+    constexpr auto operator[](size_type index) -> reference {
+        return *(data_ + index);
+    }
+    constexpr auto operator[](size_type index) const -> const_reference {
         return *(data_ + index);
     }
     constexpr auto front() -> reference {
@@ -50,7 +53,7 @@ public:
         return *(data_ + N - 1);
     }
     template <typename Self>
-    constexpr auto data(this Self && self) -> pointer {
+    constexpr auto * data(this Self && self) {
         return std::forward<Self>(self).data_;
     }
 

@@ -1,6 +1,8 @@
 #include <cstddef>
 #include <numeric>
 #include <algorithm>
+#include <typeinfo> 
+#include <format>
 
 #include <gtest/gtest.h>
 
@@ -87,7 +89,7 @@ TEST(array, range_based_for) {
     int expected_sum = 6;
     int sum = 0;
 
-    for (const auto& value : values) {
+    for (const auto & value : values) {
         sum += value;
     }
 
@@ -122,4 +124,36 @@ TEST(array, reverse_elements) {
     ASSERT_EQ(values[2], 30);
     ASSERT_EQ(values[3], 20);
     ASSERT_EQ(values[4], 10);
+}
+
+TEST(array, const_methods_return_const_references) {
+    const ml::array<int, 3> values{1, 2, 3};
+
+    using ExpectedFrontType = int const &;
+    using ExpectedBackType = int const &;
+    using ExpectedSubscriptType = int const&;
+    using ExpectedDataType = int const *;
+
+    using FrontType = decltype(values.front());
+    using BackType = decltype(values.back());
+    using SubscriptType = decltype(values[0]);
+    using DataType = decltype(values.data());
+
+    if constexpr (!std::is_same_v<FrontType, ExpectedFrontType>) {
+        GTEST_FAIL() << std::format("front() does not return {}, got: {}", typeid(ExpectedFrontType).name(), typeid(FrontType).name());
+    }
+    if constexpr (!std::is_same_v<BackType, ExpectedBackType>) {
+        GTEST_FAIL() << std::format("back() does not return {}, got: {}", typeid(ExpectedBackType).name(), typeid(BackType).name());
+    }
+    if constexpr (!std::is_same_v<SubscriptType, ExpectedSubscriptType>) {
+        GTEST_FAIL() << std::format("operator[] does not return {}, got: {}", typeid(ExpectedSubscriptType).name(), typeid(SubscriptType).name());
+    }
+    if constexpr (!std::is_same_v<DataType, ExpectedDataType>) {
+        GTEST_FAIL() << std::format("data() does not return {}, got: {}", typeid(ExpectedDataType).name(), typeid(DataType).name());
+    }
+
+    ASSERT_EQ(values.front(), 1);
+    ASSERT_EQ(values.back(), 3);
+    ASSERT_EQ(values[0], 1);
+    ASSERT_NE(values.data(), nullptr);
 }
