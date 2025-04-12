@@ -269,3 +269,87 @@ TEST(arena2, total_size_and_add_objects) {
     EXPECT_NE(ptr2, nullptr);
     EXPECT_NE(ptr3, nullptr);
 }
+
+TEST(arena2, vector_basic_operations) {
+    ml::ArenaMemoryResource2 resource;
+    ml::ArenaAllocator2<int> alloc{&resource};
+    std::vector<int, ml::ArenaAllocator2<int>> vec{alloc};
+
+    // Push back elements
+    vec.push_back(1);
+    vec.push_back(2);
+    vec.push_back(3);
+
+    EXPECT_EQ(vec.size(), 3);
+    EXPECT_EQ(vec[0], 1);
+    EXPECT_EQ(vec[1], 2);
+    EXPECT_EQ(vec[2], 3);
+}
+
+TEST(arena2, vector_reserve_and_emplace) {
+    ml::ArenaMemoryResource2 resource;
+    ml::ArenaAllocator2<int> alloc{&resource};
+    std::vector<int, ml::ArenaAllocator2<int>> vec{alloc};
+
+    // Reserve space and emplace elements
+    vec.reserve(10);
+    vec.emplace_back(10);
+    vec.emplace_back(20);
+
+    EXPECT_EQ(vec.size(), 2);
+    EXPECT_EQ(vec.capacity(), 10);
+    EXPECT_EQ(vec[0], 10);
+    EXPECT_EQ(vec[1], 20);
+}
+
+TEST(arena2, vector_resize_and_access) {
+    ml::ArenaMemoryResource2 resource;
+    ml::ArenaAllocator2<int> alloc{&resource};
+    std::vector<int, ml::ArenaAllocator2<int>> vec{alloc};
+
+    // Resize and access elements
+    vec.resize(5, 42);
+
+    EXPECT_EQ(vec.size(), 5);
+    for (int i = 0; i < 5; ++i) {
+        EXPECT_EQ(vec[i], 42);
+    }
+}
+
+TEST(arena2, vector_large_allocation) {
+    ml::ArenaMemoryResource2 resource;
+    ml::ArenaAllocator2<int> alloc{&resource};
+    std::vector<int, ml::ArenaAllocator2<int>> vec{alloc};
+
+    // Add a large number of elements
+    constexpr int num_elements = 10000;
+    for (int i = 0; i < num_elements; ++i) {
+        vec.push_back(i);
+    }
+
+    EXPECT_EQ(vec.size(), num_elements);
+    EXPECT_EQ(vec.front(), 0);
+    EXPECT_EQ(vec.back(), num_elements - 1);
+}
+
+TEST(arena2, vector_copy_and_move) {
+    ml::ArenaMemoryResource2 resource;
+    ml::ArenaAllocator2<int> alloc{&resource};
+    std::vector<int, ml::ArenaAllocator2<int>> vec1{alloc};
+
+    vec1.push_back(1);
+    vec1.push_back(2);
+
+    // Copy vector
+    std::vector<int, ml::ArenaAllocator2<int>> vec2 = vec1;
+    EXPECT_EQ(vec2.size(), 2);
+    EXPECT_EQ(vec2[0], 1);
+    EXPECT_EQ(vec2[1], 2);
+
+    // Move vector
+    std::vector<int, ml::ArenaAllocator2<int>> vec3 = std::move(vec1);
+    EXPECT_EQ(vec3.size(), 2);
+    EXPECT_EQ(vec3[0], 1);
+    EXPECT_EQ(vec3[1], 2);
+    EXPECT_TRUE(vec1.empty());
+}

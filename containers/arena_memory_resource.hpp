@@ -50,9 +50,6 @@ public:
     }
 };
 
-template <typename T>
-using ArenaAllocator = MemoryResourceAllocator<T, ArenaMemoryResource>;
-
 class Pool2 {
     Pool2 * next_pool_{nullptr};
     std::byte * buffer{nullptr}; // Non-owning pointer to the buffer
@@ -181,4 +178,10 @@ private:
         pool_ = Pool2::create_pool(initial_size);
     }
 };
+
+template <typename T>
+using ArenaAllocator = MemoryResourceAllocator<T, ArenaMemoryResource>;
+template <typename T>
+using ArenaAllocator2 = MemoryResourceAllocator<T, ArenaMemoryResource2>;
+
 }
