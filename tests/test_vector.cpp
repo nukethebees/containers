@@ -40,6 +40,30 @@ TEST(vector, emplace_struct_three_members) {
     EXPECT_EQ(values[0].b, 2.0);
     EXPECT_EQ(values[0].c, 'a');
 }
+TEST(vector, push_back_int) {
+    ml::vector<int> values;
+    values.push_back(10);
+    EXPECT_EQ(values[0], 10);
+    EXPECT_EQ(values.size(), 1);
+}
+TEST(vector, push_back_multiple) {
+    ml::vector<int> values;
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+    EXPECT_EQ(values.size(), 5);
+    EXPECT_EQ(values[0], 0);
+    EXPECT_EQ(values[1], 1);
+    EXPECT_EQ(values[2], 2);
+    EXPECT_EQ(values[3], 3);
+    EXPECT_EQ(values[4], 4);
+}
+TEST(vector, push_back_string) {
+    ml::vector<std::string> values;
+    values.push_back("Hello");
+    EXPECT_EQ(values[0], "Hello");
+    EXPECT_EQ(values.size(), 1);
+}
 TEST(vector, reserve) {
     ml::vector<int> values;
     values.reserve(5);

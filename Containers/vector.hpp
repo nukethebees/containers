@@ -120,6 +120,17 @@ public:
         }
         self.size_ = 0;
     }
+    template <typename U>
+        requires std::constructible_from<T, U>
+    void push_back(this vector & self, U && value) {
+        auto const new_size{self.size_ + 1};
+        if (new_size >= self.capacity_) {
+            self.grow();
+        }
+        new (self.data_ + self.size_) T{std::forward<U>(value)};
+        ++self.size_;
+    }
+
     template <typename... Args>
     void emplace_back(this vector & self, Args&&... args) {
         auto const new_size{self.size_ + 1};
