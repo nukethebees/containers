@@ -13,7 +13,7 @@ constexpr int n_placements{2500};
 constexpr int n_reserve{10};
 constexpr int n_repetitions{5};
 
-static void BM_vector_alloc_std(benchmark::State& state) {
+static void BM_vector_alloc_std(benchmark::State & state) {
     for (auto _ : state) {
         std::vector<std::vector<double>> d_vecs;
         std::vector<std::vector<char>> c_vecs;
@@ -32,7 +32,7 @@ static void BM_vector_alloc_std(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations());
 }
-static void BM_vector_alloc_arena(benchmark::State& state) {
+static void BM_vector_alloc_arena(benchmark::State & state) {
     constexpr int elems_to_allocate{10'000};
 
     for (auto _ : state) {
@@ -60,7 +60,8 @@ static void BM_vector_alloc_arena(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-static void BM_vector_alloc_std_stack_ref(benchmark::State & state) {
+// Comparison benchmark vs the buffer version
+static void BM_vec_stackbuf_new_ref(benchmark::State & state) {
     static constexpr std::size_t n_ints{50};
 
     for (auto _ : state) {
@@ -72,11 +73,11 @@ static void BM_vector_alloc_std_stack_ref(benchmark::State & state) {
     }
     state.SetItemsProcessed(state.iterations());
 }
-static void BM_vector_alloc_stack(benchmark::State & state) {
+static void BM_vec_stackbuf(benchmark::State & state) {
     static constexpr std::size_t n_ints{50};
     using config = ml::StackAllocConfig<int, n_ints>;
 
-    for (auto _ : state) {       
+    for (auto _ : state) {
         config::Resource resource;
         config::Allocator alloc{&resource};
         std::vector<int, config::Allocator> vec{alloc};
@@ -92,6 +93,6 @@ static void BM_vector_alloc_stack(benchmark::State & state) {
 //BENCHMARK(BM_vector_alloc_std)->Repetitions(n_repetitions);
 //BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
 
-BENCHMARK(BM_vector_alloc_std_stack_ref)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_stack)->Repetitions(n_repetitions);
+BENCHMARK(BM_vec_stackbuf_new_ref)->Repetitions(n_repetitions);
+BENCHMARK(BM_vec_stackbuf)->Repetitions(n_repetitions);
 BENCHMARK_MAIN();
