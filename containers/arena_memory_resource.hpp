@@ -107,7 +107,11 @@ public:
         remaining_capacity_ -= n_bytes;
         return new_start;
     }
-    void deallocate(void * /*alloc*/, std::size_t /*n_bytes*/, std::size_t /*alignment*/) {
+    void deallocate(void * alloc, std::size_t n_bytes, std::size_t alignment) {
+        if (next_pool_) {
+            next_pool_->deallocate(alloc, n_bytes, alignment);
+        }
+        // No-op
         return;
     }
 };
