@@ -10,6 +10,8 @@ target_sources(containers PUBLIC
   BASE_DIRS ../
   FILES
   "arena_allocator.hpp"
+  "array.hpp"
+  "memory_resource_allocator.hpp"
   "misc.hpp"
   "span.hpp"
   "span_iterator.hpp"
