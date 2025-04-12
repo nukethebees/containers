@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "arena_allocator.hpp"
+#include "arena_memory_resource.hpp"
 #include "misc.hpp"
 
 namespace ml {

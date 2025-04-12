@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "containers/arena_allocator.hpp"
+#include "containers/arena_memory_resource.hpp"
 
 using int_alloc = ml::ArenaAllocator<int>;
 template <typename T>
