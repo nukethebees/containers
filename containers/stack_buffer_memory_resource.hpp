@@ -3,6 +3,8 @@
 #include <array>
 #include <cstddef>
 
+#include "memory_resource_allocator.hpp"
+
 namespace ml {
 template <std::size_t CAPACITY>
 class StackBufferMemoryResource {
@@ -28,5 +30,11 @@ public:
     [[nodiscard]] auto size() const -> std::size_t {
         return CAPACITY - remaining_capacity_;
     }
+};
+
+template <typename T, std::size_t CAPACITY>
+struct StackAllocConfig {
+    using Resource = StackBufferMemoryResource<CAPACITY * sizeof(T)>;
+    using Allocator = MemoryResourceAllocator<T, Resource>;
 };
 }

@@ -13,6 +13,6 @@ target_sources(containers PUBLIC
   "misc.hpp"
   "span.hpp"
   "span_iterator.hpp"
-  "stack_buffer_allocator.hpp"
+  "stack_buffer_memory_resource.hpp"
   "vector.hpp"
 )
