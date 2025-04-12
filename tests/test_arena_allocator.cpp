@@ -230,3 +230,14 @@ TEST(arena2, allocate_large_object) {
 
     EXPECT_NE(ptr, nullptr);
 }
+TEST(arena2, count_number_of_pools) {
+    ml::ArenaMemoryResource2 resource;
+
+    EXPECT_EQ(resource.n_pools(), 0); // Initially, no pools should exist.
+
+    resource.allocate(ml::ArenaMemoryResource2::initial_size, alignof(std::byte));
+    EXPECT_EQ(resource.n_pools(), 1); // After first allocation, one pool should exist.
+
+    resource.allocate(ml::ArenaMemoryResource2::initial_size * 2, alignof(std::byte));
+    EXPECT_EQ(resource.n_pools(), 2); // After a larger allocation, a second pool should be created.
+}

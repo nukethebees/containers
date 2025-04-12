@@ -54,7 +54,7 @@ template <typename T>
 using ArenaAllocator = MemoryResourceAllocator<T, ArenaMemoryResource>;
 
 class Pool2 {
-    Pool2 * next_pool{nullptr};
+    Pool2 * next_pool_{nullptr};
     std::byte * buffer{nullptr}; // Non-owning pointer to the buffer
     std::size_t total_capacity_{0};
     std::size_t remaining_capacity_{0};
@@ -64,9 +64,9 @@ public:
         , total_capacity_{capacity}
         , remaining_capacity_{capacity} {}
     ~Pool2() {
-        if (next_pool) {
-            next_pool->~Pool2();
-            delete[] reinterpret_cast<std::byte *>(next_pool);
+        if (next_pool_) {
+            next_pool_->~Pool2();
+            delete[] reinterpret_cast<std::byte *>(next_pool_);
         }
     }
 
@@ -76,6 +76,9 @@ public:
         return new (buffer) Pool2(buffer + sizeof(Pool2), initial_size);
     }
 
+    auto next_pool() const -> Pool2 const * {
+        return next_pool_;
+    }
     auto total_capacity() const -> std::size_t {
         return total_capacity_;
     }
@@ -89,11 +92,11 @@ public:
         auto const cur_size{size()};
 
         if (n_bytes > remaining_capacity_) {
-            if (next_pool) {
-                return next_pool->allocate(n_bytes, alignment);
+            if (next_pool_) {
+                return next_pool_->allocate(n_bytes, alignment);
             }
             auto * new_pool{create_pool(std::max(n_bytes, total_capacity_ * 2))};
-            next_pool = new_pool;
+            next_pool_ = new_pool;
             return new_pool->allocate(n_bytes, alignment);
         }
 
@@ -143,6 +146,13 @@ public:
 
     auto pool() const -> Pool2 const * {
         return pool_;
+    }
+    auto n_pools() const -> std::size_t {
+        std::size_t count{0};
+        for (auto const * p{pool()}; p; p = p->next_pool()) {
+            ++count;
+        }
+        return count;
     }
 
     auto allocate(std::size_t n_bytes, std::size_t alignment) -> void * {
