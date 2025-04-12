@@ -54,11 +54,10 @@ class ArenaMemoryResource2;
 
 class Pool2 {
     Pool2 * next_pool_{nullptr};
-    std::byte * buffer{nullptr}; // Non-owning pointer to the buffer
     std::size_t total_capacity_{0};
     std::size_t remaining_capacity_{0};
 public:
-    Pool2(std::byte * buffer, std::size_t capacity);
+    Pool2(std::size_t capacity);
     ~Pool2();
 
     static auto create_pool(std::size_t initial_size) -> Pool2 *;

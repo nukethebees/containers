@@ -84,9 +84,8 @@ auto ArenaMemoryResource::initial_capacity() const -> std::size_t {
     return initial_capacity_;
 }
 
-Pool2::Pool2(std::byte * buffer, std::size_t capacity)
-    : buffer{buffer}
-    , total_capacity_{capacity}
+Pool2::Pool2(std::size_t capacity)
+    : total_capacity_{capacity}
     , remaining_capacity_{capacity} {}
 
 Pool2::~Pool2() {
@@ -99,7 +98,7 @@ Pool2::~Pool2() {
 auto Pool2::create_pool(std::size_t initial_size) -> Pool2 * {
     std::size_t const bytes_needed{initial_size + sizeof(Pool2)};
     auto * buffer{new std::byte[bytes_needed]};
-    return new (buffer) Pool2(buffer + sizeof(Pool2), initial_size);
+    return new (buffer) Pool2(initial_size);
 }
 
 auto Pool2::next_pool() const -> Pool2 const * {
@@ -128,7 +127,10 @@ auto Pool2::allocate(std::size_t n_bytes, std::size_t alignment, ArenaMemoryReso
         return new_pool->allocate(n_bytes, alignment, resource);
     }
 
-    auto * new_start{static_cast<void *>(buffer + cur_size)};
+    auto * new_start{static_cast<void *>(
+        static_cast<std::byte *>(static_cast<void *>(this))
+        + sizeof(std::remove_cvref_t<decltype(*this)>)
+        + cur_size)};
     if (!std::align(alignment, n_bytes, new_start, remaining_capacity_)) {
         throw std::bad_alloc{};
     }
