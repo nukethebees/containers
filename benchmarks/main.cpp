@@ -4,6 +4,7 @@
 #include <benchmark/benchmark.h>
 
 #include "containers/arena_allocator.hpp"
+#include "containers/stack_buffer_memory_resource.hpp"
 
 template <typename T>
 using pool_vec = std::vector<T, ml::ArenaAllocator<T>>;
@@ -59,6 +60,38 @@ static void BM_vector_alloc_arena(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK(BM_vector_alloc_std)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
+static void BM_vector_alloc_std_stack_ref(benchmark::State & state) {
+    static constexpr std::size_t n_ints{50};
+
+    for (auto _ : state) {
+        std::vector<int> vec{};
+        vec.reserve(n_ints);
+        for (int i{0}; i < n_ints; ++i) {
+            vec.emplace_back(i);
+        }
+    }
+    state.SetItemsProcessed(state.iterations());
+}
+static void BM_vector_alloc_stack(benchmark::State & state) {
+    static constexpr std::size_t n_ints{50};
+    using config = ml::StackAllocConfig<int, n_ints>;
+
+    for (auto _ : state) {       
+        config::Resource resource;
+        config::Allocator alloc{&resource};
+        std::vector<int, config::Allocator> vec{alloc};
+        vec.reserve(n_ints);
+        for (int i{0}; i < n_ints; ++i) {
+            vec.emplace_back(i);
+        }
+    }
+    state.SetItemsProcessed(state.iterations());
+}
+
+
+//BENCHMARK(BM_vector_alloc_std)->Repetitions(n_repetitions);
+//BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
+
+BENCHMARK(BM_vector_alloc_std_stack_ref)->Repetitions(n_repetitions);
+BENCHMARK(BM_vector_alloc_stack)->Repetitions(n_repetitions);
 BENCHMARK_MAIN();
