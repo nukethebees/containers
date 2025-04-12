@@ -114,12 +114,13 @@ public:
 };
 
 class ArenaMemoryResource2 {
-public:
-    static constexpr std::size_t initial_size{1024};
 private:
     Pool2 * pool_{nullptr};
+    std::size_t initial_capacity_{1024};
 public:
     ArenaMemoryResource2() = default;
+    explicit ArenaMemoryResource2(std::size_t initial_capacity)
+        : initial_capacity_{initial_capacity} {}
     ~ArenaMemoryResource2() {
         if (pool_) {
             pool_->~Pool2();
@@ -145,6 +146,9 @@ public:
         return *this;
     }
 
+    auto initial_capacity() const -> std::size_t {
+        return initial_capacity_;
+    }
     auto pool() const -> Pool2 const * {
         return pool_;
     }
@@ -175,7 +179,7 @@ public:
     }
 private:
     void create_pool() {
-        pool_ = Pool2::create_pool(initial_size);
+        pool_ = Pool2::create_pool(initial_capacity_);
     }
 };
 

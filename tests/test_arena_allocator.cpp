@@ -196,8 +196,8 @@ TEST(arena2, allocate_and_deallocate) {
 TEST(arena2, allocate_multiple_pools) {
     ml::ArenaMemoryResource2 resource;
 
-    constexpr std::size_t large_size = ml::ArenaMemoryResource2::initial_size * 2;
-    auto * ptr1 = resource.allocate(ml::ArenaMemoryResource2::initial_size, alignof(std::byte));
+    std::size_t large_size = resource.initial_capacity() * 2; 
+    auto * ptr1 = resource.allocate(resource.initial_capacity(), alignof(std::byte)); 
     auto * ptr2 = resource.allocate(large_size, alignof(std::byte));
 
     EXPECT_NE(ptr1, nullptr);
@@ -225,7 +225,7 @@ TEST(arena2, reallocate_within_pool) {
 TEST(arena2, allocate_large_object) {
     ml::ArenaMemoryResource2 resource;
 
-    constexpr std::size_t large_size = ml::ArenaMemoryResource2::initial_size * 10;
+    std::size_t large_size = resource.initial_capacity() * 10;
     auto * ptr = resource.allocate(large_size, alignof(std::byte));
 
     EXPECT_NE(ptr, nullptr);
@@ -235,10 +235,10 @@ TEST(arena2, count_number_of_pools) {
 
     EXPECT_EQ(resource.n_pools(), 0); // Initially, no pools should exist.
 
-    resource.allocate(ml::ArenaMemoryResource2::initial_size, alignof(std::byte));
+    resource.allocate(resource.initial_capacity(), alignof(std::byte));
     EXPECT_EQ(resource.n_pools(), 1); // After first allocation, one pool should exist.
 
-    resource.allocate(ml::ArenaMemoryResource2::initial_size * 2, alignof(std::byte));
+    resource.allocate(resource.initial_capacity() * 2, alignof(std::byte));
     EXPECT_EQ(resource.n_pools(), 2); // After a larger allocation, a second pool should be created.
 }
 TEST(arena2, total_size_and_add_objects) {
@@ -247,18 +247,18 @@ TEST(arena2, total_size_and_add_objects) {
     EXPECT_EQ(resource.total_size(), 0); // Initially, total size should be 0.
 
     // Allocate objects to create multiple pools
-    constexpr std::size_t initial_size = ml::ArenaMemoryResource2::initial_size;
-    resource.allocate(initial_size, alignof(std::byte)); // First pool
+    std::size_t initial_capacity = resource.initial_capacity();
+    resource.allocate(initial_capacity, alignof(std::byte)); // First pool
     EXPECT_EQ(resource.n_pools(), 1);
-    EXPECT_EQ(resource.total_size(), initial_size);
+    EXPECT_EQ(resource.total_size(), initial_capacity);
 
-    resource.allocate(initial_size * 2, alignof(std::byte)); // Second pool
+    resource.allocate(initial_capacity * 2, alignof(std::byte)); // Second pool
     EXPECT_EQ(resource.n_pools(), 2);
-    EXPECT_EQ(resource.total_size(), initial_size * 3);
+    EXPECT_EQ(resource.total_size(), initial_capacity * 3);
 
-    resource.allocate(initial_size * 4, alignof(std::byte)); // Third pool
+    resource.allocate(initial_capacity * 4, alignof(std::byte)); // Third pool
     EXPECT_EQ(resource.n_pools(), 3);
-    EXPECT_EQ(resource.total_size(), initial_size * 7);
+    EXPECT_EQ(resource.total_size(), initial_capacity * 7);
 
     // Add objects to each pool
     auto * ptr1 = resource.allocate(sizeof(int), alignof(int));
