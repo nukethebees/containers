@@ -3,7 +3,7 @@ add_library(containers::containers ALIAS containers)
 
 target_sources(containers PRIVATE
   "arena_allocator.cpp"
-)
+ )
 
 target_sources(containers PUBLIC
   FILE_SET HEADERS

@@ -9,11 +9,13 @@ target_sources(tests PRIVATE
     test_array.cpp
     test_vector.cpp
     test_arena_allocator.cpp
+    test_stack_buffer_allocator.cpp
 )
 target_compile_options(tests PRIVATE 
-    /FAs 
+    /FAs
     /Fa${CMAKE_BINARY_DIR}/asm\\
 )
+
 target_link_libraries(tests PRIVATE 
     GTest::gtest_main 
     containers::containers

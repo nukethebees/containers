@@ -4,46 +4,29 @@
 #include <cstddef>
 
 namespace ml {
-template <typename T, std::size_t capacity>
-class stack_buffer_allocator {
-private:
-    alignas(T) std::array<std::byte, capacity * sizeof(T)> storage{};
-    std::size_t index{0};
+template <std::size_t CAPACITY>
+class StackBufferMemoryResource {
+    std::array<std::byte, CAPACITY> buffer;
+    std::size_t remaining_capacity_{CAPACITY};
+    void * last_allocation_{nullptr};
 public:
-    constexpr stack_buffer_allocator() noexcept = default;
-    template <class U>
-    constexpr stack_buffer_allocator(const stack_buffer_allocator<U, capacity> &) noexcept {}
+    [[nodiscard]] auto allocate(std::size_t n_bytes, std::size_t alignment) -> void * {
+        auto const cur_size{CAPACITY - remaining_capacity_};
 
-    constexpr T * allocate(std::size_t n) {
-        auto const bytes_to_allocate{n * sizeof(T)};
-        auto const space_remaining{storage.size() - index};
-
-        if (bytes_to_allocate > space_remaining) {
+        auto * new_start{static_cast<void *>(buffer.data() + cur_size)};
+        if (!std::align(alignment, n_bytes, new_start, remaining_capacity_)) {
             throw std::bad_alloc{};
         }
 
-        auto * ptr{reinterpret_cast<T *>(&storage[index])};
-        index += bytes_to_allocate;
-        return ptr;
+        remaining_capacity_ -= n_bytes;
+        this->last_allocation_ = new_start;
+        return this->last_allocation_;
     }
-
-    void deallocate(T *, std::size_t) {
-        return;
+    [[nodiscard]] auto remaining_capacity() const -> std::size_t {
+        return remaining_capacity_;
     }
-
-    template <class U>
-    constexpr auto operator==(const stack_buffer_allocator<U, capacity> &) const noexcept -> bool {
-        return true;
+    [[nodiscard]] auto size() const -> std::size_t {
+        return CAPACITY - remaining_capacity_;
     }
-
-    template <class U>
-    constexpr auto operator!=(const stack_buffer_allocator<U, capacity> &) const noexcept -> bool {
-        return false;
-    }
-
-    template<class U>
-    struct rebind {
-        using other = stack_buffer_allocator<U, capacity>;
-    };
 };
 }
