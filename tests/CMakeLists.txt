@@ -15,6 +15,12 @@ target_compile_options(tests PRIVATE
     /FAs
     /Fa${CMAKE_BINARY_DIR}/asm\\
 )
+target_compile_options(tests PRIVATE 
+    /Zi
+)
+target_link_options(tests PRIVATE 
+    /DEBUG
+)
 
 target_link_libraries(tests PRIVATE 
     GTest::gtest_main 

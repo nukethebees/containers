@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <print>
 
 #include <gtest/gtest.h>
 
@@ -67,10 +68,18 @@ TEST(stack_buffer_allocator, vector_push_back_overflow) {
     config::Allocator alloc{&resource};
     config::Vec vec{alloc};
 
-    int i{0};
-    while (resource.remaining_capacity() >= sizeof(int)) {
-        vec.push_back(i);
+    volatile int i{0};
+    while (i < 10) {
+        try {
+            vec.push_back(int{i});
+        }
+        catch (std::bad_alloc) {
+            SUCCEED();
+            return;
+        }
+        
         i++;
     }
-    ASSERT_THROW(vec.push_back(i), std::bad_alloc);
+    
+    FAIL() << "Should have thrown an exception";
 }
