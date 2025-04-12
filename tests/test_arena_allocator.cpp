@@ -23,7 +23,7 @@ TEST(arena, resource_request_bytes) {
 
     auto pools{resource.pools()};
     EXPECT_EQ(pools.size(), 1);
-    auto& pool{pools.front()};
+    auto & pool{pools.front()};
     EXPECT_EQ(pool.total_capacity(), resource.initial_capacity());
     EXPECT_EQ(pool.size(), size);
 }
@@ -31,14 +31,14 @@ TEST(arena, resource_emplace_and_use_value) {
     constexpr std::size_t value{15};
 
     ml::ArenaMemoryResource resource;
-    auto* ptr{resource.allocate(1 * sizeof(std::size_t), alignof(std::size_t))};
+    auto * ptr{resource.allocate(1 * sizeof(std::size_t), alignof(std::size_t))};
 
-    auto* emplaced_value{new (ptr) std::size_t(value)};
+    auto * emplaced_value{new (ptr) std::size_t(value)};
     EXPECT_EQ(*emplaced_value, value);
 
     auto pools{resource.pools()};
     EXPECT_EQ(pools.size(), 1);
-    auto& pool{pools.front()};
+    auto & pool{pools.front()};
     EXPECT_EQ(pool.total_capacity(), resource.initial_capacity());
     EXPECT_EQ(pool.size(), sizeof(std::size_t));
 }
@@ -51,10 +51,10 @@ TEST(arena, create_arena_and_allocate_int) {
     ml::ArenaMemoryResource resource;
     int_alloc alloc{&resource};
 
-    auto* ptr{alloc.allocate(1)};
+    auto * ptr{alloc.allocate(1)};
     EXPECT_NE(ptr, nullptr);
 
-    auto* emplaced_value{new (ptr) int(value)};
+    auto * emplaced_value{new (ptr) int(value)};
     EXPECT_EQ(*emplaced_value, value);
 }
 TEST(arena, construct_new) {
@@ -74,7 +74,7 @@ TEST(arena, vector_with_arena_reserve_multiple_identical_calls) {
     constexpr int n_elems{10};
     vec.reserve(n_elems);
 
-    auto& pool{resource.pools().front()};
+    auto & pool{resource.pools().front()};
     auto const pool_size{pool.size()};
     for (int i{0}; i < n_elems; i++) {
         vec.reserve(n_elems);
@@ -100,7 +100,7 @@ TEST(arena, vector_with_arena) {
 
     auto pools{resource.pools()};
     EXPECT_EQ(pools.size(), 1);
-    auto& pool{pools.front()};
+    auto & pool{pools.front()};
     auto const initial_pool_size{pool.size()};
 
     vec.reserve(n_elems);
@@ -129,8 +129,8 @@ TEST(arena, vector_add_many_elements) {
 TEST(arena, realloc_space) {
     ml::ArenaMemoryResource resource;
 
-    auto* ptr{resource.allocate(1 * sizeof(char), alignof(char))};
-    auto* ptr2{resource.reallocate(ptr, 2 * sizeof(char), alignof(char))};
+    auto * ptr{resource.allocate(1 * sizeof(char), alignof(char))};
+    auto * ptr2{resource.reallocate(ptr, 2 * sizeof(char), alignof(char))};
 
     // We should have space to extend the allocation
     EXPECT_EQ(ptr, ptr2);
