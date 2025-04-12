@@ -113,48 +113,52 @@ class ArenaMemoryResource2 {
 public:
     static constexpr std::size_t initial_size{1024};
 private:
-    Pool2 * pool{nullptr};
+    Pool2 * pool_{nullptr};
 public:
     ArenaMemoryResource2() = default;
     ~ArenaMemoryResource2() {
-        if (pool) {
-            pool->~Pool2();
-            delete[] reinterpret_cast<std::byte *>(pool);
+        if (pool_) {
+            pool_->~Pool2();
+            delete[] reinterpret_cast<std::byte *>(pool_);
         }
     }
 
     ArenaMemoryResource2(ArenaMemoryResource2 const &) = delete;
     ArenaMemoryResource2(ArenaMemoryResource2 && other)
-        : pool{other.pool} {
-        other.pool = nullptr;
+        : pool_{other.pool_} {
+        other.pool_ = nullptr;
     }
     auto operator=(ArenaMemoryResource2 const &)->ArenaMemoryResource2 & = delete;
     auto operator=(ArenaMemoryResource2 && other) -> ArenaMemoryResource2 & {
         if (this != &other) {
-            if (pool) {
-                pool->~Pool2();
-                delete[] reinterpret_cast<std::byte *>(pool);
+            if (pool_) {
+                pool_->~Pool2();
+                delete[] reinterpret_cast<std::byte *>(pool_);
             }
-            pool = other.pool;
-            other.pool = nullptr;
+            pool_ = other.pool_;
+            other.pool_ = nullptr;
         }
         return *this;
     }
 
+    auto pool() const -> Pool2 const * {
+        return pool_;
+    }
+
     auto allocate(std::size_t n_bytes, std::size_t alignment) -> void * {
-        if (!pool) {
+        if (!pool_) {
             create_pool();
         }
-        return pool->allocate(n_bytes, alignment);
+        return pool_->allocate(n_bytes, alignment);
     }
     auto deallocate(void * ptr, std::size_t n_bytes, std::size_t alignment) -> void {
-        if (pool) {
-            pool->deallocate(ptr, n_bytes, alignment);
+        if (pool_) {
+            pool_->deallocate(ptr, n_bytes, alignment);
         }
     }
 private:
     void create_pool() {
-        pool = Pool2::create_pool(initial_size);
+        pool_ = Pool2::create_pool(initial_size);
     }
 };
 }
