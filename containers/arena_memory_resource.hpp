@@ -75,6 +75,38 @@ public:
         auto * buffer{new std::byte[bytes_needed]};
         return new (buffer) Pool2(buffer + sizeof(Pool2), initial_size);
     }
+
+    auto total_capacity() const -> std::size_t {
+        return total_capacity_;
+    }
+    auto remaining_capacity() const -> std::size_t {
+        return remaining_capacity_;
+    }
+    auto size() const -> std::size_t {
+        return total_capacity_ - remaining_capacity_;
+    }
+    [[nodiscard]] auto allocate(std::size_t n_bytes, std::size_t alignment) -> void * {
+        auto const cur_size{size()};
+
+        if (n_bytes > remaining_capacity_) {
+            if (next_pool) {
+                return next_pool->allocate(n_bytes, alignment);
+            }
+            auto * new_pool{create_pool(std::max(n_bytes, total_capacity_ * 2))};
+            next_pool = new_pool;
+            return new_pool->allocate(n_bytes, alignment);
+        }
+
+        auto * new_start{static_cast<void *>(buffer + cur_size)};
+        if (!std::align(alignment, n_bytes, new_start, remaining_capacity_)) {
+            throw std::bad_alloc{};
+        }
+        remaining_capacity_ -= n_bytes;
+        return new_start;
+    }
+    void deallocate(void * /*alloc*/, std::size_t /*n_bytes*/, std::size_t /*alignment*/) {
+        return;
+    }
 };
 
 class ArenaMemoryResource2 {
@@ -107,6 +139,18 @@ public:
             other.pool = nullptr;
         }
         return *this;
+    }
+
+    auto allocate(std::size_t n_bytes, std::size_t alignment) -> void * {
+        if (!pool) {
+            create_pool();
+        }
+        return pool->allocate(n_bytes, alignment);
+    }
+    auto deallocate(void * ptr, std::size_t n_bytes, std::size_t alignment) -> void {
+        if (pool) {
+            pool->deallocate(ptr, n_bytes, alignment);
+        }
     }
 private:
     void create_pool() {
