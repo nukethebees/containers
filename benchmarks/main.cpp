@@ -9,9 +9,9 @@
 template <typename T>
 using pool_vec = std::vector<T, ml::ArenaAllocator<T>>;
 
-constexpr int n_placements{15000};
+constexpr int n_placements{25000};
 constexpr int n_reserve{10};
-constexpr int n_repetitions{25};
+constexpr int n_repetitions{5};
 
 constexpr int arena_elems_to_allocate{10'000};
 
