@@ -241,3 +241,31 @@ TEST(arena2, count_number_of_pools) {
     resource.allocate(ml::ArenaMemoryResource2::initial_size * 2, alignof(std::byte));
     EXPECT_EQ(resource.n_pools(), 2); // After a larger allocation, a second pool should be created.
 }
+TEST(arena2, total_size_and_add_objects) {
+    ml::ArenaMemoryResource2 resource;
+
+    EXPECT_EQ(resource.total_size(), 0); // Initially, total size should be 0.
+
+    // Allocate objects to create multiple pools
+    constexpr std::size_t initial_size = ml::ArenaMemoryResource2::initial_size;
+    resource.allocate(initial_size, alignof(std::byte)); // First pool
+    EXPECT_EQ(resource.n_pools(), 1);
+    EXPECT_EQ(resource.total_size(), initial_size);
+
+    resource.allocate(initial_size * 2, alignof(std::byte)); // Second pool
+    EXPECT_EQ(resource.n_pools(), 2);
+    EXPECT_EQ(resource.total_size(), initial_size * 3);
+
+    resource.allocate(initial_size * 4, alignof(std::byte)); // Third pool
+    EXPECT_EQ(resource.n_pools(), 3);
+    EXPECT_EQ(resource.total_size(), initial_size * 7);
+
+    // Add objects to each pool
+    auto * ptr1 = resource.allocate(sizeof(int), alignof(int));
+    auto * ptr2 = resource.allocate(sizeof(double), alignof(double));
+    auto * ptr3 = resource.allocate(sizeof(char), alignof(char));
+
+    EXPECT_NE(ptr1, nullptr);
+    EXPECT_NE(ptr2, nullptr);
+    EXPECT_NE(ptr3, nullptr);
+}

@@ -158,7 +158,13 @@ public:
         }
         return count;
     }
-
+    auto total_size() const -> std::size_t {
+        std::size_t total{0};
+        for (auto const * p{pool()}; p; p = p->next_pool()) {
+            total += p->size();
+        }
+        return total;
+    }
     auto allocate(std::size_t n_bytes, std::size_t alignment) -> void * {
         if (!pool_) {
             create_pool();
