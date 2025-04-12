@@ -46,8 +46,14 @@ public:
     auto begin() -> iterator {
         return iterator(data_);
     }
+    auto cbegin() const -> const_iterator {
+        return const_iterator(data_);
+    }
     auto end() -> iterator {
         return iterator(data_ + size_);
+    }
+    auto cend() const -> const_iterator {
+        return const_iterator(data_ + size_);
     }
 
     // Element access

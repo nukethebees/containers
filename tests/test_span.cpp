@@ -60,6 +60,48 @@ TEST(span, indexing_from_array_const) {
     auto span{ml::span<int const>(values)};
     ASSERT_EQ(span[0], 1);
 }
+
+TEST(span, begin) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int>(values)};
+    ASSERT_EQ(*span.begin(), 1);
+}
+TEST(span, begin_const) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int const>(values)};
+    ASSERT_EQ(*span.begin(), 1);
+}
+TEST(span, cbegin) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int>(values)};
+    ASSERT_EQ(*span.cbegin(), 1);
+}
+TEST(span, cbegin_const) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int const>(values)};
+    ASSERT_EQ(*span.cbegin(), 1);
+}
+TEST(span, end) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int>(values)};
+    ASSERT_EQ(*(span.end() - 1), 3);
+}
+TEST(span, end_const) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int const>(values)};
+    ASSERT_EQ(*(span.end() - 1), 3);
+}
+TEST(span, cend) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int>(values)};
+    ASSERT_EQ(*(span.cend() - 1), 3);
+}
+TEST(span, cend_const) {
+    std::array<int, 3> values{{1, 2, 3}};
+    auto span{ml::span<int const>(values)};
+    ASSERT_EQ(*(span.cend() - 1), 3);
+}
+
 TEST(span, front) {
     std::array<int, 3> values{{1, 2, 3}};
     auto span{ml::span<int>(values)};
@@ -70,6 +112,7 @@ TEST(span, back) {
     auto span{ml::span<int>(values)};
     ASSERT_EQ(span.back(), 3);
 }
+
 TEST(span, at) {
     std::array<int, 3> values{{1, 2, 3}};
     auto span{ml::span<int>(values)};
