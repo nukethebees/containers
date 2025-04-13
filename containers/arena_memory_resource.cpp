@@ -113,27 +113,21 @@ auto Pool2::remaining_capacity() const -> std::size_t {
 auto Pool2::size() const -> std::size_t {
     return total_capacity_ - remaining_capacity_;
 }
-auto Pool2::allocate(std::size_t n_bytes, std::size_t alignment, ArenaMemoryResource2 & resource) -> void * {
+auto Pool2::allocate(std::size_t n_bytes, std::size_t alignment) -> void * {
     auto const cur_size{size()};
 
-    if (n_bytes > remaining_capacity_) {
-        if (next_pool_) {
-            return next_pool_->allocate(n_bytes, alignment, resource);
-        }
-        auto const cap{total_capacity()};
-        auto * new_pool{create_pool(ml::max(cap * 2, (n_bytes / cap) * 2))};
-        next_pool_ = new_pool;
-        resource.last_pool_ = new_pool;
-        return new_pool->allocate(n_bytes, alignment, resource);
-    }
+    static constexpr std::size_t this_size{
+        sizeof(std::remove_cvref_t<decltype(*this)>)};
 
     auto * new_start{static_cast<void *>(
         static_cast<std::byte *>(static_cast<void *>(this))
-        + sizeof(std::remove_cvref_t<decltype(*this)>)
+        + this_size
         + cur_size)};
+
     if (!std::align(alignment, n_bytes, new_start, remaining_capacity_)) {
         throw std::bad_alloc{};
     }
+
     remaining_capacity_ -= n_bytes;
     return new_start;
 }
@@ -197,19 +191,26 @@ auto ArenaMemoryResource2::total_size() const -> std::size_t {
 }
 auto ArenaMemoryResource2::allocate(std::size_t n_bytes, std::size_t alignment) -> void * {
     if (!last_pool_) {
-        create_pool();
+        auto const cap{initial_capacity_};
+        auto const new_size{ml::max(cap * 2, (n_bytes / cap) * 2 * cap)};
+        pool_ = Pool2::create_pool(new_size);
+        last_pool_ = pool_;
+        return last_pool_->allocate(n_bytes, alignment);
     }
-    return last_pool_->allocate(n_bytes, alignment, *this);
+
+    if (last_pool_->remaining_capacity() <= n_bytes) {
+        auto const cap{last_pool_->total_capacity()};
+        auto const new_size{ml::max(cap * 2, (n_bytes / cap) * 2 * cap)};
+        last_pool_->next_pool_ = Pool2::create_pool(new_size);
+        last_pool_ = last_pool_->next_pool_;
+        return last_pool_->allocate(n_bytes, alignment);
+    }
+
+    return last_pool_->allocate(n_bytes, alignment);
 }
 auto ArenaMemoryResource2::deallocate(void * ptr, std::size_t n_bytes, std::size_t alignment) -> void {
     if (pool_) {
         pool_->deallocate(ptr, n_bytes, alignment);
     }
 }
-
-void ArenaMemoryResource2::create_pool() {
-    pool_ = Pool2::create_pool(initial_capacity_);
-    last_pool_ = pool_;
-}
-
 }

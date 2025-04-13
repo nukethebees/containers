@@ -50,9 +50,8 @@ public:
     }
 };
 
-class ArenaMemoryResource2;
-
 class Pool2 {
+public:
     Pool2 * next_pool_{nullptr};
     std::size_t total_capacity_{0};
     std::size_t remaining_capacity_{0};
@@ -66,7 +65,7 @@ public:
     auto total_capacity() const->std::size_t;
     auto remaining_capacity() const->std::size_t;
     auto size() const->std::size_t;
-    [[nodiscard]] auto allocate(std::size_t n_bytes, std::size_t alignment, ArenaMemoryResource2 & resource) -> void *; // Updated
+    [[nodiscard]] auto allocate(std::size_t n_bytes, std::size_t alignment) -> void *; // Updated
     void deallocate(void * alloc, std::size_t n_bytes, std::size_t alignment);
 };
 
@@ -92,8 +91,6 @@ public:
     auto total_size() const->std::size_t;
     auto allocate(std::size_t n_bytes, std::size_t alignment) -> void *;
     auto deallocate(void * ptr, std::size_t n_bytes, std::size_t alignment) -> void;
-private:
-    void create_pool();
 };
 
 template <typename T>

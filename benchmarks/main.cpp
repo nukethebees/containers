@@ -86,7 +86,7 @@ static void BM_vec_stackbuf(benchmark::State & state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK(BM_vector_alloc_std)->Repetitions(n_repetitions);
+//BENCHMARK(BM_vector_alloc_std)->Repetitions(n_repetitions);
 BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
 BENCHMARK(BM_vector_alloc_arena2)->Repetitions(n_repetitions);
 
