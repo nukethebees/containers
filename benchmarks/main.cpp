@@ -6,9 +6,6 @@
 #include "containers/arena_memory_resource.hpp"
 #include "containers/stack_buffer_memory_resource.hpp"
 
-template <typename T>
-using pool_vec = std::vector<T, ml::ArenaAllocator<T>>;
-
 constexpr int n_placements{25000};
 constexpr int n_reserve{10};
 constexpr int n_repetitions{5};
@@ -27,29 +24,14 @@ static void BM_vector_alloc_std(benchmark::State & state) {
     }
     state.SetItemsProcessed(state.iterations() * n_placements);
 }
-static void BM_vector_alloc_arena(benchmark::State & state) {
+static void BM_vector_alloc_arena2(benchmark::State & state) {
     for (auto _ : state) {
         ml::ArenaMemoryResource char_resource{sizeof(char) * arena_elems_to_allocate};
         ml::ArenaAllocator<char> c_alloc{&char_resource};
-        std::vector<pool_vec<char>> c_vecs;
+        std::vector<std::vector<char, ml::ArenaAllocator<char>>> c_vecs;
 
         for (int i = 0; i < n_placements; ++i) {
-            pool_vec<char> char_vec{c_alloc};
-            char_vec.reserve(n_reserve);
-            c_vecs.emplace_back(std::move(char_vec));
-        }
-    }
-    state.SetItemsProcessed(state.iterations() * n_placements);
-}
-
-static void BM_vector_alloc_arena2(benchmark::State & state) {
-    for (auto _ : state) {
-        ml::ArenaMemoryResource2 char_resource{sizeof(char) * arena_elems_to_allocate};
-        ml::ArenaAllocator2<char> c_alloc{&char_resource};
-        std::vector<std::vector<char, ml::ArenaAllocator2<char>>> c_vecs;
-
-        for (int i = 0; i < n_placements; ++i) {
-            std::vector<char, ml::ArenaAllocator2<char>> char_vec{c_alloc};
+            std::vector<char, ml::ArenaAllocator<char>> char_vec{c_alloc};
             char_vec.reserve(n_reserve);
             c_vecs.emplace_back(std::move(char_vec));
         }
@@ -87,7 +69,6 @@ static void BM_vec_stackbuf(benchmark::State & state) {
 }
 
 //BENCHMARK(BM_vector_alloc_std)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
 BENCHMARK(BM_vector_alloc_arena2)->Repetitions(n_repetitions);
 
 //BENCHMARK(BM_vec_stackbuf_new_ref)->Repetitions(n_repetitions);
