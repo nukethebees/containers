@@ -84,15 +84,8 @@ static void BM_vec_stackbuf(benchmark::State & state) {
 
 //BENCHMARK(BM_vector_alloc_std)->Repetitions(n_repetitions);
 
-// Interleaved benchmarks
-BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_arena_pmr)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_arena_pmr)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_arena_pmr)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_arena_pmr)->Repetitions(n_repetitions);
+BENCHMARK(BM_vector_alloc_arena);
+BENCHMARK(BM_vector_alloc_arena_pmr);
 
 //BENCHMARK(BM_vec_stackbuf_new_ref)->Repetitions(n_repetitions);
 //BENCHMARK(BM_vec_stackbuf)->Repetitions(n_repetitions);
