@@ -78,6 +78,33 @@ TEST(polymorphic_allocator, vector_large_allocation) {
     EXPECT_EQ(vec.back(), num_elements - 1);
 }
 
+TEST(polymorphic_allocator, vector_copy_and_shared_resource) {
+    ml::ArenaMemoryResourcePmr resource;
+    ml::polymorphic_allocator<int> alloc{&resource};
+    std::vector<int, ml::polymorphic_allocator<int>> vec1{alloc};
+
+    // Fill the vector
+    vec1.push_back(1);
+    vec1.push_back(2);
+    vec1.push_back(3);
+
+    // Copy the vector
+    std::vector<int, ml::polymorphic_allocator<int>> vec2 = vec1;
+
+    // Ensure both vectors are valid and have the same content
+    EXPECT_EQ(vec1.size(), 3);
+    EXPECT_EQ(vec2.size(), 3);
+    EXPECT_EQ(vec1[0], 1);
+    EXPECT_EQ(vec2[0], 1);
+    EXPECT_EQ(vec1[1], 2);
+    EXPECT_EQ(vec2[1], 2);
+    EXPECT_EQ(vec1[2], 3);
+    EXPECT_EQ(vec2[2], 3);
+
+    // Ensure both vectors use the same memory resource
+    EXPECT_EQ(vec1.get_allocator().resource(), vec2.get_allocator().resource());
+}
+
 TEST(polymorphic_allocator, list_basic_operations) {
     ml::ArenaMemoryResourcePmr resource;
     ml::polymorphic_allocator<int> alloc{&resource};

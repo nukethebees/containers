@@ -53,6 +53,8 @@ class polymorphic_allocator {
 
     auto select_on_container_copy_construction() const noexcept -> polymorphic_allocator { return *this; }
 
+    auto resource() const noexcept -> std::pmr::memory_resource* { return resource_; }
+
     auto operator=(polymorphic_allocator const&) noexcept -> polymorphic_allocator& = default;
     auto operator=(polymorphic_allocator&&) noexcept -> polymorphic_allocator& = default;
 
