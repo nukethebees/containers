@@ -12,8 +12,7 @@ target_sources(tests PRIVATE
     test_stack_buffer_allocator.cpp
 )
 target_compile_options(tests PRIVATE 
-    /FAs
-    /Fa${CMAKE_BINARY_DIR}/asm\\
+    $<$<CXX_COMPILER_ID:MSVC>:/FAs /Fa${CMAKE_BINARY_DIR}/asm\\>
 )
 target_compile_options(tests PRIVATE 
     /Zi

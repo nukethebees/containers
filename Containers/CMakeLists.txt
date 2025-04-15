@@ -3,8 +3,7 @@ add_library(containers::containers ALIAS containers)
 
 target_sources(containers PRIVATE
   "arena_memory_resource.cpp"
- )
-
+)
 target_sources(containers PUBLIC
   FILE_SET HEADERS
   BASE_DIRS ../
@@ -17,4 +16,8 @@ target_sources(containers PUBLIC
   "span_iterator.hpp"
   "stack_buffer_memory_resource.hpp"
   "vector.hpp"
+)
+
+target_compile_options(containers PRIVATE
+  $<$<CXX_COMPILER_ID:MSVC>:/FAs /Fa${CMAKE_BINARY_DIR}/asm\\>
 )
