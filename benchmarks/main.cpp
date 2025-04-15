@@ -24,7 +24,7 @@ static void BM_vector_alloc_std(benchmark::State & state) {
     }
     state.SetItemsProcessed(state.iterations() * n_placements);
 }
-static void BM_vector_alloc_arena2(benchmark::State & state) {
+static void BM_vector_alloc_arena(benchmark::State & state) {
     for (auto _ : state) {
         ml::ArenaMemoryResource char_resource{sizeof(char) * arena_elems_to_allocate};
         ml::ArenaAllocator<char> c_alloc{&char_resource};
@@ -32,6 +32,20 @@ static void BM_vector_alloc_arena2(benchmark::State & state) {
 
         for (int i = 0; i < n_placements; ++i) {
             std::vector<char, ml::ArenaAllocator<char>> char_vec{c_alloc};
+            char_vec.reserve(n_reserve);
+            c_vecs.emplace_back(std::move(char_vec));
+        }
+    }
+    state.SetItemsProcessed(state.iterations() * n_placements);
+}
+
+static void BM_vector_alloc_arena_pmr(benchmark::State & state) {
+    for (auto _ : state) {
+        ml::ArenaMemoryResourcePmr char_resource{sizeof(char) * arena_elems_to_allocate};
+        std::vector<std::pmr::vector<char>> c_vecs;
+
+        for (int i = 0; i < n_placements; ++i) {
+            std::pmr::vector<char> char_vec{&char_resource};
             char_vec.reserve(n_reserve);
             c_vecs.emplace_back(std::move(char_vec));
         }
@@ -69,7 +83,16 @@ static void BM_vec_stackbuf(benchmark::State & state) {
 }
 
 //BENCHMARK(BM_vector_alloc_std)->Repetitions(n_repetitions);
-BENCHMARK(BM_vector_alloc_arena2)->Repetitions(n_repetitions);
+
+// Interleaved benchmarks
+BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
+BENCHMARK(BM_vector_alloc_arena_pmr)->Repetitions(n_repetitions);
+BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
+BENCHMARK(BM_vector_alloc_arena_pmr)->Repetitions(n_repetitions);
+BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
+BENCHMARK(BM_vector_alloc_arena_pmr)->Repetitions(n_repetitions);
+BENCHMARK(BM_vector_alloc_arena)->Repetitions(n_repetitions);
+BENCHMARK(BM_vector_alloc_arena_pmr)->Repetitions(n_repetitions);
 
 //BENCHMARK(BM_vec_stackbuf_new_ref)->Repetitions(n_repetitions);
 //BENCHMARK(BM_vec_stackbuf)->Repetitions(n_repetitions);
