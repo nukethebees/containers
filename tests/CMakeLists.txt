@@ -10,6 +10,7 @@ target_sources(tests PRIVATE
     test_vector.cpp
     test_arena_allocator.cpp
     test_stack_buffer_allocator.cpp
+    "test_polymorphic_allocator.cpp"
 )
 target_compile_options(tests PRIVATE 
     $<$<CXX_COMPILER_ID:MSVC>:/FAs /Fa${CMAKE_BINARY_DIR}/asm\\>

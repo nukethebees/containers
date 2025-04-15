@@ -12,6 +12,7 @@ target_sources(containers PUBLIC
   "array.hpp"
   "memory_resource_allocator.hpp"
   "misc.hpp"
+  "polymorphic_allocator.hpp"
   "span.hpp"
   "span_iterator.hpp"
   "stack_buffer_memory_resource.hpp"
