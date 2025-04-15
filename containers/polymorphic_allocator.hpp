@@ -14,6 +14,10 @@ class polymorphic_allocator {
     using value_type = T;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
+
+    using propagate_on_container_copy_assignment = std::true_type;
+    using propagate_on_container_move_assignment = std::true_type;
+    using propagate_on_container_swap = std::true_type;
   private:
     std::pmr::memory_resource* resource_{nullptr};
 
@@ -54,6 +58,8 @@ class polymorphic_allocator {
     auto select_on_container_copy_construction() const noexcept -> polymorphic_allocator { return *this; }
 
     auto resource() const noexcept -> std::pmr::memory_resource* { return resource_; }
+
+    auto max_size() const noexcept -> std::size_t { return std::numeric_limits<std::size_t>::max() / sizeof(T); }
 
     auto operator=(polymorphic_allocator const&) noexcept -> polymorphic_allocator& = default;
     auto operator=(polymorphic_allocator&&) noexcept -> polymorphic_allocator& = default;
