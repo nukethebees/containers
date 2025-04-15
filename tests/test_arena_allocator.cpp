@@ -202,3 +202,133 @@ TEST(arena, vector_copy_and_move) {
     EXPECT_EQ(vec3[1], 2);
     EXPECT_TRUE(vec1.empty());
 }
+
+TEST(arena_pmr, empty_memory_resource) {
+    ml::ArenaMemoryResourcePmr resource;
+    SUCCEED();
+}
+
+TEST(arena_pmr, resource_request_bytes) {
+    constexpr std::size_t size{100};
+
+    ml::ArenaMemoryResourcePmr resource;
+    auto * ptr = resource.allocate(size * sizeof(std::byte), alignof(std::byte));
+    EXPECT_NE(ptr, nullptr);
+    resource.deallocate(ptr, size * sizeof(std::byte), alignof(std::byte));
+}
+
+TEST(arena_pmr, allocate_with_alignment) {
+    ml::ArenaMemoryResourcePmr resource;
+
+    constexpr std::size_t alignment = 64;
+    auto * ptr = resource.allocate(128, alignment);
+
+    EXPECT_NE(ptr, nullptr);
+    EXPECT_EQ(reinterpret_cast<std::uintptr_t>(ptr) % alignment, 0);
+
+    resource.deallocate(ptr, 128, alignment);
+}
+
+TEST(arena_pmr, allocate_and_deallocate) {
+    ml::ArenaMemoryResourcePmr resource;
+
+    auto * ptr = resource.allocate(10 * sizeof(char), alignof(char));
+    EXPECT_NE(ptr, nullptr);
+
+    resource.deallocate(ptr, 10 * sizeof(char), alignof(char));
+    // Deallocate should not throw or cause issues
+}
+
+TEST(arena_pmr, allocate_large_object) {
+    ml::ArenaMemoryResourcePmr resource;
+
+    std::size_t large_size = 1024 * 10;
+    auto * ptr = resource.allocate(large_size, alignof(std::byte));
+
+    EXPECT_NE(ptr, nullptr);
+    resource.deallocate(ptr, large_size, alignof(std::byte));
+}
+
+TEST(arena_pmr, pmr_vector_basic_operations) {
+    ml::ArenaMemoryResourcePmr resource;
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec{alloc};
+
+    // Push back elements
+    vec.push_back(1);
+    vec.push_back(2);
+    vec.push_back(3);
+
+    EXPECT_EQ(vec.size(), 3);
+    EXPECT_EQ(vec[0], 1);
+    EXPECT_EQ(vec[1], 2);
+    EXPECT_EQ(vec[2], 3);
+}
+
+TEST(arena_pmr, pmr_vector_reserve_and_emplace) {
+    ml::ArenaMemoryResourcePmr resource;
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec{alloc};
+
+    // Reserve space and emplace elements
+    vec.reserve(10);
+    vec.emplace_back(10);
+    vec.emplace_back(20);
+
+    EXPECT_EQ(vec.size(), 2);
+    EXPECT_EQ(vec.capacity(), 10);
+    EXPECT_EQ(vec[0], 10);
+    EXPECT_EQ(vec[1], 20);
+}
+
+TEST(arena_pmr, pmr_vector_resize_and_access) {
+    ml::ArenaMemoryResourcePmr resource;
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec{alloc};
+
+    // Resize and access elements
+    vec.resize(5, 42);
+
+    EXPECT_EQ(vec.size(), 5);
+    for (int i = 0; i < 5; ++i) {
+        EXPECT_EQ(vec[i], 42);
+    }
+}
+
+TEST(arena_pmr, pmr_vector_large_allocation) {
+    ml::ArenaMemoryResourcePmr resource;
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec{alloc};
+
+    // Add a large number of elements
+    constexpr int num_elements = 10000;
+    for (int i = 0; i < num_elements; ++i) {
+        vec.push_back(i);
+    }
+
+    EXPECT_EQ(vec.size(), num_elements);
+    EXPECT_EQ(vec.front(), 0);
+    EXPECT_EQ(vec.back(), num_elements - 1);
+}
+
+TEST(arena_pmr, pmr_vector_copy_and_move) {
+    ml::ArenaMemoryResourcePmr resource;
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec1{alloc};
+
+    vec1.push_back(1);
+    vec1.push_back(2);
+
+    // Copy vector
+    std::pmr::vector<int> vec2 = vec1;
+    EXPECT_EQ(vec2.size(), 2);
+    EXPECT_EQ(vec2[0], 1);
+    EXPECT_EQ(vec2[1], 2);
+
+    // Move vector
+    std::pmr::vector<int> vec3 = std::move(vec1);
+    EXPECT_EQ(vec3.size(), 2);
+    EXPECT_EQ(vec3[0], 1);
+    EXPECT_EQ(vec3[1], 2);
+    EXPECT_TRUE(vec1.empty());
+}

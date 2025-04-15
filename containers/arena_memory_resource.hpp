@@ -1,12 +1,7 @@
 ﻿#pragma once
 
-#include <compare>
 #include <cstddef>
-#include <memory>
-#include <new>
-#include <span>
-#include <stdexcept>
-#include <vector>
+#include <memory_resource>
 
 #include "memory_resource_allocator.hpp"
 
@@ -60,4 +55,16 @@ class ArenaMemoryResource {
 template <typename T>
 using ArenaAllocator = MemoryResourceAllocator<T, ArenaMemoryResource>;
 
+class ArenaMemoryResourcePmr : public std::pmr::memory_resource {
+  private:
+    ArenaMemoryResource arena;
+  public:
+    ArenaMemoryResourcePmr() = default;
+    explicit ArenaMemoryResourcePmr(std::size_t initial_capacity);
+    ~ArenaMemoryResourcePmr() override = default;
+  protected:
+    auto do_allocate(std::size_t n_bytes, std::size_t alignment) -> void* override;
+    void do_deallocate(void* p, std::size_t n_bytes, std::size_t alignment) override;
+    auto do_is_equal(std::pmr::memory_resource const& other) const noexcept -> bool;
+};
 }
