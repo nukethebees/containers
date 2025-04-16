@@ -62,6 +62,12 @@ class ArenaMemoryResourcePmr : public std::pmr::memory_resource {
     ArenaMemoryResourcePmr() = default;
     explicit ArenaMemoryResourcePmr(std::size_t initial_capacity);
     ~ArenaMemoryResourcePmr() override = default;
+
+    ArenaMemoryResourcePmr(ArenaMemoryResourcePmr const&) = default;
+    ArenaMemoryResourcePmr(ArenaMemoryResourcePmr&& other) noexcept = default;
+
+    auto operator=(ArenaMemoryResourcePmr const&) -> ArenaMemoryResourcePmr& = default;
+    auto operator=(ArenaMemoryResourcePmr&& other) noexcept -> ArenaMemoryResourcePmr& = default;
   protected:
     auto do_allocate(std::size_t n_bytes, std::size_t alignment) -> void* override final;
     void do_deallocate(void* p, std::size_t n_bytes, std::size_t alignment) override final;
