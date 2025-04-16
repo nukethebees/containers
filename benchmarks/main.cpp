@@ -121,7 +121,7 @@ static void BM_mixed_vector_multipool_allocator(benchmark::State& state) {
     for (auto _ : state) {
         constexpr std::size_t n_resources = 3;
 
-        ml::MultiArenaMemoryResourcePmr resource{n_resources, sizeof(char) * arena_elems_to_allocate};
+        ml::multi_arena_memory_resource_pmr resource{n_resources, sizeof(char) * arena_elems_to_allocate};
 
         auto* char_arena = resource.get_resource(0);
         auto* double_arena = resource.get_resource(1);
@@ -145,8 +145,8 @@ static void BM_mixed_vector_multipool_allocator(benchmark::State& state) {
 }
 static void BM_mixed_vector_multipool_t_allocator(benchmark::State& state) {
     for (auto _ : state) {
-        ml::MultiTArenaMemoryResourcePmr<char, double, std::pmr::string> resource{sizeof(char) *
-                                                                                  arena_elems_to_allocate};
+        ml::multi_t_arena_memory_resource_pmr<char, double, std::pmr::string> resource{sizeof(char) *
+                                                                                       arena_elems_to_allocate};
 
         auto* char_arena = resource.get_resource<char>();
         auto* double_arena = resource.get_resource<double>();
