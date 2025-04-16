@@ -8,4 +8,11 @@ MultiArenaMemoryResourcePmr::MultiArenaMemoryResourcePmr(std::size_t n_resources
         resources_.emplace_back(initial_capacity);
     }
 }
+
+auto MultiArenaMemoryResourcePmr::get_resource(std::size_t i) -> ArenaMemoryResourcePmr* {
+    if (i >= resources_.size()) {
+        throw std::out_of_range("Invalid resource index");
+    }
+    return &resources_[i];
+}
 }
