@@ -11,6 +11,7 @@ target_sources(containers PUBLIC
   "arena_memory_resource.hpp"
   "array.hpp"
   "memory_resource_allocator.hpp"
+  "multi_arena_resource.hpp"
   "misc.hpp"
   "span.hpp"
   "span_iterator.hpp"
