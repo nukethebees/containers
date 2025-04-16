@@ -14,7 +14,9 @@ struct types_to_index {
     static constexpr std::size_t get() {
         return get<T, Types...>();
     }
-private:
+
+    static constexpr std::size_t size() { return sizeof...(Types); }
+  private:
     template <typename T, typename Next, typename... Rest>
     static constexpr std::size_t get() {
         if constexpr (std::is_same_v<T, Next>) {
