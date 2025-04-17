@@ -3,8 +3,8 @@
 #include <utility>
 
 namespace ml {
-template <typename T>
-auto&& max(T&& a, T&& b) {
+template <typename T, typename U>
+auto&& max(T&& a, U&& b) {
     return (a < b) ? std::forward<T>(b) : std::forward<T>(a);
 }
 

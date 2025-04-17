@@ -174,4 +174,5 @@ BENCHMARK(BM_mixed_vector_single_resource);
 BENCHMARK(BM_mixed_vector_multipool_allocator);
 BENCHMARK(BM_mixed_vector_multipool_t_allocator);
 
+
 BENCHMARK_MAIN();

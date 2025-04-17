@@ -20,4 +20,8 @@ target_link_options(benchmarks PUBLIC
 
 if (MSVC)
     target_link_options(benchmarks PRIVATE /DEBUG)
+    target_compile_options(benchmarks PRIVATE
+        /FAs 
+        /Fa${CMAKE_BINARY_DIR}/asm\\
+    )
 endif()
