@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <numeric>
+
 #include <gtest/gtest.h>
 
 #include "containers/slist.hpp"
@@ -88,4 +91,40 @@ TEST(slist, insert_end) {
     ASSERT_EQ(list.size(), 3);
     ASSERT_EQ(list.front(), 1);
     ASSERT_EQ(list.back(), 3);
+}
+TEST(slist, range_based_for_loop_sum) {
+    ml::slist<int> list;
+    list.emplace_back(1);
+    list.emplace_back(2);
+    list.emplace_back(3);
+    int sum{0};
+    for (auto const& elem : list) {
+        sum += elem;
+    }
+    ASSERT_EQ(sum, 6);
+}
+TEST(slist, accumulate) {
+    ml::slist<int> list;
+    list.emplace_back(1);
+    list.emplace_back(2);
+    list.emplace_back(3);
+    auto sum = std::accumulate(list.begin(), list.end(), 0);
+    ASSERT_EQ(sum, 6);
+}
+TEST(slist, reduce_find_max) {
+    ml::slist<int> list;
+    list.emplace_back(1);
+    list.emplace_back(2);
+    list.emplace_back(3);
+    auto max = std::reduce(list.begin(), list.end(), 0, [](int a, int b) { return std::max(a, b); });
+    ASSERT_EQ(max, 3);
+}
+TEST(slist, map_double_values) {
+    ml::slist<int> list;
+    list.emplace_back(1);
+    list.emplace_back(2);
+    list.emplace_back(3);
+    std::transform(list.begin(), list.end(), list.begin(), [](int a) { return a * 2; });
+    ASSERT_EQ(list.front(), 2);
+    ASSERT_EQ(list.back(), 6);
 }

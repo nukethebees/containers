@@ -20,6 +20,34 @@ class slist {
         auto& elem() const { return elem_; }
     };
 
+    class Iterator {
+      public:
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = std::forward_iterator_tag;
+      private:
+        node* ptr{nullptr};
+      public:
+        Iterator() = default;
+        explicit Iterator(node* ptr)
+            : ptr{ptr} {}
+
+        auto operator*() const -> reference { return ptr->elem(); }
+        auto operator*() -> reference { return ptr->elem(); }
+        auto operator++() -> Iterator& {
+            ptr = ptr->next_.get();
+            return *this;
+        }
+        auto operator++(int) -> Iterator {
+            auto temp{*this};
+            ++(*this);
+            return temp;
+        }
+        auto operator<=>(Iterator const& other) const = default;
+    };
+
     std::unique_ptr<node> node_{nullptr};
     std::size_t size_{0};
     node* tail_{nullptr};
@@ -40,6 +68,7 @@ class slist {
         tail_ = nullptr;
         size_ = 0;
     }
+    auto begin() -> Iterator { return Iterator{node_.get()}; }
     template <typename... Args>
     void emplace_back(Args&&... args) {
         if (!tail_) {
@@ -63,6 +92,7 @@ class slist {
         size_++;
     }
     auto empty() const -> bool { return size_ == 0; }
+    auto end() -> Iterator { return Iterator{nullptr}; }
     auto front() -> reference { return node_->elem(); }
     auto front() const -> const_reference { return node_->elem(); }
     // Inserts an element at the given position
@@ -158,4 +188,8 @@ class slist {
         return current;
     }
 };
+
+static_assert(std::input_or_output_iterator<ml::slist<int>::Iterator>);
+static_assert(std::input_iterator<ml::slist<int>::Iterator>);
+static_assert(std::forward_iterator<ml::slist<int>::Iterator>);
 }
