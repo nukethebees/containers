@@ -24,10 +24,17 @@ class slist {
     std::size_t size_{0};
     node* tail_{nullptr};
   public:
+    using value_type = T;
+    using size_type = std::size_t;
+    using reference = T&;
+    using const_reference = T const&;
+    using pointer = T*;
+    using const_pointer = T const*;
+
     slist() = default;
 
-    auto& back() { return tail_->elem(); }
-    auto& back() const { return tail_->elem(); }
+    auto back() -> reference { return tail_->elem(); }
+    auto back() const -> const_reference { return tail_->elem(); }
     void clear() {
         node_.reset();
         tail_ = nullptr;
@@ -56,8 +63,8 @@ class slist {
         size_++;
     }
     auto empty() const -> bool { return size_ == 0; }
-    auto& front() { return node_->elem(); }
-    auto& front() const { return node_->elem(); }
+    auto front() -> reference { return node_->elem(); }
+    auto front() const -> const_reference { return node_->elem(); }
     // Inserts an element at the given position
     // If the position is greater than the size of the list, it will be inserted at the end
     template <typename U>
@@ -78,7 +85,7 @@ class slist {
         }
 
         // Insert the new element between i-1 and i
-        // (i-1) -> (i) 
+        // (i-1) -> (i)
         // (i-1) -> (new_node) -> (i)
         auto new_node{std::make_unique<node>(std::forward<U>(new_elem))};
         auto* prev{node_at(i - 1)};
@@ -141,7 +148,7 @@ class slist {
         }
         size_++;
     }
-    auto size() const { return size_; }
+    auto size() const -> size_type { return size_; }
   private:
     auto* node_at(std::size_t i) {
         auto* current{node_.get()};
