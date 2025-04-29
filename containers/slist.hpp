@@ -28,6 +28,11 @@ class slist {
 
     auto& back() { return tail_->elem(); }
     auto& back() const { return tail_->elem(); }
+    void clear() {
+        node_.reset();
+        tail_ = nullptr;
+        size_ = 0;
+    }
     template <typename... Args>
     void emplace_back(Args&&... args) {
         if (!tail_) {

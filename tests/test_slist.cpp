@@ -64,3 +64,10 @@ TEST(slist, push_front) {
     ASSERT_EQ(list.front(), 3);
     ASSERT_EQ(list.back(), 1);
 }
+TEST(slist, clear) {
+    ml::slist<int> list;
+    list.emplace_back(1);
+    list.emplace_back(2);
+    list.clear();
+    ASSERT_EQ(list.size(), 0);
+}
