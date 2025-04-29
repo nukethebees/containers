@@ -40,6 +40,16 @@ class slist {
         size_++;
         return;
     }
+    template <typename... Args>
+    void emplace_front(Args&&... args) {
+        auto new_node{std::make_unique<node>(std::forward<Args>(args)...)};
+        new_node->next_ = std::move(node_);
+        node_ = std::move(new_node);
+        if (!tail_) {
+            tail_ = node_.get();
+        }
+        size_++;
+    }
     auto empty() const -> bool { return size_ == 0; }
     auto& front() { return node_->elem(); }
     auto& front() const { return node_->elem(); }

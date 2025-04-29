@@ -38,3 +38,11 @@ TEST(slist, pop_front) {
     ASSERT_EQ(list.front(), 2);
     ASSERT_EQ(list.back(), 2);
 }
+TEST(slist, emplace_front) {
+    ml::slist<int> list;
+    list.emplace_back(1);
+    list.emplace_front(2);
+    ASSERT_EQ(list.size(), 2);
+    ASSERT_EQ(list.front(), 2);
+    ASSERT_EQ(list.back(), 1);
+}
