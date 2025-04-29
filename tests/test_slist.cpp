@@ -71,3 +71,21 @@ TEST(slist, clear) {
     list.clear();
     ASSERT_EQ(list.size(), 0);
 }
+TEST(slist, insert_0) {
+    ml::slist<int> list;
+    list.emplace_back(1);
+    list.emplace_back(2);
+    list.insert(0, 0);
+    ASSERT_EQ(list.size(), 3);
+    ASSERT_EQ(list.front(), 0);
+    ASSERT_EQ(list.back(), 2);
+}
+TEST(slist, insert_end) {
+    ml::slist<int> list;
+    list.emplace_back(1);
+    list.emplace_back(2);
+    list.insert(3, 2);
+    ASSERT_EQ(list.size(), 3);
+    ASSERT_EQ(list.front(), 1);
+    ASSERT_EQ(list.back(), 3);
+}

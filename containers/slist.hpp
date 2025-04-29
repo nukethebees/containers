@@ -58,6 +58,37 @@ class slist {
     auto empty() const -> bool { return size_ == 0; }
     auto& front() { return node_->elem(); }
     auto& front() const { return node_->elem(); }
+    // Inserts an element at the given position
+    // If the position is greater than the size of the list, it will be inserted at the end
+    template <typename U>
+    void insert(U&& new_elem, std::size_t i) {
+        auto const size{size_};
+        if (i > size) {
+            i = size;
+        }
+
+        if (i == 0) {
+            push_front(std::forward<U>(new_elem));
+            return;
+        }
+
+        if (i == size) {
+            push_back(std::forward<U>(new_elem));
+            return;
+        }
+
+        // Insert the new element between i-1 and i
+        // (i-1) -> (i) 
+        // (i-1) -> (new_node) -> (i)
+        auto new_node{std::make_unique<node>(std::forward<U>(new_elem))};
+        auto* prev{node_at(i - 1)};
+
+        new_node->next_ = std::move(prev->next_);
+        prev->next_ = std::move(new_node);
+        size_++;
+
+        return;
+    }
     void pop_back() {
         if (empty()) {
             return;
@@ -111,5 +142,13 @@ class slist {
         size_++;
     }
     auto size() const { return size_; }
+  private:
+    auto* node_at(std::size_t i) {
+        auto* current{node_.get()};
+        for (std::size_t j{0}; j < i; ++j) {
+            current = current->next_.get();
+        }
+        return current;
+    }
 };
 }
