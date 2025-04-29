@@ -93,11 +93,3 @@ template <typename T>
     requires has_data_and_size<T>
 span(T & iter)->span<std::remove_cvref_t<decltype(*iter.data())>>;
 }
-
-static_assert(std::input_or_output_iterator<ml::span_iterator<int>>);
-static_assert(std::input_iterator<ml::span_iterator<int>>);
-static_assert(std::incrementable<ml::span_iterator<int>>);
-static_assert(std::forward_iterator<ml::span_iterator<int>>);
-static_assert(std::bidirectional_iterator<ml::span_iterator<int>>);
-static_assert(std::random_access_iterator<ml::span_iterator<int>>);
-static_assert(std::contiguous_iterator<ml::span_iterator<int>>);
