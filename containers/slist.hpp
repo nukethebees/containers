@@ -43,6 +43,37 @@ class slist {
     auto empty() const -> bool { return size_ == 0; }
     auto& front() { return node_->elem(); }
     auto& front() const { return node_->elem(); }
+    void pop_back() {
+        if (empty()) {
+            return;
+        }
+
+        if (size_ == 1) {
+            node_.reset();
+            tail_ = nullptr;
+        } else {
+            auto* prev{node_.get()};
+            while (prev->next_->next_) {
+                prev = prev->next_.get();
+            }
+            prev->next_.reset();
+            tail_ = prev;
+        }
+
+        size_--;
+    }
+    void pop_front() {
+        if (empty()) {
+            return;
+        }
+        if (size_ == 1) {
+            node_.reset();
+            tail_ = nullptr;
+        } else {
+            node_ = std::move(node_->next_);
+        }
+        size_--;
+    }
     auto size() const { return size_; }
 };
 }

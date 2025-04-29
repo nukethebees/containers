@@ -20,3 +20,21 @@ TEST(slist, add_two_elems) {
     ASSERT_EQ(list.front(), 1);
     ASSERT_EQ(list.back(), 2);
 }
+TEST(slist, pop_back) {
+    ml::slist<int> list;
+    list.emplace_back(1);
+    list.emplace_back(2);
+    list.pop_back();
+    ASSERT_EQ(list.size(), 1);
+    ASSERT_EQ(list.front(), 1);
+    ASSERT_EQ(list.back(), 1);
+}
+TEST(slist, pop_front) {
+    ml::slist<int> list;
+    list.emplace_back(1);
+    list.emplace_back(2);
+    list.pop_front();
+    ASSERT_EQ(list.size(), 1);
+    ASSERT_EQ(list.front(), 2);
+    ASSERT_EQ(list.back(), 2);
+}
