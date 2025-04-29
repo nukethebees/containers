@@ -84,6 +84,27 @@ class slist {
         }
         size_--;
     }
+    template <typename U>
+    void push_back(U&& new_elem) {
+        if (!tail_) {
+            node_ = std::make_unique<node>(std::forward<U>(new_elem));
+            tail_ = node_.get();
+        } else {
+            tail_->next_ = std::make_unique<node>(std::forward<U>(new_elem));
+            tail_ = tail_->next_.get();
+        }
+        size_++;
+    }
+    template <typename U>
+    void push_front(U&& new_elem) {
+        auto new_node{std::make_unique<node>(std::forward<U>(new_elem))};
+        new_node->next_ = std::move(node_);
+        node_ = std::move(new_node);
+        if (!tail_) {
+            tail_ = node_.get();
+        }
+        size_++;
+    }
     auto size() const { return size_; }
 };
 }

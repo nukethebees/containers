@@ -46,3 +46,21 @@ TEST(slist, emplace_front) {
     ASSERT_EQ(list.front(), 2);
     ASSERT_EQ(list.back(), 1);
 }
+TEST(slist, push_back) {
+    ml::slist<int> list;
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
+    ASSERT_EQ(list.size(), 3);
+    ASSERT_EQ(list.front(), 1);
+    ASSERT_EQ(list.back(), 3);
+}
+TEST(slist, push_front) {
+    ml::slist<int> list;
+    list.push_front(1);
+    list.push_front(2);
+    list.push_front(3);
+    ASSERT_EQ(list.size(), 3);
+    ASSERT_EQ(list.front(), 3);
+    ASSERT_EQ(list.back(), 1);
+}
