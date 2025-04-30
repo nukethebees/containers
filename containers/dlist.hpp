@@ -1,10 +1,13 @@
 #pragma once
 
+#include <memory>
+#include <utility>
+
 #include "platform.hpp"
 
 namespace ml {
 // Doubly-linked list
-template <typename T, typename Allocator = std::allocator<T>>
+template <typename T, template <typename> typename Allocator = std::allocator>
 class dlist {
     struct Node {
         Node* prev_{nullptr};
@@ -13,6 +16,11 @@ class dlist {
 
         auto operator*() -> T& { return elem_; }
         auto operator*() const -> T const& { return elem_; }
+
+        Node() = default;
+        template <typename... Args>
+        Node(Args&&... args)
+            : elem_{std::forward<Args>(args)...} {}
     };
 
     class Iterator {};
@@ -27,11 +35,11 @@ class dlist {
 
     dlist() noexcept = default;
 
-    auto back() noexcept -> reference { return *tail_; }
-    auto back() const noexcept -> const_reference { return *tail_; }
+    auto back() noexcept -> reference { return **tail_; }
+    auto back() const noexcept -> const_reference { return **tail_; }
     auto empty() const noexcept -> bool { return size_ == 0; }
-    auto front() noexcept -> reference { return *head_; }
-    auto front() const noexcept -> const_reference { return *head_; }
+    auto front() noexcept -> reference { return **head_; }
+    auto front() const noexcept -> const_reference { return **head_; }
     void pop_back() {
         if (empty()) {
             return;
@@ -50,11 +58,26 @@ class dlist {
             tail_->next_ = nullptr;
         }
     }
+    template <typename U>
+    void push_back(U&& new_elem) {
+        auto* new_node{alloc_.allocate(1)};
+        auto* new_node_ptr{new (new_node) Node{std::forward<U>(new_elem)}};
+
+        if (empty()) {
+            head_ = new_node_ptr;
+            tail_ = new_node_ptr;
+        } else {
+            tail_->next_ = new_node_ptr;
+            new_node_ptr->prev_ = tail_;
+            tail_ = new_node_ptr;
+        }
+        size_++;
+    }
     auto size() const noexcept -> size_type { return size_; }
   private:
     Node* head_{nullptr};
     Node* tail_{nullptr};
     size_type size_{0};
-    NO_UNIQUE_ADDRESS Allocator alloc_{};
+    NO_UNIQUE_ADDRESS Allocator<Node> alloc_{};
 };
 }
