@@ -58,6 +58,7 @@ class slist {
     using const_reference = T const&;
     using pointer = T*;
     using const_pointer = T const*;
+    using iterator = Iterator;
 
     slist() = default;
 
