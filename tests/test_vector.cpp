@@ -108,7 +108,6 @@ TEST(vector, size) {
     values.emplace_back(20);
     EXPECT_EQ(values.size(), 2);
 }
-
 TEST(vector, range_based_for) {
     ml::vector<int> values;
     values.emplace_back(1);
@@ -116,7 +115,21 @@ TEST(vector, range_based_for) {
     values.emplace_back(3);
 
     int sum = 0;
-    for (const auto & value : values) {
+    for (auto const& value : values) {
+        sum += value;
+    }
+
+    EXPECT_EQ(sum, 6);
+}
+
+TEST(vector, pmr_allocator) {
+    ml::vector<int, std::pmr::polymorphic_allocator<int>> values;
+    values.emplace_back(1);
+    values.emplace_back(2);
+    values.emplace_back(3);
+
+    int sum = 0;
+    for (auto const& value : values) {
         sum += value;
     }
 
