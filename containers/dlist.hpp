@@ -32,6 +32,24 @@ class dlist {
     auto empty() const noexcept -> bool { return size_ == 0; }
     auto front() noexcept -> reference { return *head_; }
     auto front() const noexcept -> const_reference { return *head_; }
+    void pop_back() {
+        if (empty()) {
+            return;
+        }
+
+        if (size_ == 1) {
+            tail_->~Node();
+            alloc_.deallocate(tail_, 1);
+            head_ = nullptr;
+            tail_ = nullptr;
+        } else {
+            auto* prev{tail_->prev_};
+            tail_->~Node();
+            alloc_.deallocate(tail_, 1);
+            tail_ = prev;
+            tail_->next_ = nullptr;
+        }
+    }
     auto size() const noexcept -> size_type { return size_; }
   private:
     Node* head_{nullptr};
