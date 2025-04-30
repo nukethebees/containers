@@ -13,7 +13,9 @@ target_sources(tests PRIVATE
     "test_multi_arena_resource.cpp" 
     "test_misc.cpp"
     "test_polymorphic_allocator.cpp"
- "test_slist.cpp")
+    "test_slist.cpp"
+    "test_dlist.cpp"
+)
 target_compile_options(tests PRIVATE 
     $<$<CXX_COMPILER_ID:MSVC>:/FAs /Fa${CMAKE_BINARY_DIR}/asm\\>
 )
