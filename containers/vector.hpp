@@ -128,12 +128,10 @@ template <typename T, typename Allocator>
 inline auto vector<T, Allocator>::begin(this vector& self) -> iterator {
     return iterator(self.data_);
 }
-
 template <typename T, typename Allocator>
 inline auto vector<T, Allocator>::cbegin(this vector const& self) -> const_iterator {
     return const_iterator(self.data_);
 }
-
 template <typename T, typename Allocator>
 inline auto vector<T, Allocator>::cend(this vector const& self) -> const_iterator {
     return const_iterator(self.data_ + self.size_);

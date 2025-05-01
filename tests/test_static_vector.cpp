@@ -43,3 +43,35 @@ TEST(static_vector, pop_back_string) {
     values.pop_back();
     EXPECT_EQ(values.size(), 0);
 }
+TEST(static_vector, accumulate_int) {
+    ml::static_vector<int, 10> values{};
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+    auto sum = std::accumulate(values.begin(), values.end(), 0);
+    EXPECT_EQ(sum, 10);
+}
+TEST(static_vector, accumulate_const_int) {
+    ml::static_vector<int, 10> values{};
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+    auto sum = std::accumulate(values.cbegin(), values.cend(), 0);
+    EXPECT_EQ(sum, 10);
+}
+TEST(static_vector, accumulate_reverse_int) {
+    ml::static_vector<int, 10> values{};
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+    auto sum = std::accumulate(values.rbegin(), values.rend(), 0);
+    EXPECT_EQ(sum, 10);
+}
+TEST(static_vector, accumulate_const_reverse_int) {
+    ml::static_vector<int, 10> values{};
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+    auto sum = std::accumulate(values.crbegin(), values.crend(), 0);
+    EXPECT_EQ(sum, 10);
+}
