@@ -33,6 +33,7 @@ TEST(span, from_array) {
 TEST(span, const_from_array) {
     std::array<int, 5> values{0};
     auto span{ml::span<int const>(values)};
+    ASSERT_EQ(span.size(), 5);
 }
 TEST(span, foreach_from_array) {
     std::array<int, 3> values{{1, 2, 3}};
