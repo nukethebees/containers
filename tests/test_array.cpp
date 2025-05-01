@@ -12,7 +12,7 @@
 
 TEST(array, init_empty_int_array) {
     constexpr std::size_t size{3};
-    ml::array<int, size> values;
+    ml::array<int, size> values{};
     ASSERT_EQ(values.size(), size);
 }
 TEST(array, init_int_array) {

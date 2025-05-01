@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "multi_arena_resource.hpp"
 
 namespace ml {

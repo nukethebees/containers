@@ -75,7 +75,7 @@ TEST(stack_buffer_allocator, vector_push_back_overflow) {
         try {
             vec.push_back(int{i});
         }
-        catch (std::bad_alloc) {
+        catch (std::bad_alloc const&) {
             SUCCEED();
             return;
         }

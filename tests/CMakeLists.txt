@@ -17,14 +17,12 @@ target_sources(tests PRIVATE
     "test_dlist.cpp"
 )
 target_compile_options(tests PRIVATE 
-    $<$<CXX_COMPILER_ID:MSVC>:/FAs /Fa${CMAKE_BINARY_DIR}/asm\\>
+    $<$<CXX_COMPILER_ID:MSVC>:/FAs /Fa${CMAKE_BINARY_DIR}/asm\\ /Zi>
 )
-target_compile_options(tests PRIVATE 
-    /Zi
-)
-target_link_options(tests PRIVATE 
-    /DEBUG
-)
+
+if (MSVC)
+  target_link_options(tests PRIVATE /DEBUG)
+endif()
 
 target_link_libraries(tests PRIVATE 
     GTest::gtest_main 
