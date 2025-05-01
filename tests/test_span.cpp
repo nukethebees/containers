@@ -6,6 +6,8 @@
 
 #include "containers/span.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 using size_t = typename ml::span<int>::size_type;
 
 // span_iterator
@@ -18,13 +20,15 @@ TEST(span_iterator, indexing_from_array) {
 
 // span
 TEST(span, ptr_size_ctor) {
-    int * ptr{nullptr};
+    int* ptr{nullptr};
     constexpr size_t size{1};
     auto span{ml::span(ptr, size)};
+    EXPECT_EQ(span.size(), size);   
 }
 TEST(span, from_array) {
     std::array<int, 5> values{0};
     auto span{ml::span(values)};
+    ASSERT_EQ(span.size(), 5);
 }
 TEST(span, const_from_array) {
     std::array<int, 5> values{0};

@@ -8,6 +8,8 @@
 
 #include "containers/array.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 TEST(array, init_empty_int_array) {
     constexpr std::size_t size{3};
     ml::array<int, size> values;

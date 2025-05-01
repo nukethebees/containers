@@ -5,6 +5,8 @@
 
 #include "containers/vector.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 TEST(vector, init_empty_int_vector) {
     ml::vector<int> values;
     EXPECT_EQ(values.capacity(), 0);

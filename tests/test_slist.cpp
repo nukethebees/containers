@@ -5,6 +5,8 @@
 
 #include "containers/slist.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 TEST(slist, empty) {
     ml::slist<int> list;
     ASSERT_EQ(list.size(), 0);
