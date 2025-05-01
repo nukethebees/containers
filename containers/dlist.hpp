@@ -23,7 +23,20 @@ class dlist {
             : elem_{std::forward<Args>(args)...} {}
     };
 
-    class Iterator {};
+    class Iterator {
+      public:
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = std::bidirectional_iterator_tag;
+
+        Iterator() = default;
+        explicit Iterator(Node* ptr)
+            : ptr_{ptr} {}
+      private:
+        Node* ptr_{nullptr};
+    };
   public:
     using value_type = T;
     using size_type = std::size_t;
@@ -37,7 +50,14 @@ class dlist {
 
     auto back() noexcept -> reference { return **tail_; }
     auto back() const noexcept -> const_reference { return **tail_; }
+    auto begin() noexcept -> iterator { return Iterator{head_}; }
+    void clear() noexcept {
+        while (!empty()) {
+            pop_back();
+        }
+    }
     auto empty() const noexcept -> bool { return size_ == 0; }
+    auto end() noexcept -> iterator { return Iterator{nullptr}; }
     auto front() noexcept -> reference { return **head_; }
     auto front() const noexcept -> const_reference { return **head_; }
     void pop_back() {

@@ -66,3 +66,12 @@ TEST(dlist, pop_front) {
     values.pop_front();
     EXPECT_TRUE(values.empty());
 }
+TEST(dlist, clear_3elem_list) {
+    ml::dlist<int> values;
+    values.push_back(1);
+    values.push_back(2);
+    values.push_back(3);
+    EXPECT_EQ(values.size(), 3);
+    values.clear();
+    EXPECT_TRUE(values.empty());
+}
