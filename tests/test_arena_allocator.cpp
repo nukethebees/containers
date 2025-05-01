@@ -17,15 +17,15 @@ TEST(arena, resource_request_bytes) {
     constexpr std::size_t size{100};
 
     ml::ArenaMemoryResource resource;
-    auto * ptr = resource.allocate(size * sizeof(std::byte), alignof(std::byte));
+    auto* ptr = resource.allocate(size * sizeof(std::byte), alignof(std::byte));
     EXPECT_NE(ptr, nullptr);
 }
 TEST(arena, resource_emplace_and_use_value) {
     constexpr std::size_t value{42};
 
     ml::ArenaMemoryResource resource;
-    auto * ptr = resource.allocate(sizeof(std::size_t), alignof(std::size_t));
-    auto * emplaced_value = new (ptr) std::size_t(value);
+    auto* ptr = resource.allocate(sizeof(std::size_t), alignof(std::size_t));
+    auto* emplaced_value = new (ptr) std::size_t(value);
 
     EXPECT_EQ(*emplaced_value, value);
 }
@@ -33,16 +33,16 @@ TEST(arena, create_arena_and_allocate_int) {
     constexpr int value{15};
 
     ml::ArenaMemoryResource resource;
-    auto * ptr = resource.allocate(sizeof(int), alignof(int));
+    auto* ptr = resource.allocate(sizeof(int), alignof(int));
     EXPECT_NE(ptr, nullptr);
 
-    auto * emplaced_value = new (ptr) int(value);
+    auto* emplaced_value = new (ptr) int(value);
     EXPECT_EQ(*emplaced_value, value);
 }
 TEST(arena, allocate_and_deallocate) {
     ml::ArenaMemoryResource resource;
 
-    auto * ptr = resource.allocate(10 * sizeof(char), alignof(char));
+    auto* ptr = resource.allocate(10 * sizeof(char), alignof(char));
     EXPECT_NE(ptr, nullptr);
 
     resource.deallocate(ptr, 10 * sizeof(char), alignof(char));
@@ -51,9 +51,9 @@ TEST(arena, allocate_and_deallocate) {
 TEST(arena, allocate_multiple_pools) {
     ml::ArenaMemoryResource resource;
 
-    std::size_t large_size = resource.initial_capacity() * 2; 
-    auto * ptr1 = resource.allocate(resource.initial_capacity(), alignof(std::byte)); 
-    auto * ptr2 = resource.allocate(large_size, alignof(std::byte));
+    std::size_t large_size = resource.initial_capacity() * 2;
+    auto* ptr1 = resource.allocate(resource.initial_capacity(), alignof(std::byte));
+    auto* ptr2 = resource.allocate(large_size, alignof(std::byte));
 
     EXPECT_NE(ptr1, nullptr);
     EXPECT_NE(ptr2, nullptr);
@@ -63,7 +63,7 @@ TEST(arena, allocate_with_alignment) {
     ml::ArenaMemoryResource resource;
 
     constexpr std::size_t alignment = 64;
-    auto * ptr = resource.allocate(128, alignment);
+    auto* ptr = resource.allocate(128, alignment);
 
     EXPECT_NE(ptr, nullptr);
     EXPECT_EQ(reinterpret_cast<std::uintptr_t>(ptr) % alignment, 0);
@@ -71,8 +71,8 @@ TEST(arena, allocate_with_alignment) {
 TEST(arena, reallocate_within_pool) {
     ml::ArenaMemoryResource resource;
 
-    auto * ptr = resource.allocate(10, alignof(std::byte));
-    auto * ptr2 = resource.allocate(20, alignof(std::byte));
+    auto* ptr = resource.allocate(10, alignof(std::byte));
+    auto* ptr2 = resource.allocate(20, alignof(std::byte));
 
     EXPECT_NE(ptr, nullptr);
     EXPECT_NE(ptr2, nullptr);
@@ -81,7 +81,7 @@ TEST(arena, allocate_large_object) {
     ml::ArenaMemoryResource resource;
 
     std::size_t large_size = resource.initial_capacity() * 10;
-    auto * ptr = resource.allocate(large_size, alignof(std::byte));
+    auto* ptr = resource.allocate(large_size, alignof(std::byte));
 
     EXPECT_NE(ptr, nullptr);
 }
@@ -116,9 +116,9 @@ TEST(arena, total_size_and_add_objects) {
     EXPECT_EQ(resource.total_size(), initial_capacity * 7);
 
     // Add objects to each pool
-    auto * ptr1 = resource.allocate(sizeof(int), alignof(int));
-    auto * ptr2 = resource.allocate(sizeof(double), alignof(double));
-    auto * ptr3 = resource.allocate(sizeof(char), alignof(char));
+    auto* ptr1 = resource.allocate(sizeof(int), alignof(int));
+    auto* ptr2 = resource.allocate(sizeof(double), alignof(double));
+    auto* ptr3 = resource.allocate(sizeof(char), alignof(char));
 
     EXPECT_NE(ptr1, nullptr);
     EXPECT_NE(ptr2, nullptr);
@@ -214,7 +214,7 @@ TEST(arena_pmr, resource_request_bytes) {
     constexpr std::size_t size{100};
 
     ml::ArenaMemoryResourcePmr resource;
-    auto * ptr = resource.allocate(size * sizeof(std::byte), alignof(std::byte));
+    auto* ptr = resource.allocate(size * sizeof(std::byte), alignof(std::byte));
     EXPECT_NE(ptr, nullptr);
     resource.deallocate(ptr, size * sizeof(std::byte), alignof(std::byte));
 }
@@ -223,7 +223,7 @@ TEST(arena_pmr, allocate_with_alignment) {
     ml::ArenaMemoryResourcePmr resource;
 
     constexpr std::size_t alignment = 64;
-    auto * ptr = resource.allocate(128, alignment);
+    auto* ptr = resource.allocate(128, alignment);
 
     EXPECT_NE(ptr, nullptr);
     EXPECT_EQ(reinterpret_cast<std::uintptr_t>(ptr) % alignment, 0);
@@ -234,7 +234,7 @@ TEST(arena_pmr, allocate_with_alignment) {
 TEST(arena_pmr, allocate_and_deallocate) {
     ml::ArenaMemoryResourcePmr resource;
 
-    auto * ptr = resource.allocate(10 * sizeof(char), alignof(char));
+    auto* ptr = resource.allocate(10 * sizeof(char), alignof(char));
     EXPECT_NE(ptr, nullptr);
 
     resource.deallocate(ptr, 10 * sizeof(char), alignof(char));
@@ -245,7 +245,7 @@ TEST(arena_pmr, allocate_large_object) {
     ml::ArenaMemoryResourcePmr resource;
 
     std::size_t large_size = 1024 * 10;
-    auto * ptr = resource.allocate(large_size, alignof(std::byte));
+    auto* ptr = resource.allocate(large_size, alignof(std::byte));
 
     EXPECT_NE(ptr, nullptr);
     resource.deallocate(ptr, large_size, alignof(std::byte));
@@ -292,7 +292,7 @@ TEST(arena_pmr, pmr_vector_resize_and_access) {
     vec.resize(5, 42);
 
     EXPECT_EQ(vec.size(), 5);
-    for (int i = 0; i < 5; ++i) {
+    for (std::size_t i{0}; i < 5; ++i) {
         EXPECT_EQ(vec[i], 42);
     }
 }
@@ -304,7 +304,7 @@ TEST(arena_pmr, pmr_vector_large_allocation) {
 
     // Add a large number of elements
     constexpr int num_elements = 10000;
-    for (int i = 0; i < num_elements; ++i) {
+    for (std::size_t i{0}; i < num_elements; ++i) {
         vec.push_back(i);
     }
 

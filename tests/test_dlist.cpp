@@ -2,6 +2,8 @@
 
 #include "containers/dlist.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 TEST(dlist, empty) {
     ml::dlist<int> values;
     EXPECT_TRUE(values.empty());

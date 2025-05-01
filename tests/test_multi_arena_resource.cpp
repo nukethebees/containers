@@ -13,7 +13,7 @@ TEST(multi_arena, create_with_multiple_resources) {
     ml::MultiArenaMemoryResourcePmr resource{n_resources, initial_capacity};
 
     for (std::size_t i = 0; i < n_resources; ++i) {
-        auto *arena = resource.get_resource(i);
+        auto* arena = resource.get_resource(i);
         EXPECT_NE(arena, nullptr);
     }
 }
@@ -23,10 +23,10 @@ TEST(multi_arena, allocate_from_specific_resource) {
 
     ml::MultiArenaMemoryResourcePmr resource{n_resources, initial_capacity};
 
-    auto *arena = resource.get_resource(0);
+    auto* arena = resource.get_resource(0);
     ASSERT_NE(arena, nullptr);
 
-    auto *ptr = arena->allocate(128, alignof(std::byte));
+    auto* ptr = arena->allocate(128, alignof(std::byte));
     EXPECT_NE(ptr, nullptr);
 
     arena->deallocate(ptr, 128, alignof(std::byte));
@@ -38,10 +38,10 @@ TEST(multi_arena, allocate_across_multiple_resources) {
     ml::MultiArenaMemoryResourcePmr resource{n_resources, initial_capacity};
 
     for (std::size_t i = 0; i < n_resources; ++i) {
-        auto *arena = resource.get_resource(i);
+        auto* arena = resource.get_resource(i);
         ASSERT_NE(arena, nullptr);
 
-        auto *ptr = arena->allocate(initial_capacity / 2, alignof(std::byte));
+        auto* ptr = arena->allocate(initial_capacity / 2, alignof(std::byte));
         EXPECT_NE(ptr, nullptr);
 
         arena->deallocate(ptr, initial_capacity / 2, alignof(std::byte));
@@ -62,8 +62,8 @@ TEST(multi_arena, fill_vectors_with_different_resources) {
     ml::MultiArenaMemoryResourcePmr resource{n_resources, initial_capacity};
 
     // Create vectors using different resources
-    auto *arena1 = resource.get_resource(0);
-    auto *arena2 = resource.get_resource(1);
+    auto* arena1 = resource.get_resource(0);
+    auto* arena2 = resource.get_resource(1);
 
     ASSERT_NE(arena1, nullptr);
     ASSERT_NE(arena2, nullptr);
@@ -84,7 +84,7 @@ TEST(multi_arena, fill_vectors_with_different_resources) {
     EXPECT_EQ(int_vec.size(), 10);
     EXPECT_EQ(double_vec.size(), 10);
 
-    for (int i = 0; i < 10; ++i) {
+    for (std::size_t i{0}; i < 10; ++i) {
         EXPECT_EQ(int_vec[i], i);
         EXPECT_DOUBLE_EQ(double_vec[i], i * 1.1);
     }
@@ -95,7 +95,7 @@ TEST(multi_t_arena, init) {
     SUCCEED();
 }
 TEST(multi_t_arena, get_resource) {
-    auto resource = ml::MultiTArenaMemoryResourcePmr<int, double, char>{ 1024 };
+    auto resource = ml::MultiTArenaMemoryResourcePmr<int, double, char>{1024};
     auto* int_arena = resource.get_resource<int>();
     EXPECT_NE(int_arena, nullptr);
 }

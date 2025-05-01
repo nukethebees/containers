@@ -28,16 +28,16 @@ class slist {
         using reference = T&;
         using iterator_category = std::forward_iterator_tag;
       private:
-        node* ptr{nullptr};
+        node* ptr_{nullptr};
       public:
         Iterator() = default;
         explicit Iterator(node* ptr)
-            : ptr{ptr} {}
+            : ptr_{ptr} {}
 
-        auto operator*() const -> reference { return ptr->elem(); }
-        auto operator*() -> reference { return ptr->elem(); }
+        auto operator*() const -> reference { return ptr_->elem(); }
+        auto operator*() -> reference { return ptr_->elem(); }
         auto operator++() -> Iterator& {
-            ptr = ptr->next_.get();
+            ptr_ = ptr_->next_.get();
             return *this;
         }
         auto operator++(int) -> Iterator {

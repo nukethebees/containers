@@ -70,7 +70,7 @@ class vector {
     // Capacity
     auto empty(this vector const& self) -> bool { return self.size_ == 0; }
     auto size(this vector const& self) -> std::size_t { return self.size_; }
-    auto max_size(this vector const& self) -> std::size_t { return std::numeric_limits<std::size_t>::max(); }
+    auto max_size() const -> std::size_t { return std::numeric_limits<std::size_t>::max(); }
     void reserve(this vector& self, std::size_t new_capacity) {
         if (new_capacity <= self.capacity_) {
             return;
@@ -87,7 +87,7 @@ class vector {
         self.capacity_ = new_capacity;
     }
     auto capacity(this vector const& self) -> std::size_t { return self.capacity_; }
-    void shrink_to_fit(this vector& self) { return; }
+    void shrink_to_fit() { return; }
 
     // Modifieers
     void clear(this vector& self) {
