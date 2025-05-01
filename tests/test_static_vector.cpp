@@ -75,3 +75,11 @@ TEST(static_vector, accumulate_const_reverse_int) {
     auto sum = std::accumulate(values.crbegin(), values.crend(), 0);
     EXPECT_EQ(sum, 10);
 }
+TEST(static_vector, clear_strings) {
+    ml::static_vector<std::string, 10> values{};
+    values.emplace_back("Hello");
+    values.emplace_back("World");
+    EXPECT_EQ(values.size(), 2);
+    values.clear();
+    EXPECT_EQ(values.size(), 0);
+}

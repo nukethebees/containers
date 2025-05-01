@@ -60,6 +60,7 @@ class static_vector {
     auto size() const -> size_type;
 
     // Modification
+    void clear();
     template <typename... Args>
     void emplace_back(Args&&... args);
     void pop_back();
@@ -153,6 +154,13 @@ inline auto static_vector<T, CAPACITY>::size() const -> size_type {
 }
 
 template <typename T, std::size_t CAPACITY>
+inline void static_vector<T, CAPACITY>::clear() {
+    for (size_type i{0}; i < size_; ++i) {
+        data_[i].value.~T();
+    }
+    size_ = 0;
+}
+template <typename T, std::size_t CAPACITY>
 template <typename... Args>
 inline void static_vector<T, CAPACITY>::emplace_back(Args&&... args) {
     if (size_ >= CAPACITY) {
@@ -164,7 +172,7 @@ inline void static_vector<T, CAPACITY>::emplace_back(Args&&... args) {
 template <typename T, std::size_t CAPACITY>
 inline void static_vector<T, CAPACITY>::pop_back() {
     if (size_ == 0) {
-        throw std::out_of_range{ "static_vector: pop_back: out of range" };
+        throw std::out_of_range{"static_vector: pop_back: out of range"};
     }
     --size_;
     data_[size_].value.~T();
