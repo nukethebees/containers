@@ -57,12 +57,12 @@ class static_vector {
     // Capacity
     constexpr auto capacity() const -> size_type;
     auto empty() const -> size_type;
-    void pop_back();
     auto size() const -> size_type;
 
     // Modification
     template <typename... Args>
     void emplace_back(Args&&... args);
+    void pop_back();
     template <typename U>
     void push_back(U&& value);
   private:
@@ -148,14 +148,6 @@ inline auto static_vector<T, CAPACITY>::empty() const -> size_type {
     return size_ == 0;
 }
 template <typename T, std::size_t CAPACITY>
-inline void static_vector<T, CAPACITY>::pop_back() {
-    if (size_ == 0) {
-        throw std::out_of_range{"static_vector: pop_back: out of range"};
-    }
-    --size_;
-    data_[size_].value.~T();
-}
-template <typename T, std::size_t CAPACITY>
 inline auto static_vector<T, CAPACITY>::size() const -> size_type {
     return size_;
 }
@@ -168,6 +160,14 @@ inline void static_vector<T, CAPACITY>::emplace_back(Args&&... args) {
     }
     new (&data_[size_].value) T{std::forward<Args>(args)...};
     ++size_;
+}
+template <typename T, std::size_t CAPACITY>
+inline void static_vector<T, CAPACITY>::pop_back() {
+    if (size_ == 0) {
+        throw std::out_of_range{ "static_vector: pop_back: out of range" };
+    }
+    --size_;
+    data_[size_].value.~T();
 }
 template <typename T, std::size_t CAPACITY>
 template <typename U>
