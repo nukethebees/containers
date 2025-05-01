@@ -57,6 +57,28 @@ class dlist {
             tail_ = prev;
             tail_->next_ = nullptr;
         }
+
+        size_--;
+    }
+    void pop_front() {
+        if (empty()) {
+            return;
+        }
+
+        if (size_ == 1) {
+            head_->~Node();
+            alloc_.deallocate(head_, 1);
+            head_ = nullptr;
+            tail_ = nullptr;
+        } else {
+            auto* next{head_->next_};
+            head_->~Node();
+            alloc_.deallocate(head_, 1);
+            head_ = next;
+            head_->prev_ = nullptr;
+        }
+
+        size_--;
     }
     template <typename U>
     void push_back(U&& new_elem) {
@@ -71,6 +93,23 @@ class dlist {
             new_node_ptr->prev_ = tail_;
             tail_ = new_node_ptr;
         }
+
+        size_++;
+    }
+    template <typename U>
+    void push_front(U&& new_elem) {
+        auto* new_node{alloc_.allocate(1)};
+        auto* new_node_ptr{new (new_node) Node{std::forward<U>(new_elem)}};
+
+        if (empty()) {
+            head_ = new_node_ptr;
+            tail_ = new_node_ptr;
+        } else {
+            head_->prev_ = new_node_ptr;
+            new_node_ptr->next_ = head_;
+            head_ = new_node_ptr;
+        }
+
         size_++;
     }
     auto size() const noexcept -> size_type { return size_; }
