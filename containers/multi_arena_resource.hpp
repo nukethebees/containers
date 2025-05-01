@@ -20,19 +20,19 @@ class MultiArenaMemoryResourcePmr {
 template <typename... Types>
 class MultiTArenaMemoryResourcePmr {
   private:
-    static inline constexpr auto indexer{types_to_index<Types...>{}};
+    using Indexer = types_to_index<Types...>;
     std::vector<ArenaMemoryResourcePmr> resources_;
   public:
     MultiTArenaMemoryResourcePmr(std::size_t initial_capacity) {
-        resources_.reserve(indexer.size());
+        resources_.reserve(Indexer::size());
 
-        for (std::size_t i = 0; i < indexer.size(); ++i) {
+        for (std::size_t i = 0; i < Indexer::size(); ++i) {
             resources_.emplace_back(initial_capacity);
         }
     }
     template <typename T>
     auto get_resource() -> ArenaMemoryResourcePmr* {
-        return &resources_[indexer.get<T>()];
+        return &resources_[Indexer::template get<T>()];
     }
 };
 }
