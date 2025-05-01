@@ -133,3 +133,19 @@ TEST(dlist, reduce_reverse_find_max) {
     auto max = std::reduce(values.rbegin(), values.rend(), 0, [](int a, int b) { return std::max(a, b); });
     EXPECT_EQ(max, 3);
 }
+TEST(dlist, emplace_front) {
+    ml::dlist<int> values;
+    values.emplace_front(1);
+    EXPECT_FALSE(values.empty());
+    EXPECT_EQ(values.size(), 1);
+    EXPECT_EQ(values.front(), 1);
+    EXPECT_EQ(values.back(), 1);
+}
+TEST(dlist, emplace_back) {
+    ml::dlist<int> values;
+    values.emplace_back(1);
+    EXPECT_FALSE(values.empty());
+    EXPECT_EQ(values.size(), 1);
+    EXPECT_EQ(values.front(), 1);
+    EXPECT_EQ(values.back(), 1);
+}

@@ -83,6 +83,34 @@ class dlist {
             pop_back();
         }
     }
+    template <typename... Args>
+    void emplace_back(Args&&... args) {
+        auto* new_node{alloc_.allocate(1)};
+        auto* new_node_ptr{new (new_node) Node{std::forward<Args>(args)...}};
+        if (empty()) {
+            head_ = new_node_ptr;
+            tail_ = new_node_ptr;
+        } else {
+            tail_->next_ = new_node_ptr;
+            new_node_ptr->prev_ = tail_;
+            tail_ = new_node_ptr;
+        }
+        size_++;
+    }
+    template <typename... Args>
+    void emplace_front(Args&&... args) {
+        auto* new_node{alloc_.allocate(1)};
+        auto* new_node_ptr{new (new_node) Node{std::forward<Args>(args)...}};
+        if (empty()) {
+            head_ = new_node_ptr;
+            tail_ = new_node_ptr;
+        } else {
+            head_->prev_ = new_node_ptr;
+            new_node_ptr->next_ = head_;
+            head_ = new_node_ptr;
+        }
+        size_++;
+    }
     auto empty() const noexcept -> bool { return size_ == 0; }
     auto end() noexcept -> iterator { return Iterator{nullptr, tail_}; }
     auto front() noexcept -> reference { return **head_; }
