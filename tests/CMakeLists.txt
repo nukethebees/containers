@@ -16,11 +16,13 @@ target_sources(tests PRIVATE
     "test_slist.cpp"
     "test_dlist.cpp"
 )
-target_compile_options(tests PRIVATE 
-    $<$<CXX_COMPILER_ID:MSVC>:/FAs /Fa${CMAKE_BINARY_DIR}/asm\\ /Zi>
-)
 
 if (MSVC)
+  target_compile_options(tests PRIVATE 
+    /FAs
+    /Fa${CMAKE_BINARY_DIR}/asm\\
+  )
+  target_compile_options(tests PRIVATE /Zi)
   target_link_options(tests PRIVATE /DEBUG)
 endif()
 
