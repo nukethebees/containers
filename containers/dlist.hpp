@@ -34,6 +34,28 @@ class dlist {
         Iterator() = default;
         explicit Iterator(Node* ptr)
             : ptr_{ptr} {}
+
+        auto operator*() const -> reference { return **ptr_; }
+        auto operator*() -> reference { return **ptr_; }
+        auto operator++() -> Iterator& {
+            ptr_ = ptr_->next_;
+            return *this;
+        }
+        auto operator++(int) -> Iterator {
+            auto temp{*this};
+            ++(*this);
+            return temp;
+        }
+        auto operator--() -> Iterator& {
+            ptr_ = ptr_->prev_;
+            return *this;
+        }
+        auto operator--(int) -> Iterator {
+            auto temp{*this};
+            --(*this);
+            return temp;
+        }
+        auto operator<=>(Iterator const& other) const = default;
       private:
         Node* ptr_{nullptr};
     };
@@ -138,6 +160,10 @@ class dlist {
     Node* tail_{nullptr};
     size_type size_{0};
     NO_UNIQUE_ADDRESS Allocator<Node> alloc_{};
+
+    static_assert(std::input_or_output_iterator<Iterator>);
+    static_assert(std::input_iterator<Iterator>);
+    static_assert(std::forward_iterator<Iterator>);
 };
 }
 
