@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstddef>
 #include <numeric>
 
@@ -121,6 +122,38 @@ TEST(vector, range_based_for) {
         sum += value;
     }
 
+    EXPECT_EQ(sum, 6);
+}
+TEST(vector, accumulate) {
+    ml::vector<int> values;
+    values.emplace_back(1);
+    values.emplace_back(2);
+    values.emplace_back(3);
+    int sum = std::accumulate(values.begin(), values.end(), 0);
+    EXPECT_EQ(sum, 6);
+}
+TEST(vector, accumulate_const) {
+    ml::vector<int> values;
+    values.emplace_back(1);
+    values.emplace_back(2);
+    values.emplace_back(3);
+    int sum = std::accumulate(values.cbegin(), values.cend(), 0);
+    EXPECT_EQ(sum, 6);
+}
+TEST(vector, accumulate_reverse) {
+    ml::vector<int> values;
+    values.emplace_back(1);
+    values.emplace_back(2);
+    values.emplace_back(3);
+    int sum = std::accumulate(values.rbegin(), values.rend(), 0);
+    EXPECT_EQ(sum, 6);
+}
+TEST(vector, accumulate_const_reverse) {
+    ml::vector<int> values;
+    values.emplace_back(1);
+    values.emplace_back(2);
+    values.emplace_back(3);
+    int sum = std::accumulate(values.crbegin(), values.crend(), 0);
     EXPECT_EQ(sum, 6);
 }
 

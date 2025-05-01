@@ -22,6 +22,8 @@ class vector {
     using const_pointer = T const*;
     using iterator = span_iterator<T>;
     using const_iterator = span_iterator<T const>;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     vector() noexcept;
     ~vector();
@@ -42,7 +44,11 @@ class vector {
     auto begin(this vector& self) -> iterator;
     auto cbegin(this vector const& self) -> const_iterator;
     auto cend(this vector const& self) -> const_iterator;
+    auto crbegin(this vector const& self) -> const_reverse_iterator;
+    auto crend(this vector const& self) -> const_reverse_iterator;
     auto end(this vector& self) -> iterator;
+    auto rbegin(this vector& self) -> reverse_iterator;
+    auto rend(this vector& self) -> reverse_iterator;
 
     // Capacity
     auto capacity(this vector const& self) -> std::size_t;
@@ -132,10 +138,25 @@ template <typename T, typename Allocator>
 inline auto vector<T, Allocator>::cend(this vector const& self) -> const_iterator {
     return const_iterator(self.data_ + self.size_);
 }
-
+template <typename T, typename Allocator>
+inline auto vector<T, Allocator>::crbegin(this vector const& self) -> const_reverse_iterator {
+    return const_reverse_iterator(self.cend());
+}
+template <typename T, typename Allocator>
+inline auto vector<T, Allocator>::crend(this vector const& self) -> const_reverse_iterator {
+    return const_reverse_iterator(self.cbegin());
+}
 template <typename T, typename Allocator>
 inline auto vector<T, Allocator>::end(this vector& self) -> iterator {
     return iterator(self.data_ + self.size_);
+}
+template <typename T, typename Allocator>
+inline auto vector<T, Allocator>::rbegin(this vector& self) -> reverse_iterator {
+    return reverse_iterator(self.end());
+}
+template <typename T, typename Allocator>
+inline auto vector<T, Allocator>::rend(this vector& self) -> reverse_iterator {
+    return reverse_iterator(self.begin());
 }
 
 // Capacity
