@@ -7,6 +7,8 @@
 #include "containers/arena_memory_resource.hpp"
 #include "containers/polymorphic_allocator.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 TEST(polymorphic_allocator, resource_allocate_bytes) {
     ml::ArenaMemoryResourcePmr resource;
 

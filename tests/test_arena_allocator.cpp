@@ -6,6 +6,8 @@
 
 #include "containers/arena_memory_resource.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 TEST(arena, empty_memory_resource) {
     ml::ArenaMemoryResource resource;
     // No pools should exist initially

@@ -109,15 +109,15 @@ inline auto ArenaMemoryResource::pool() const -> ArenaMemoryResourcePool const* 
     return pool_;
 }
 inline auto ArenaMemoryResource::n_pools() const -> std::size_t {
-    std::size_t count{ 0 };
-    for (auto const* p{ pool() }; p; p = p->next_pool()) {
+    std::size_t count{0};
+    for (auto const* p{pool()}; p; p = p->next_pool()) {
         ++count;
     }
     return count;
 }
 inline auto ArenaMemoryResource::total_size() const -> std::size_t {
-    std::size_t total{ 0 };
-    for (auto const* p{ pool() }; p; p = p->next_pool()) {
+    std::size_t total{0};
+    for (auto const* p{pool()}; p; p = p->next_pool()) {
         total += p->size();
     }
     return total;

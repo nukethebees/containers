@@ -2,6 +2,8 @@
 
 #include "containers/misc.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 TEST(max_fn, handles_ints) {
     EXPECT_EQ(ml::max(3, 5), 5);
     EXPECT_EQ(ml::max(10, 2), 10);

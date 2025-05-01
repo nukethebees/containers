@@ -8,6 +8,11 @@
 #include "containers/multi_arena_resource.hpp"
 #include "containers/misc.hpp"
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wunused-function"
+#endif
+
 constexpr int n_placements{25000};
 constexpr int n_reserve{10};
 constexpr int n_repetitions{5};
@@ -62,7 +67,7 @@ static void BM_vec_stackbuf_new_ref(benchmark::State& state) {
     for (auto _ : state) {
         std::vector<int> vec{};
         vec.reserve(n_ints);
-        for (int i{0}; i < n_ints; ++i) {
+        for (std::size_t i{0}; i < n_ints; ++i) {
             vec.emplace_back(i);
         }
     }
@@ -77,7 +82,7 @@ static void BM_vec_stackbuf(benchmark::State& state) {
         config::Allocator alloc{&resource};
         std::vector<int, config::Allocator> vec{alloc};
         vec.reserve(n_ints);
-        for (int i{0}; i < n_ints; ++i) {
+        for (std::size_t i{0}; i < n_ints; ++i) {
             vec.emplace_back(i);
         }
     }

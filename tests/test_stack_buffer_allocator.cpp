@@ -6,6 +6,8 @@
 #include "containers/stack_buffer_memory_resource.hpp"
 #include "containers/memory_resource_allocator.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 template <typename T, std::size_t CAPACITY>
 struct VecConfig : ml::StackAllocConfig<T, CAPACITY> {
     using Resource = typename ml::StackAllocConfig<T, CAPACITY>::Resource;
@@ -78,7 +80,7 @@ TEST(stack_buffer_allocator, vector_push_back_overflow) {
             return;
         }
         
-        i++;
+        i = i + 1;
     }
     
     FAIL() << "Should have thrown an exception";

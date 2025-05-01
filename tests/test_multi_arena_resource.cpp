@@ -4,6 +4,8 @@
 
 #include "containers/multi_arena_resource.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 TEST(multi_arena, create_with_multiple_resources) {
     constexpr std::size_t n_resources = 3;
     constexpr std::size_t initial_capacity = 1024;
