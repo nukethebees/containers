@@ -188,9 +188,9 @@ class slist {
         }
         return current;
     }
-};
 
-static_assert(std::input_or_output_iterator<ml::slist<int>::Iterator>);
-static_assert(std::input_iterator<ml::slist<int>::Iterator>);
-static_assert(std::forward_iterator<ml::slist<int>::Iterator>);
+    static_assert(std::input_or_output_iterator<Iterator>);
+    static_assert(std::input_iterator<Iterator>);
+    static_assert(std::forward_iterator<Iterator>);
+};
 }
