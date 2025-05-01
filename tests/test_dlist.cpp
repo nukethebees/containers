@@ -105,3 +105,31 @@ TEST(dlist, reduce_find_max) {
     auto max = std::reduce(values.begin(), values.end(), 0, [](int a, int b) { return std::max(a, b); });
     EXPECT_EQ(max, 3);
 }
+TEST(dlist, for_loop_sum_reverse) {
+    ml::dlist<int> values;
+    values.push_back(1);
+    values.push_back(2);
+    values.push_back(3);
+    int sum{0};
+    for (auto it = values.rbegin(); it != values.rend(); ++it) {
+        sum += *it;
+    }
+    EXPECT_EQ(sum, 6);
+}
+TEST(dlist, accumulate_reverse) {
+    ml::dlist<int> values;
+    values.push_back(1);
+    values.push_back(2);
+    values.push_back(3);
+
+    auto sum = std::accumulate(values.rbegin(), values.rend(), 0);
+    EXPECT_EQ(sum, 6);
+}
+TEST(dlist, reduce_reverse_find_max) {
+    ml::dlist<int> values;
+    values.push_back(1);
+    values.push_back(2);
+    values.push_back(3);
+    auto max = std::reduce(values.rbegin(), values.rend(), 0, [](int a, int b) { return std::max(a, b); });
+    EXPECT_EQ(max, 3);
+}

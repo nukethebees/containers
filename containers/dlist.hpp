@@ -32,13 +32,15 @@ class dlist {
         using iterator_category = std::bidirectional_iterator_tag;
 
         Iterator() = default;
-        explicit Iterator(Node* ptr)
-            : ptr_{ptr} {}
+        explicit Iterator(Node* node, Node* prev)
+            : node_{node}
+            , prev_{prev} {}
 
-        auto operator*() const -> reference { return **ptr_; }
-        auto operator*() -> reference { return **ptr_; }
+        auto operator*() const -> reference { return **node_; }
+        auto operator*() -> reference { return **node_; }
         auto operator++() -> Iterator& {
-            ptr_ = ptr_->next_;
+            prev_ = node_;
+            node_ = node_->next_;
             return *this;
         }
         auto operator++(int) -> Iterator {
@@ -47,7 +49,8 @@ class dlist {
             return temp;
         }
         auto operator--() -> Iterator& {
-            ptr_ = ptr_->prev_;
+            node_ = prev_;
+            prev_ = prev_->prev_;
             return *this;
         }
         auto operator--(int) -> Iterator {
@@ -57,7 +60,8 @@ class dlist {
         }
         auto operator<=>(Iterator const& other) const = default;
       private:
-        Node* ptr_{nullptr};
+        Node* node_{nullptr};
+        Node* prev_{nullptr};
     };
   public:
     using value_type = T;
@@ -67,19 +71,20 @@ class dlist {
     using pointer = T*;
     using const_pointer = T const*;
     using iterator = Iterator;
+    using reverse_iterator = std::reverse_iterator<Iterator>;
 
     dlist() noexcept = default;
 
     auto back() noexcept -> reference { return **tail_; }
     auto back() const noexcept -> const_reference { return **tail_; }
-    auto begin() noexcept -> iterator { return Iterator{head_}; }
+    auto begin() noexcept -> iterator { return Iterator{head_, nullptr}; }
     void clear() noexcept {
         while (!empty()) {
             pop_back();
         }
     }
     auto empty() const noexcept -> bool { return size_ == 0; }
-    auto end() noexcept -> iterator { return Iterator{nullptr}; }
+    auto end() noexcept -> iterator { return Iterator{nullptr, tail_}; }
     auto front() noexcept -> reference { return **head_; }
     auto front() const noexcept -> const_reference { return **head_; }
     void pop_back() {
@@ -154,6 +159,8 @@ class dlist {
 
         size_++;
     }
+    auto rbegin() noexcept -> reverse_iterator { return reverse_iterator{end()}; }
+    auto rend() noexcept -> reverse_iterator { return reverse_iterator{begin()}; }
     auto size() const noexcept -> size_type { return size_; }
   private:
     Node* head_{nullptr};
@@ -164,6 +171,7 @@ class dlist {
     static_assert(std::input_or_output_iterator<Iterator>);
     static_assert(std::input_iterator<Iterator>);
     static_assert(std::forward_iterator<Iterator>);
+    static_assert(std::bidirectional_iterator<Iterator>);
 };
 }
 
