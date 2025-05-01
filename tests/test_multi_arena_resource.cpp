@@ -86,7 +86,7 @@ TEST(multi_arena, fill_vectors_with_different_resources) {
 
     for (std::size_t i{0}; i < 10; ++i) {
         EXPECT_EQ(int_vec[i], i);
-        EXPECT_DOUBLE_EQ(double_vec[i], i * 1.1);
+        EXPECT_DOUBLE_EQ(double_vec[i], static_cast<double>(i) * 1.1);
     }
 }
 

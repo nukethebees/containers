@@ -161,10 +161,11 @@ TEST(arena, vector_resize_and_access) {
     std::vector<int, ml::ArenaAllocator<int>> vec{alloc};
 
     // Resize and access elements
-    vec.resize(5, 42);
+    static constexpr std::size_t size{5};
+    vec.resize(size, 42);
 
-    EXPECT_EQ(vec.size(), 5);
-    for (int i = 0; i < 5; ++i) {
+    EXPECT_EQ(vec.size(), size);
+    for (std::size_t i{0}; i < size; ++i) {
         EXPECT_EQ(vec[i], 42);
     }
 }
@@ -304,7 +305,7 @@ TEST(arena_pmr, pmr_vector_large_allocation) {
 
     // Add a large number of elements
     constexpr int num_elements = 10000;
-    for (std::size_t i{0}; i < num_elements; ++i) {
+    for (int i{0}; i < num_elements; ++i) {
         vec.push_back(i);
     }
 
