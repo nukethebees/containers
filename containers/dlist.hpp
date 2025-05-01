@@ -3,7 +3,7 @@
 #include <memory>
 #include <utility>
 
-#include "platform.hpp"
+#include "platform_def.hpp"
 
 namespace ml {
 // Doubly-linked list
@@ -81,3 +81,5 @@ class dlist {
     NO_UNIQUE_ADDRESS Allocator<Node> alloc_{};
 };
 }
+
+#include "platform_undef.hpp"

@@ -6,8 +6,9 @@
 #include <memory>
 #include <type_traits>
 
-#include "platform.hpp"
 #include "span_iterator.hpp"
+
+#include "platform_def.hpp"
 
 namespace ml {
 template <typename T, typename Allocator = std::allocator<T>>
@@ -126,3 +127,5 @@ class vector {
     void grow(this vector& self) { self.reserve(self.capacity_ ? self.capacity_ * 2uz : 1uz); }
 };
 }
+
+#include "platform_undef.hpp"
