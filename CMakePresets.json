@@ -18,19 +18,20 @@
             "hidden": true,
             "inherits": "windows-base",
             "environment": {
-                "MSVC_FLAGS": "/EHsc /W4 /Zc:preprocessor /permissive- /GS /Zc:wchar_t /Zc:inline /fp:precise /Gd /FC /nologo /Zc:checkGwOdr /Zc:enumTypes /Zc:externConstexpr /Zc:gotoScope /Zc:templateScope /Zc:ternary /Zc:throwingNew /GF /MP",
-                "MSVC_RELEASE_FLAGS": "$env{MSVC_FLAGS} /O2 /GF /GL /Gy /Qpar"
+                "MSVC_BASE_FLAGS": "/EHsc /W4 /Zc:preprocessor /permissive- /GS /Zc:wchar_t /Zc:inline /fp:precise /Gd /FC /nologo /Zc:checkGwOdr /Zc:enumTypes /Zc:externConstexpr /Zc:gotoScope /Zc:templateScope /Zc:ternary /Zc:throwingNew /GF /MP",
+                "MSVC_DEBUG_FLAGS": "$env{MSVC_BASE_FLAGS} /Od /RTC1",
+                "MSVC_RELEASE_FLAGS": "$env{MSVC_BASE_FLAGS} /O2 /GF /GL /Gy /Qpar",
+                "MSVC_RELEASE_PROFILE_FLAGS": "$env{MSVC_RELEASE_FLAGS} /Zi"
             },
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe",
-                "CMAKE_CXX_FLAGS": "$env{MSVC_FLAGS}",
                 "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
             }
         },
         {
-            "name": "x64-debug",
-            "displayName": "x64 Debug",
+            "name": "x64-debug-msvc",
+            "displayName": "x64 Debug (MSVC)",
             "inherits": "msvc-base",
             "architecture": {
                 "value": "x64",
@@ -38,12 +39,12 @@
             },
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_FLAGS": "$env{MSVC_FLAGS} /Od /RTC1"
+                "CMAKE_CXX_FLAGS": "$env{MSVC_DEBUG_FLAGS}"
             }
         },
         {
-            "name": "x64-release",
-            "displayName": "x64 Release",
+            "name": "x64-release-msvc",
+            "displayName": "x64 Release (MSVC)",
             "inherits": "msvc-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
@@ -51,12 +52,40 @@
             }
         },
         {
-            "name": "x64-release-profile",
-            "displayName": "x64 Release (Profiling)",
+            "name": "x64-release-profile-msvc",
+            "displayName": "x64 Release (Profiling, MSVC)",
             "inherits": "msvc-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_CXX_FLAGS": "$env{MSVC_RELEASE_FLAGS} /Zi"
+                "CMAKE_CXX_FLAGS": "$env{MSVC_RELEASE_PROFILE_FLAGS}"
+            }
+        },
+        {
+            "name": "clang-cl-base",
+            "hidden": true,
+            "inherits": "windows-base",
+            "environment": {
+                "CLANG_CL_BASE_FLAGS": "-Xclang -fexceptions -Xclang -fcxx-exceptions",
+                "CLANG_CL_DEBUG_FLAGS": "$env{CLANG_CL_BASE_FLAGS}",
+                "CLANG_CL_RELEASE_FLAGS": "$env{CLANG_CL_BASE_FLAGS}"
+            },
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang-cl.exe",
+                "CMAKE_CXX_COMPILER": "clang-cl.exe",
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+            }
+        },
+        {
+            "name": "x64-debug-clang-cl",
+            "displayName": "x64 Debug (clang-cl)",
+            "inherits": "clang-cl-base",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_FLAGS": "$env{CLANG_CL_DEBUG_FLAGS}"
             }
         }
     ]
