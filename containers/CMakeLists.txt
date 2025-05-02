@@ -10,6 +10,7 @@ target_sources(containers PUBLIC
   FILES
   "arena_memory_resource.hpp"
   "array.hpp"
+  "bst.hpp"
   "memory_resource_allocator.hpp"
   "multi_arena_resource.hpp"
   "misc.hpp"
