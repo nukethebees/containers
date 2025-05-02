@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <numeric>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -72,4 +74,23 @@ TEST(bst, get_min) {
     bst.insert(6);
 
     EXPECT_EQ(*bst.min(), 1);
+}
+
+TEST(bst, accumulate) {
+    ml::bst<int> bst;
+    std::vector<int> values{1, 2, 3, 4, 5};
+    for (auto const& value : values) {
+        bst.insert(value);
+    }
+    auto sum = std::accumulate(bst.begin(), bst.end(), 0);
+    EXPECT_EQ(sum, 15);
+}
+TEST(bst, accumulate_const) {
+    ml::bst<int> bst;
+    std::vector<int> values{1, 2, 3, 4, 5};
+    for (auto const& value : values) {
+        bst.insert(value);
+    }
+    auto sum = std::accumulate(bst.cbegin(), bst.cend(), 0);
+    EXPECT_EQ(sum, 15);
 }

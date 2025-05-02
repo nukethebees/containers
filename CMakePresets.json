@@ -65,7 +65,7 @@
             "hidden": true,
             "inherits": "windows-base",
             "environment": {
-                "CLANG_CL_BASE_FLAGS": "-Xclang -fexceptions -Xclang -fcxx-exceptions -Wall -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unsafe-buffer-usage",
+                "CLANG_CL_BASE_FLAGS": "-Xclang -fexceptions -Xclang -fcxx-exceptions -Wall -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-unsafe-buffer-usage -Wno-c++20-compat",
                 "CLANG_CL_DEBUG_FLAGS": "$env{CLANG_CL_BASE_FLAGS}",
                 "CLANG_CL_RELEASE_FLAGS": "$env{CLANG_CL_BASE_FLAGS}"
             },

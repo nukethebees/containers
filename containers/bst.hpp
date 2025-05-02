@@ -1,8 +1,11 @@
 #pragma once
 
 #include <cstddef>
+#include <compare>
+#include <iterator>
 #include <functional>
 #include <memory>
+#include <type_traits>
 
 #include "platform_def.hpp"
 
@@ -19,7 +22,8 @@ class bst_node {
     using const_pointer = value_type const*;
 
     bst_node() = delete;
-    bst_node(bst_node* parent, T&& value) noexcept;
+    template <typename U>
+    bst_node(bst_node* parent, U&& value) noexcept;
 
     ~bst_node() = default;
 
@@ -43,8 +47,9 @@ class bst_node {
 };
 
 template <typename T>
-bst_node<T>::bst_node(bst_node* parent, T&& value) noexcept
-    : value_{std::move(value)}
+template <typename U>
+bst_node<T>::bst_node(bst_node* parent, U&& value) noexcept
+    : value_{std::forward<U>(value)}
     , parent_{parent} {}
 
 #define METHOD_START      \
@@ -102,15 +107,69 @@ concept bst_can_be_compared = requires(T t, U u) {
 template <typename T>
 class bst_iterator {
   public:
+    using difference_type = std::ptrdiff_t;
+    using node_type = detail::bst_node<std::remove_cvref_t<T>>;
     using value_type = T;
-    using node_type = detail::bst_node<value_type>;
+    using pointer = value_type*;
+    using reference = value_type&;
+    using iterator_category = std::bidirectional_iterator_tag;
 
     bst_iterator() noexcept = default;
     bst_iterator(node_type* ptr) noexcept
         : ptr_{ptr} {}
+
+    auto operator*() const -> reference;
+    auto operator*() -> reference;
+
+    auto operator++() -> bst_iterator&;
+    auto operator++(int) -> bst_iterator;
+    auto operator--() -> bst_iterator&;
+    auto operator--(int) -> bst_iterator;
+    auto operator<=>(bst_iterator const& other) const = default;
   private:
     node_type* ptr_{nullptr};
 };
+
+template <typename T>
+inline auto bst_iterator<T>::operator*() const -> reference {
+    return ptr_->value();
+}
+template <typename T>
+inline auto bst_iterator<T>::operator*() -> reference {
+    return ptr_->value();
+}
+
+template <typename T>
+inline auto bst_iterator<T>::operator++() -> bst_iterator& {
+    if (ptr_) {
+        ptr_ = ptr_->greater();
+    }
+    return *this;
+}
+template <typename T>
+inline auto bst_iterator<T>::operator++(int) -> bst_iterator {
+    auto temp{*this};
+    ++(*this);
+    return temp;
+}
+template <typename T>
+inline auto bst_iterator<T>::operator--() -> bst_iterator& {
+    if (ptr_) {
+        ptr_ = ptr_->less();
+    }
+    return *this;
+}
+template <typename T>
+inline auto bst_iterator<T>::operator--(int) -> bst_iterator {
+    auto temp{*this};
+    --(*this);
+    return temp;
+}
+
+static_assert(std::input_or_output_iterator<bst_iterator<int>>);
+static_assert(std::input_iterator<bst_iterator<int>>);
+static_assert(std::forward_iterator<bst_iterator<int>>);
+static_assert(std::bidirectional_iterator<bst_iterator<int>>);
 
 template <typename T, typename Compare = std::less<T>, template <typename> typename Allocator = std::allocator>
 class bst {
@@ -125,14 +184,16 @@ class bst {
     using const_pointer = value_type const*;
     using iterator = bst_iterator<value_type>;
     using const_iterator = bst_iterator<value_type const>;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     struct parent_child_pair {
         node_type* parent{nullptr};
         node_type** child{nullptr};
 
-        parent_child_pair(node_type* parent, node_type** child)
-            : parent{parent}
-            , child{child} {}
+        parent_child_pair(node_type* parent_, node_type** child_)
+            : parent{parent_}
+            , child{child_} {}
     };
 
     // Access
@@ -149,6 +210,20 @@ class bst {
     // Capacity
     auto empty() const -> bool;
     auto size() const -> size_type;
+
+    // Iterators
+    auto begin() -> iterator;
+    auto begin() const -> const_iterator;
+    auto cbegin() const -> const_iterator;
+    auto cend() const -> const_iterator;
+    auto crbegin() const -> const_reverse_iterator;
+    auto crend() const -> const_reverse_iterator;
+    auto end() -> iterator;
+    auto end() const -> const_iterator;
+    auto rbegin() -> reverse_iterator;
+    auto rbegin() const -> const_reverse_iterator;
+    auto rend() const -> const_reverse_iterator;
+    auto rend() -> reverse_iterator;
 
     // Modifiers
     void clear();
@@ -177,6 +252,7 @@ class bst {
     __VA_OPT__(__VA_ARGS__)                                                         \
     inline auto bst<T, Compare, Allocator>
 
+// Access
 template <typename T, typename Compare, template <typename> typename Allocator>
 template <typename U>
     requires detail::bst_can_be_compared<T, U, Compare>
@@ -219,6 +295,7 @@ inline auto* bst<T, Compare, Allocator>::min(this Self&& self) {
     return ptr ? &ptr->value() : nullptr;
 }
 
+// Capacity
 METHOD_START()::empty() const->bool {
     return size_ == 0;
 }
@@ -226,6 +303,45 @@ METHOD_START()::size() const->size_type {
     return size_;
 }
 
+// Iterators
+METHOD_START()::begin()->iterator {
+    return iterator{root_};
+}
+METHOD_START()::begin() const->const_iterator {
+    return const_iterator{root_};
+}
+METHOD_START()::cbegin() const->const_iterator {
+    return const_iterator(root_);
+}
+METHOD_START()::cend() const->const_iterator {
+    return const_iterator{nullptr};
+}
+METHOD_START()::crbegin() const->const_reverse_iterator {
+    return std::reverse_iterator{cbegin()};
+}
+METHOD_START()::crend() const->const_reverse_iterator {
+    return std::reverse_iterator{cend()};
+}
+METHOD_START()::end()->iterator {
+    return iterator{nullptr};
+}
+METHOD_START()::end() const->const_iterator {
+    return const_iterator{nullptr};
+}
+METHOD_START()::rbegin()->reverse_iterator {
+    return std::reverse_iterator{end()};
+}
+METHOD_START()::rbegin() const->const_reverse_iterator {
+    return std::reverse_iterator{end()};
+}
+METHOD_START()::rend()->reverse_iterator {
+    return std::reverse_iterator{begin()};
+}
+METHOD_START()::rend() const->const_reverse_iterator {
+    return std::reverse_iterator{begin()};
+}
+
+// Modifiers
 METHOD_START()::clear()->void {
     if (root_) {
         remove_from(root_);
@@ -238,7 +354,7 @@ METHOD_START(template <typename U>)::insert(U&& new_value)->void {
     auto& child{*address.child};
     if (!child) {
         child = alloc_.allocate(1);
-        new (child) node_type{address.parent, std::forward<U>(new_value)};
+        new (child) node_type(address.parent, std::forward<U>(new_value));
         size_++;
     }
 }
