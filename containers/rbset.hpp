@@ -7,6 +7,13 @@
 #include "platform_def.hpp"
 
 namespace ml {
+namespace detail {
+template <typename T>
+class rbset_node {
+    T value_;
+};
+}
+
 // Red-black tree set
 template <typename Key, typename Compare = std::less<Key>, typename Allocator = std::allocator<Key>>
 class rbset {
@@ -20,15 +27,21 @@ class rbset {
     using const_reference = value_type const&;
     using pointer = value_type*;
     using const_pointer = value_type const*;
+    using node_type = detail::rbset_node<Key>;
 
     rbset() = default;
 
+    // Iterators
     // Capacity
     auto empty() const -> bool;
     auto size() const -> size_type;
+    // Modifiers
+    // Lookup
   private:
     static inline auto compare{Compare{}};
     size_type size_{0};
+    NO_UNIQUE_ADDRESS Allocator alloc_;
+    node_type* root_{nullptr};
 };
 
 #define METHOD_START                                              \
@@ -41,7 +54,7 @@ METHOD_START::empty() const->bool {
 METHOD_START::size() const->size_type {
     return size_;
 }
-}
 
 #undef METHOD_START
+}
 #include "platform_undef.hpp"

@@ -14,6 +14,7 @@ target_sources(containers PUBLIC
   "multi_arena_resource.hpp"
   "misc.hpp"
   "polymorphic_allocator.hpp"
+  "rbset.hpp"
   "slist.hpp"
   "span.hpp"
   "span_iterator.hpp"
