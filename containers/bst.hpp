@@ -93,6 +93,15 @@ class bst {
     using pointer = value_type*;
     using const_pointer = value_type const*;
 
+    struct parent_child_pair {
+        node_type* parent{nullptr};
+        node_type** child{nullptr};
+
+        parent_child_pair(node_type* parent, node_type** child)
+            : parent{parent}
+            , child{child} {}
+    };
+
     // Access
     template <typename U>
         requires detail::bst_can_be_compared<T, U, Compare>
@@ -112,7 +121,7 @@ class bst {
     void remove_from(node_type* node);
     void remove_from(const_reference value);
   private:
-    auto get_placement_address(const_reference value) -> node_type**;
+    auto get_placement_address(const_reference value) -> parent_child_pair;
 
     inline static Compare compare{};
     NO_UNIQUE_ADDRESS allocator_type alloc_;
@@ -169,11 +178,12 @@ METHOD_START()::clear()->void {
     }
 }
 METHOD_START(template <typename U>)::insert(U&& new_value)->void {
-    node_type** node_to_add{get_placement_address(new_value)};
+    auto address{get_placement_address(new_value)};
 
-    if (!*node_to_add) {
-        *node_to_add = alloc_.allocate(1);
-        new (*node_to_add) node_type{std::forward<U>(new_value)};
+    auto& child{*address.child};
+    if (!child) {
+        child = alloc_.allocate(1);
+        new (child) node_type{std::forward<U>(new_value)};
         size_++;
     }
 }
@@ -191,40 +201,28 @@ METHOD_START()::remove_from(node_type* node)->void {
     size_--;
 }
 METHOD_START()::remove_from(const_reference value)->void {
-    if (!root_) {
+    auto address{get_placement_address(value)};
+
+    auto& child{*address.child};
+    if (!child) {
         return;
     }
 
-    node_type* current{root_};
-    node_type* parent{nullptr};
+    remove_from(child);
 
-    while (current) {
-        auto const& node_value{current->value()};
-
-        if (compare(value, node_value)) {
-            parent = current;
-            current = current->less();
-        } else if (compare(node_value, value)) {
-            parent = current;
-            current = current->greater();
+    if (address.parent) {
+        if (address.parent->less() == child) {
+            address.parent->less() = nullptr;
         } else {
-            remove_from(current);
-
-            if (parent) {
-                if (parent->less() == current) {
-                    parent->less() = nullptr;
-                } else {
-                    parent->greater() = nullptr;
-                }
-            } else {
-                root_ = nullptr;
-            }
-            return;
+            address.parent->greater() = nullptr;
         }
+    } else {
+        root_ = nullptr;
     }
 }
 
-METHOD_START()::get_placement_address(const_reference value)->node_type** {
+METHOD_START()::get_placement_address(const_reference value)->parent_child_pair {
+    node_type* parent{nullptr};
     node_type* current{root_};
     node_type** address{&root_};
 
@@ -232,10 +230,14 @@ METHOD_START()::get_placement_address(const_reference value)->node_type** {
         auto const& node_value{current->value()};
         if (compare(value, node_value)) {
             auto& ptr{current->less()};
+
+            parent = current;
             address = &ptr;
             current = ptr;
         } else if (compare(node_value, value)) {
             auto& ptr{current->greater()};
+
+            parent = current;
             address = &ptr;
             current = ptr;
         } else {
@@ -243,7 +245,7 @@ METHOD_START()::get_placement_address(const_reference value)->node_type** {
         }
     }
 
-    return address;
+    return parent_child_pair{parent, address};
 }
 
 #undef METHOD_START
