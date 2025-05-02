@@ -23,12 +23,12 @@ class bst_node {
 
     ~bst_node() = default;
 
-    auto value() -> reference;
-    auto value() const -> const_reference;
-    auto less() -> bst_node*&;
-    auto less() const -> bst_node const*&;
     auto greater() -> bst_node*&;
     auto greater() const -> bst_node const*&;
+    auto less() -> bst_node*&;
+    auto less() const -> bst_node const*&;
+    auto value() -> reference;
+    auto value() const -> const_reference;
     auto operator*() -> reference;
     auto operator*() const -> const_reference;
 
@@ -47,11 +47,11 @@ bst_node<T>::bst_node(T&& value) noexcept
     template <typename T> \
     inline auto bst_node<T>
 
-METHOD_START::value()->reference {
-    return value_;
+METHOD_START::greater()->bst_node*& {
+    return greater_;
 }
-METHOD_START::value() const->const_reference {
-    return value_;
+METHOD_START::greater() const->bst_node const*& {
+    return greater_;
 }
 METHOD_START::less()->bst_node*& {
     return less_;
@@ -59,11 +59,11 @@ METHOD_START::less()->bst_node*& {
 METHOD_START::less() const->bst_node const*& {
     return less_;
 }
-METHOD_START::greater()->bst_node*& {
-    return greater_;
+METHOD_START::value()->reference {
+    return value_;
 }
-METHOD_START::greater() const->bst_node const*& {
-    return greater_;
+METHOD_START::value() const->const_reference {
+    return value_;
 }
 METHOD_START::operator*()->reference {
     return value_;
