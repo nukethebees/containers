@@ -55,3 +55,21 @@ TEST(bst, remove_three) {
     bst.remove_from(5);
     EXPECT_EQ(bst.size(), 1);
 }
+TEST(bst, get_max) {
+    ml::bst<int> bst;
+    bst.insert(1);
+    bst.insert(5);
+    bst.insert(4);
+    bst.insert(6);
+
+    EXPECT_EQ(*bst.max(), 6);
+}
+TEST(bst, get_min) {
+    ml::bst<int> bst;
+    bst.insert(1);
+    bst.insert(5);
+    bst.insert(4);
+    bst.insert(6);
+
+    EXPECT_EQ(*bst.min(), 1);
+}

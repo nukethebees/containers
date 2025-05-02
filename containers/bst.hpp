@@ -124,6 +124,10 @@ class bst {
     template <typename U>
         requires detail::bst_can_be_compared<T, U, Compare>
     auto contains(U&& value) const -> bool;
+    template <typename Self>
+    auto* max(this Self&& self);
+    template <typename Self>
+    auto* min(this Self&& self);
     auto root() -> pointer;
     auto root() const -> const_pointer;
 
@@ -140,6 +144,11 @@ class bst {
     void remove_from(const_reference value);
   private:
     auto get_placement_address(const_reference value) -> parent_child_pair;
+    template <typename Self>
+    auto* max_node(this Self&& self);
+    template <typename Self>
+    auto* min_node(this Self&& self);
+
     void remove_from_inner(node_type* node);
 
     inline static Compare compare{};
@@ -181,6 +190,24 @@ METHOD_START()::root() const->const_pointer {
         return nullptr;
     }
     return &root_->value();
+}
+template <typename T, typename Compare, template <typename> typename Allocator>
+template <typename Self>
+inline auto* bst<T, Compare, Allocator>::max(this Self&& self) {
+    auto* ptr{std::forward<Self>(self).max_node()};
+
+    if (ptr) {
+        return &ptr->value();
+    }
+}
+template <typename T, typename Compare, template <typename> typename Allocator>
+template <typename Self>
+inline auto* bst<T, Compare, Allocator>::min(this Self&& self) {
+    auto* ptr{std::forward<Self>(self).min_node()};
+
+    if (ptr) {
+        return &ptr->value();
+    }
 }
 
 METHOD_START()::empty() const->bool {
@@ -238,24 +265,8 @@ METHOD_START()::remove_from(const_reference value)->void {
         remove_from(child);
     }
 }
-METHOD_START()::remove_from_inner(node_type* node)->void {
-    auto& less{node->less()};
-    auto& greater{node->greater()};
 
-    if (less) {
-        remove_from(less);
-        less = nullptr;
-    }
-
-    if (greater) {
-        remove_from(greater);
-        greater = nullptr;
-    }
-
-    alloc_.deallocate(node, 1);
-    size_--;
-}
-
+// Private methods
 METHOD_START()::get_placement_address(const_reference value)->parent_child_pair {
     node_type* parent{nullptr};
     node_type* current{root_};
@@ -281,6 +292,57 @@ METHOD_START()::get_placement_address(const_reference value)->parent_child_pair 
     }
 
     return parent_child_pair{parent, address};
+}
+
+template <typename T, typename Compare, template <typename> typename Allocator>
+template <typename Self>
+inline auto* bst<T, Compare, Allocator>::max_node(this Self&& self) {
+    auto* current{std::forward<Self>(self).root_};
+
+    while (current) {
+        auto* next{current->greater()};
+        if (next) {
+            current = next;
+        } else {
+            break;
+        }
+    }
+
+    return current;
+}
+template <typename T, typename Compare, template <typename> typename Allocator>
+template <typename Self>
+inline auto* bst<T, Compare, Allocator>::min_node(this Self&& self) {
+    auto* current{std::forward<Self>(self).root_};
+
+    while (current) {
+        auto* next{current->less()};
+        if (next) {
+            current = next;
+        } else {
+            break;
+        }
+    }
+
+    return current;
+}
+
+METHOD_START()::remove_from_inner(node_type* node)->void {
+    auto& less{node->less()};
+    auto& greater{node->greater()};
+
+    if (less) {
+        remove_from(less);
+        less = nullptr;
+    }
+
+    if (greater) {
+        remove_from(greater);
+        greater = nullptr;
+    }
+
+    alloc_.deallocate(node, 1);
+    size_--;
 }
 
 #undef METHOD_START
