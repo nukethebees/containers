@@ -123,6 +123,8 @@ class bst {
     using const_reference = value_type const&;
     using pointer = value_type*;
     using const_pointer = value_type const*;
+    using iterator = bst_iterator<value_type>;
+    using const_iterator = bst_iterator<value_type const>;
 
     struct parent_child_pair {
         node_type* parent{nullptr};
