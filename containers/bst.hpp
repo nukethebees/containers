@@ -115,8 +115,7 @@ class bst_iterator {
     using iterator_category = std::bidirectional_iterator_tag;
 
     bst_iterator() noexcept = default;
-    bst_iterator(node_type* ptr) noexcept
-        : ptr_{ptr} {}
+    bst_iterator(node_type* node) noexcept;
 
     auto operator*() const -> reference;
     auto operator*() -> reference;
@@ -127,22 +126,26 @@ class bst_iterator {
     auto operator--(int) -> bst_iterator;
     auto operator<=>(bst_iterator const& other) const = default;
   private:
-    node_type* ptr_{nullptr};
+    node_type* node_{nullptr};
 };
 
 template <typename T>
+inline bst_iterator<T>::bst_iterator(node_type* node) noexcept
+    : node_{node} {}
+
+template <typename T>
 inline auto bst_iterator<T>::operator*() const -> reference {
-    return ptr_->value();
+    return node_->value();
 }
 template <typename T>
 inline auto bst_iterator<T>::operator*() -> reference {
-    return ptr_->value();
+    return node_->value();
 }
 
 template <typename T>
 inline auto bst_iterator<T>::operator++() -> bst_iterator& {
-    if (ptr_) {
-        ptr_ = ptr_->greater();
+    if (node_) {
+        node_ = node_->greater();
     }
     return *this;
 }
@@ -154,8 +157,8 @@ inline auto bst_iterator<T>::operator++(int) -> bst_iterator {
 }
 template <typename T>
 inline auto bst_iterator<T>::operator--() -> bst_iterator& {
-    if (ptr_) {
-        ptr_ = ptr_->less();
+    if (node_) {
+        node_ = node_->less();
     }
     return *this;
 }
