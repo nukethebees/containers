@@ -28,11 +28,11 @@ class bst_node {
     ~bst_node() = default;
 
     auto greater() -> bst_node*&;
-    auto greater() const -> bst_node const*&;
+    auto greater() const -> bst_node const*;
     auto less() -> bst_node*&;
-    auto less() const -> bst_node const*&;
+    auto less() const -> bst_node const*;
     auto parent() -> bst_node*&;
-    auto parent() const -> bst_node const*&;
+    auto parent() const -> bst_node const*;
     auto value() -> reference;
     auto value() const -> const_reference;
     auto operator*() -> reference;
@@ -59,19 +59,19 @@ bst_node<T>::bst_node(bst_node* parent, U&& value) noexcept
 METHOD_START::greater()->bst_node*& {
     return greater_;
 }
-METHOD_START::greater() const->bst_node const*& {
+METHOD_START::greater() const->bst_node const* {
     return greater_;
 }
 METHOD_START::less()->bst_node*& {
     return less_;
 }
-METHOD_START::less() const->bst_node const*& {
+METHOD_START::less() const->bst_node const* {
     return less_;
 }
 METHOD_START::parent()->bst_node*& {
     return parent_;
 }
-METHOD_START::parent() const->bst_node const*& {
+METHOD_START::parent() const->bst_node const* {
     return parent_;
 }
 METHOD_START::value()->reference {
@@ -174,8 +174,7 @@ METHOD_START::operator++(int)->bst_iterator {
 }
 METHOD_START::operator--()->bst_iterator& {
     if (node_) {
-        node_ = nullptr;
-        // node_ = node_->less();
+        node_ = node_->less();
     }
     return *this;
 }
