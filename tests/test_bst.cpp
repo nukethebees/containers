@@ -42,3 +42,16 @@ TEST(bst, string_contains_rv_const_ptr) {
     bst.insert("foo");
     ASSERT_TRUE(bst.contains("foo"));
 }
+TEST(bst, remove_three) {
+    ml::bst<int> bst;
+    bst.insert(1);
+
+    bst.insert(5);
+    bst.insert(4);
+    bst.insert(6);
+
+    EXPECT_EQ(bst.size(), 4);
+
+    bst.remove_from(5);
+    EXPECT_EQ(bst.size(), 1);
+}

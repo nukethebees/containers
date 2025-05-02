@@ -25,10 +25,10 @@ class bst_node {
 
     auto value() -> reference;
     auto value() const -> const_reference;
-    auto less() -> bst_node*;
-    auto less() const -> bst_node const*;
-    auto greater() -> bst_node*;
-    auto greater() const -> bst_node const*;
+    auto less() -> bst_node*&;
+    auto less() const -> bst_node const*&;
+    auto greater() -> bst_node*&;
+    auto greater() const -> bst_node const*&;
 
     auto operator*() -> reference;
     auto operator*() const -> const_reference;
@@ -52,16 +52,16 @@ METHOD_START::value()->reference {
 METHOD_START::value() const->const_reference {
     return value_;
 }
-METHOD_START::less()->bst_node* {
+METHOD_START::less()->bst_node*& {
     return less_;
 }
-METHOD_START::less() const->bst_node const* {
+METHOD_START::less() const->bst_node const*& {
     return less_;
 }
-METHOD_START::greater()->bst_node* {
+METHOD_START::greater()->bst_node*& {
     return greater_;
 }
-METHOD_START::greater() const->bst_node const* {
+METHOD_START::greater() const->bst_node const*& {
     return greater_;
 }
 
@@ -102,7 +102,7 @@ class bst {
 
     // Capacity
     auto empty() const -> bool;
-    auto size() const -> bool;
+    auto size() const -> size_type;
 
     // Modifiers
     void clear();
@@ -110,6 +110,7 @@ class bst {
     void insert(U&& value);
     // Caller needs to nullify the node afterwards
     void remove_from(node_type* node);
+    void remove_from(const_reference value);
   private:
     inline static Compare compare{};
     NO_UNIQUE_ADDRESS allocator_type alloc_;
@@ -155,7 +156,7 @@ METHOD_START()::root() const->const_pointer {
 METHOD_START()::empty() const->bool {
     return size_ == 0;
 }
-METHOD_START()::size() const->bool {
+METHOD_START()::size() const->size_type {
     return size_;
 }
 
@@ -166,24 +167,30 @@ METHOD_START()::clear()->void {
     }
 }
 METHOD_START(template <typename U>)::insert(U&& new_value)->void {
-    auto* current{root_};
-
-    if (!current) {
-        root_ = alloc_.allocate(1);
-        new (root_) node_type{std::forward<U>(new_value)};
-        size_++;
-        return;
-    }
+    node_type* current{root_};
+    node_type** node_to_add{&root_};
 
     while (current) {
         auto const& node_value{current->value()};
         if (compare(new_value, node_value)) {
-            current = current->less();
+            auto& ptr{current->less()};
+            node_to_add = &ptr;
+            current = ptr;
         } else if (compare(node_value, new_value)) {
-            current = current->greater();
+            auto& ptr{current->greater()};
+            node_to_add = &ptr;
+            current = ptr;
         } else {
             return;
         }
+    }
+
+    if (node_to_add) {
+        *node_to_add = alloc_.allocate(1);
+        new (*node_to_add) node_type{std::forward<U>(new_value)};
+        size_++;
+    } else {
+        return;
     }
 }
 METHOD_START()::remove_from(node_type* node)->void {
@@ -198,6 +205,39 @@ METHOD_START()::remove_from(node_type* node)->void {
     }
     alloc_.deallocate(node, 1);
     size_--;
+}
+METHOD_START()::remove_from(const_reference value)->void {
+    if (!root_) {
+        return;
+    }
+
+    node_type* current{root_};
+    node_type* parent{nullptr};
+
+    while (current) {
+        auto const& node_value{current->value()};
+
+        if (compare(value, node_value)) {
+            parent = current;
+            current = current->less();
+        } else if (compare(node_value, value)) {
+            parent = current;
+            current = current->greater();
+        } else {
+            remove_from(current);
+
+            if (parent) {
+                if (parent->less() == current) {
+                    parent->less() = nullptr;
+                } else {
+                    parent->greater() = nullptr;
+                }
+            } else {
+                root_ = nullptr;
+            }
+            return;
+        }
+    }
 }
 
 #undef METHOD_START
