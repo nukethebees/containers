@@ -29,9 +29,10 @@ class bst_node {
     auto less() const -> bst_node const*&;
     auto greater() -> bst_node*&;
     auto greater() const -> bst_node const*&;
-
     auto operator*() -> reference;
     auto operator*() const -> const_reference;
+
+    void disconnect(bst_node* node);
   private:
     T value_;
     bst_node* less_{nullptr};
@@ -64,12 +65,19 @@ METHOD_START::greater()->bst_node*& {
 METHOD_START::greater() const->bst_node const*& {
     return greater_;
 }
-
 METHOD_START::operator*()->reference {
     return value_;
 }
 METHOD_START::operator*() const->const_reference {
     return value_;
+}
+
+METHOD_START::disconnect(bst_node* node)->void {
+    if (less_ == node) {
+        less_ = nullptr;
+    } else if (greater_ == node) {
+        greater_ = nullptr;
+    }
 }
 
 #undef METHOD_START
@@ -211,11 +219,7 @@ METHOD_START()::remove_from(const_reference value)->void {
     remove_from(child);
 
     if (address.parent) {
-        if (address.parent->less() == child) {
-            address.parent->less() = nullptr;
-        } else {
-            address.parent->greater() = nullptr;
-        }
+        address.parent->disconnect(child);
     } else {
         root_ = nullptr;
     }
