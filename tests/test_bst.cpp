@@ -21,7 +21,7 @@ TEST(bst, remove_single_verify_null_root) {
     ml::bst<int> bst;
     bst.insert(1);
     bst.clear();
-    ASSERT_EQ(nullptr, bst.root());
+    ASSERT_EQ(nullptr, bst.root_value());
 }
 TEST(bst, contains_int1) {
     ml::bst<int> bst;
@@ -75,7 +75,22 @@ TEST(bst, get_min) {
 
     EXPECT_EQ(*bst.min(), 1);
 }
+TEST(bst, range_based_for_sum) {
+    ml::bst<int> bst;
 
+    std::vector<int> values{1, 2, 3, 4, 5};
+    for (auto const& value : values) {
+        bst.insert(value);
+    }
+
+    auto sum = 0;
+    auto end{bst.end()};
+    for (auto it{bst.begin()}; it != end; ++it) {
+        sum += *it;
+    }
+
+    EXPECT_EQ(sum, 15);
+}
 TEST(bst, accumulate) {
     ml::bst<int> bst;
     std::vector<int> values{1, 2, 3, 4, 5};
@@ -92,5 +107,39 @@ TEST(bst, accumulate_const) {
         bst.insert(value);
     }
     auto sum = std::accumulate(bst.cbegin(), bst.cend(), 0);
+    EXPECT_EQ(sum, 15);
+}
+TEST(bst, range_based_for_sum_reverse) {
+    ml::bst<int> bst;
+
+    std::vector<int> values{1, 2, 3, 4, 5};
+    for (auto const& value : values) {
+        bst.insert(value);
+    }
+
+    auto sum = 0;
+    auto end{bst.crend()};
+    for (auto it{bst.crbegin()}; it != end; ++it) {
+        sum += *it;
+    }
+
+    EXPECT_EQ(sum, 15);
+}
+TEST(bst, accumulate_reverse) {
+    ml::bst<int> bst;
+    std::vector<int> values{1, 2, 3, 4, 5};
+    for (auto const& value : values) {
+        bst.insert(value);
+    }
+    auto sum = std::accumulate(bst.rbegin(), bst.rend(), 0);
+    EXPECT_EQ(sum, 15);
+}
+TEST(bst, accumulate_reverse_const) {
+    ml::bst<int> bst;
+    std::vector<int> values{1, 2, 3, 4, 5};
+    for (auto const& value : values) {
+        bst.insert(value);
+    }
+    auto sum = std::accumulate(bst.crbegin(), bst.crend(), 0);
     EXPECT_EQ(sum, 15);
 }

@@ -104,18 +104,20 @@ concept bst_can_be_compared = requires(T t, U u) {
 };
 }
 
-template <typename T>
+template <typename T, bool is_const>
 class bst_iterator {
   public:
     using difference_type = std::ptrdiff_t;
-    using node_type = detail::bst_node<std::remove_cvref_t<T>>;
+    using element_type = std::remove_cvref_t<T>;
+    using node_type =
+        std::conditional_t<is_const, detail::bst_node<element_type> const, detail::bst_node<element_type>>;
     using value_type = T;
     using pointer = value_type*;
     using reference = value_type&;
     using iterator_category = std::bidirectional_iterator_tag;
 
     bst_iterator() noexcept = default;
-    bst_iterator(node_type* node) noexcept;
+    bst_iterator(node_type* parent, node_type* node, bool is_end = false) noexcept;
 
     auto operator*() const -> reference;
     auto operator*() -> reference;
@@ -127,52 +129,68 @@ class bst_iterator {
     auto operator<=>(bst_iterator const& other) const = default;
   private:
     node_type* node_{nullptr};
+    node_type* parent_{nullptr};
+    bool is_end_{false};
 };
 
-template <typename T>
-inline bst_iterator<T>::bst_iterator(node_type* node) noexcept
-    : node_{node} {}
+#define METHOD_START                     \
+    template <typename T, bool is_const> \
+    inline auto bst_iterator<T, is_const>
 
-template <typename T>
-inline auto bst_iterator<T>::operator*() const -> reference {
+template <typename T, bool is_const>
+inline bst_iterator<T, is_const>::bst_iterator(node_type* parent, node_type* node, bool is_end) noexcept
+    : node_{node}
+    , parent_{parent}
+    , is_end_{is_end} {}
+
+METHOD_START::operator*() const->reference {
     return node_->value();
 }
-template <typename T>
-inline auto bst_iterator<T>::operator*() -> reference {
+METHOD_START::operator*()->reference {
     return node_->value();
 }
+METHOD_START::operator++()->bst_iterator& {
+    bool const has_parent{parent_ != nullptr};
+    bool const has_node{node_ != nullptr};
 
-template <typename T>
-inline auto bst_iterator<T>::operator++() -> bst_iterator& {
-    if (node_) {
-        node_ = node_->greater();
+    // We want to traverse the values in order
+    // The parent must be greater than both the current node and the greater child
+    // Traverse through the greaters until we reach the end
+    // If we reach the end, traverse through the parents until we find a greater parent
+
+    if (has_parent && has_node) {
+
+    } else if (has_node) {
+
+    } else if (has_parent) {
     }
+
     return *this;
 }
-template <typename T>
-inline auto bst_iterator<T>::operator++(int) -> bst_iterator {
+METHOD_START::operator++(int)->bst_iterator {
     auto temp{*this};
     ++(*this);
     return temp;
 }
-template <typename T>
-inline auto bst_iterator<T>::operator--() -> bst_iterator& {
+METHOD_START::operator--()->bst_iterator& {
     if (node_) {
-        node_ = node_->less();
+        node_ = nullptr;
+        // node_ = node_->less();
     }
     return *this;
 }
-template <typename T>
-inline auto bst_iterator<T>::operator--(int) -> bst_iterator {
+METHOD_START::operator--(int)->bst_iterator {
     auto temp{*this};
     --(*this);
     return temp;
 }
 
-static_assert(std::input_or_output_iterator<bst_iterator<int>>);
-static_assert(std::input_iterator<bst_iterator<int>>);
-static_assert(std::forward_iterator<bst_iterator<int>>);
-static_assert(std::bidirectional_iterator<bst_iterator<int>>);
+// static_assert(std::input_or_output_iterator<bst_iterator<int>>);
+// static_assert(std::input_iterator<bst_iterator<int>>);
+// static_assert(std::forward_iterator<bst_iterator<int>>);
+// static_assert(std::bidirectional_iterator<bst_iterator<int>>);
+
+#undef METHOD_START
 
 template <typename T, typename Compare = std::less<T>, template <typename> typename Allocator = std::allocator>
 class bst {
@@ -185,8 +203,8 @@ class bst {
     using const_reference = value_type const&;
     using pointer = value_type*;
     using const_pointer = value_type const*;
-    using iterator = bst_iterator<value_type>;
-    using const_iterator = bst_iterator<value_type const>;
+    using iterator = bst_iterator<value_type, false>;
+    using const_iterator = bst_iterator<value_type const, true>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -207,8 +225,7 @@ class bst {
     auto* max(this Self&& self);
     template <typename Self>
     auto* min(this Self&& self);
-    auto root() -> pointer;
-    auto root() const -> const_pointer;
+    auto root_value() const -> const_pointer;
 
     // Capacity
     auto empty() const -> bool;
@@ -236,12 +253,16 @@ class bst {
     void remove_from(node_type* node);
     void remove_from(const_reference value);
   private:
+    // Access
+    auto root() -> node_type*;
+    auto root() const -> node_type const*;
     auto get_placement_address(const_reference value) -> parent_child_pair;
     template <typename Self>
     auto* max_node(this Self&& self);
     template <typename Self>
     auto* min_node(this Self&& self);
 
+    // Modifiers
     void remove_from_inner(node_type* node);
 
     inline static Compare compare{};
@@ -273,18 +294,6 @@ inline auto bst<T, Compare, Allocator>::contains(U&& value) const -> bool {
     }
     return false;
 }
-METHOD_START()::root()->pointer {
-    if (!root_) {
-        return nullptr;
-    }
-    return &root_->value();
-}
-METHOD_START()::root() const->const_pointer {
-    if (!root_) {
-        return nullptr;
-    }
-    return &root_->value();
-}
 template <typename T, typename Compare, template <typename> typename Allocator>
 template <typename Self>
 inline auto* bst<T, Compare, Allocator>::max(this Self&& self) {
@@ -297,6 +306,12 @@ inline auto* bst<T, Compare, Allocator>::min(this Self&& self) {
     auto* ptr{std::forward<Self>(self).min_node()};
     return ptr ? &ptr->value() : nullptr;
 }
+METHOD_START()::root_value() const->const_pointer {
+    if (root_) {
+        return &root_->value();
+    }
+    return nullptr;
+}
 
 // Capacity
 METHOD_START()::empty() const->bool {
@@ -308,16 +323,28 @@ METHOD_START()::size() const->size_type {
 
 // Iterators
 METHOD_START()::begin()->iterator {
-    return iterator{root_};
+    auto* node{min_node()};
+    if (!node) {
+        return {};
+    }
+    return {node->parent(), node};
 }
 METHOD_START()::begin() const->const_iterator {
-    return const_iterator{root_};
+    auto* node{min_node()};
+    if (!node) {
+        return {};
+    }
+    return {node->parent(), node};
 }
 METHOD_START()::cbegin() const->const_iterator {
-    return const_iterator(root_);
+    auto* node{min_node()};
+    if (!node) {
+        return {};
+    }
+    return {node->parent(), node};
 }
 METHOD_START()::cend() const->const_iterator {
-    return const_iterator{nullptr};
+    return {nullptr, root(), true};
 }
 METHOD_START()::crbegin() const->const_reverse_iterator {
     return std::reverse_iterator{cbegin()};
@@ -326,10 +353,10 @@ METHOD_START()::crend() const->const_reverse_iterator {
     return std::reverse_iterator{cend()};
 }
 METHOD_START()::end()->iterator {
-    return iterator{nullptr};
+    return {nullptr, root(), true};
 }
 METHOD_START()::end() const->const_iterator {
-    return const_iterator{nullptr};
+    return {nullptr, root(), true};
 }
 METHOD_START()::rbegin()->reverse_iterator {
     return std::reverse_iterator{end()};
@@ -395,6 +422,13 @@ METHOD_START()::remove_from(const_reference value)->void {
 }
 
 // Private methods
+// Access
+METHOD_START()::root()->node_type* {
+    return root_;
+}
+METHOD_START()::root() const->node_type const* {
+    return root_;
+}
 METHOD_START()::get_placement_address(const_reference value)->parent_child_pair {
     node_type* parent{nullptr};
     node_type* current{root_};
@@ -421,7 +455,6 @@ METHOD_START()::get_placement_address(const_reference value)->parent_child_pair 
 
     return parent_child_pair{parent, address};
 }
-
 template <typename T, typename Compare, template <typename> typename Allocator>
 template <typename Self>
 inline auto* bst<T, Compare, Allocator>::max_node(this Self&& self) {
@@ -455,6 +488,7 @@ inline auto* bst<T, Compare, Allocator>::min_node(this Self&& self) {
     return current;
 }
 
+// Modifiers
 METHOD_START()::remove_from_inner(node_type* node)->void {
     auto& less{node->less()};
     auto& greater{node->greater()};
