@@ -88,11 +88,14 @@ class bst {
     using const_pointer = value_type const*;
 
     // Access
+    auto contains(const_reference value) -> bool;
     auto root() -> pointer;
     auto root() const -> const_pointer;
+
     // Capacity
     auto empty() const -> bool;
     auto size() const -> bool;
+
     // Modifiers
     void clear();
     template <typename U>
@@ -111,6 +114,20 @@ class bst {
     __VA_OPT__(__VA_ARGS__)                                                         \
     inline auto bst<T, Compare, Allocator>
 
+METHOD_START()::contains(const_reference value)->bool {
+    auto* current{root_};
+    while (current) {
+        auto const& node_value{current->value()};
+        if (compare(value, node_value)) {
+            current = current->less();
+        } else if (compare(node_value, value)) {
+            current = current->greater();
+        } else {
+            return true;
+        }
+    }
+    return false;
+}
 METHOD_START()::root()->pointer {
     if (!root_) {
         return nullptr;
@@ -139,14 +156,15 @@ METHOD_START()::clear()->void {
 }
 METHOD_START(template <typename U>)::insert(U&& new_value)->void {
     auto* current{root_};
-    while (true) {
-        if (!current) {
-            current = alloc_.allocate(1);
-            new (current) node_type(std::forward<U>(new_value));
-            size_++;
-            return;
-        }
 
+    if (!current) {
+        root_ = alloc_.allocate(1);
+        new (root_) node_type{std::forward<U>(new_value)};
+        size_++;
+        return;
+    }
+
+    while (current) {
         auto const& node_value{current->value()};
         if (compare(new_value, node_value)) {
             current = current->less();

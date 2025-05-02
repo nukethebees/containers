@@ -1,3 +1,5 @@
+#include <string>
+
 #include <gtest/gtest.h>
 
 #include "containers/bst.hpp"
@@ -18,4 +20,14 @@ TEST(bst, remove_single_verify_null_root) {
     bst.insert(1);
     bst.clear();
     ASSERT_EQ(nullptr, bst.root());
+}
+TEST(bst, contains_int1) {
+    ml::bst<int> bst;
+    bst.insert(1);
+    ASSERT_TRUE(bst.contains(1));
+}
+TEST(bst, contains_string_foo) {
+    ml::bst<std::string> bst;
+    bst.insert("foo");
+    ASSERT_TRUE(bst.contains("foo"));
 }
