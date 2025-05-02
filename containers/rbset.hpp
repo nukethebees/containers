@@ -8,10 +8,21 @@
 
 namespace ml {
 namespace detail {
+enum class rb_colour : unsigned char { red, black };
+
 template <typename T>
 class rbset_node {
     T value_;
+    rb_colour color_;
+
+    rbset_node() = delete;
+    rbset_node(T&& value, rb_colour color) noexcept;
 };
+
+template <typename T>
+rbset_node<T>::rbset_node(T&& value, rb_colour color) noexcept
+    : value_{std::move(value)}
+    , color_{color} {}
 }
 
 // Red-black tree set
