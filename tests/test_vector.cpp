@@ -140,6 +140,17 @@ TEST(vector, accumulate_const) {
     int sum = std::accumulate(values.cbegin(), values.cend(), 0);
     EXPECT_EQ(sum, 6);
 }
+TEST(vector, for_sum_reverse) {
+    ml::vector<int> values;
+    values.emplace_back(1);
+    values.emplace_back(2);
+    values.emplace_back(3);
+    int sum = 0;
+    for (auto it = values.rbegin(); it != values.rend(); ++it) {
+        sum += *it;
+    }
+    EXPECT_EQ(sum, 6);
+}
 TEST(vector, accumulate_reverse) {
     ml::vector<int> values;
     values.emplace_back(1);

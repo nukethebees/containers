@@ -141,7 +141,7 @@ template <typename T, bool is_const>
 inline bst_iterator<T, is_const>::bst_iterator(node_type* parent, node_type* node, bool is_end) noexcept
     : node_{node}
     , parent_{parent}
-    , is_end_{is_end} {}
+    , is_end_{is_end && false} {}
 
 METHOD_START::operator*() const->reference {
     return node_->value();
@@ -150,19 +150,9 @@ METHOD_START::operator*()->reference {
     return node_->value();
 }
 METHOD_START::operator++()->bst_iterator& {
-    bool const has_parent{parent_ != nullptr};
-    bool const has_node{node_ != nullptr};
-
-    // We want to traverse the values in order
-    // The parent must be greater than both the current node and the greater child
-    // Traverse through the greaters until we reach the end
-    // If we reach the end, traverse through the parents until we find a greater parent
-
-    if (has_parent && has_node) {
-
-    } else if (has_node) {
-
-    } else if (has_parent) {
+    if (node_) {
+        parent_ = node_;
+        node_ = node_->greater();
     }
 
     return *this;
@@ -174,7 +164,16 @@ METHOD_START::operator++(int)->bst_iterator {
 }
 METHOD_START::operator--()->bst_iterator& {
     if (node_) {
-        node_ = node_->less();
+        if (node_->less()) {
+            parent_ = node_;
+            node_ = node_->less();
+        } else if (parent_) {
+            node_ = parent_;
+            parent_ = parent_->parent();
+        }
+    } else if (parent_) {
+        node_ = parent_;
+        parent_ = parent_->parent();
     }
     return *this;
 }
@@ -184,10 +183,10 @@ METHOD_START::operator--(int)->bst_iterator {
     return temp;
 }
 
-// static_assert(std::input_or_output_iterator<bst_iterator<int>>);
-// static_assert(std::input_iterator<bst_iterator<int>>);
-// static_assert(std::forward_iterator<bst_iterator<int>>);
-// static_assert(std::bidirectional_iterator<bst_iterator<int>>);
+static_assert(std::input_or_output_iterator<bst_iterator<int, false>>);
+static_assert(std::input_iterator<bst_iterator<int, false>>);
+static_assert(std::forward_iterator<bst_iterator<int, false>>);
+static_assert(std::bidirectional_iterator<bst_iterator<int, false>>);
 
 #undef METHOD_START
 
@@ -343,31 +342,31 @@ METHOD_START()::cbegin() const->const_iterator {
     return {node->parent(), node};
 }
 METHOD_START()::cend() const->const_iterator {
-    return {nullptr, root(), true};
+    return {max_node(), nullptr, true};
 }
 METHOD_START()::crbegin() const->const_reverse_iterator {
-    return std::reverse_iterator{cbegin()};
+    return const_reverse_iterator{cend()};
 }
 METHOD_START()::crend() const->const_reverse_iterator {
-    return std::reverse_iterator{cend()};
+    return const_reverse_iterator{cbegin()};
 }
 METHOD_START()::end()->iterator {
-    return {nullptr, root(), true};
+    return {max_node(), nullptr, true};
 }
 METHOD_START()::end() const->const_iterator {
-    return {nullptr, root(), true};
+    return {max_node(), nullptr, true};
 }
 METHOD_START()::rbegin()->reverse_iterator {
-    return std::reverse_iterator{end()};
+    return reverse_iterator{end()};
 }
 METHOD_START()::rbegin() const->const_reverse_iterator {
-    return std::reverse_iterator{end()};
+    return const_reverse_iterator{end()};
 }
 METHOD_START()::rend()->reverse_iterator {
-    return std::reverse_iterator{begin()};
+    return reverse_iterator{begin()};
 }
 METHOD_START()::rend() const->const_reverse_iterator {
-    return std::reverse_iterator{begin()};
+    return const_reverse_iterator{begin()};
 }
 
 // Modifiers
