@@ -99,6 +99,19 @@ concept bst_can_be_compared = requires(T t, U u) {
 };
 }
 
+template <typename T>
+class bst_iterator {
+  public:
+    using value_type = T;
+    using node_type = detail::bst_node<value_type>;
+
+    bst_iterator() noexcept = default;
+    bst_iterator(node_type* ptr) noexcept
+        : ptr_{ptr} {}
+  private:
+    node_type* ptr_{nullptr};
+};
+
 template <typename T, typename Compare = std::less<T>, template <typename> typename Allocator = std::allocator>
 class bst {
   public:
@@ -195,19 +208,13 @@ template <typename T, typename Compare, template <typename> typename Allocator>
 template <typename Self>
 inline auto* bst<T, Compare, Allocator>::max(this Self&& self) {
     auto* ptr{std::forward<Self>(self).max_node()};
-
-    if (ptr) {
-        return &ptr->value();
-    }
+    return ptr ? &ptr->value() : nullptr;
 }
 template <typename T, typename Compare, template <typename> typename Allocator>
 template <typename Self>
 inline auto* bst<T, Compare, Allocator>::min(this Self&& self) {
     auto* ptr{std::forward<Self>(self).min_node()};
-
-    if (ptr) {
-        return &ptr->value();
-    }
+    return ptr ? &ptr->value() : nullptr;
 }
 
 METHOD_START()::empty() const->bool {
