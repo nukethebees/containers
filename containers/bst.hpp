@@ -112,6 +112,8 @@ class bst {
     void remove_from(node_type* node);
     void remove_from(const_reference value);
   private:
+    auto get_placement_address(const_reference value) -> node_type**;
+
     inline static Compare compare{};
     NO_UNIQUE_ADDRESS allocator_type alloc_;
     node_type* root_{nullptr};
@@ -167,30 +169,12 @@ METHOD_START()::clear()->void {
     }
 }
 METHOD_START(template <typename U>)::insert(U&& new_value)->void {
-    node_type* current{root_};
-    node_type** node_to_add{&root_};
+    node_type** node_to_add{get_placement_address(new_value)};
 
-    while (current) {
-        auto const& node_value{current->value()};
-        if (compare(new_value, node_value)) {
-            auto& ptr{current->less()};
-            node_to_add = &ptr;
-            current = ptr;
-        } else if (compare(node_value, new_value)) {
-            auto& ptr{current->greater()};
-            node_to_add = &ptr;
-            current = ptr;
-        } else {
-            return;
-        }
-    }
-
-    if (node_to_add) {
+    if (!*node_to_add) {
         *node_to_add = alloc_.allocate(1);
         new (*node_to_add) node_type{std::forward<U>(new_value)};
         size_++;
-    } else {
-        return;
     }
 }
 METHOD_START()::remove_from(node_type* node)->void {
@@ -238,6 +222,28 @@ METHOD_START()::remove_from(const_reference value)->void {
             return;
         }
     }
+}
+
+METHOD_START()::get_placement_address(const_reference value)->node_type** {
+    node_type* current{root_};
+    node_type** address{&root_};
+
+    while (current) {
+        auto const& node_value{current->value()};
+        if (compare(value, node_value)) {
+            auto& ptr{current->less()};
+            address = &ptr;
+            current = ptr;
+        } else if (compare(node_value, value)) {
+            auto& ptr{current->greater()};
+            address = &ptr;
+            current = ptr;
+        } else {
+            break;
+        }
+    }
+
+    return address;
 }
 
 #undef METHOD_START
