@@ -73,6 +73,12 @@ METHOD_START::operator*() const->const_reference {
 }
 
 #undef METHOD_START
+
+template <typename T, typename U, typename Compare>
+concept bst_can_be_compared = requires(T t, U u) {
+    { Compare{}(u, t) } -> std::convertible_to<bool>;
+    { Compare{}(t, u) } -> std::convertible_to<bool>;
+};
 }
 
 template <typename T, typename Compare = std::less<T>, template <typename> typename Allocator = std::allocator>
@@ -88,7 +94,9 @@ class bst {
     using const_pointer = value_type const*;
 
     // Access
-    auto contains(const_reference value) -> bool;
+    template <typename U>
+        requires detail::bst_can_be_compared<T, U, Compare>
+    auto contains(U&& value) const -> bool;
     auto root() -> pointer;
     auto root() const -> const_pointer;
 
@@ -114,13 +122,16 @@ class bst {
     __VA_OPT__(__VA_ARGS__)                                                         \
     inline auto bst<T, Compare, Allocator>
 
-METHOD_START()::contains(const_reference value)->bool {
+template <typename T, typename Compare, template <typename> typename Allocator>
+template <typename U>
+    requires detail::bst_can_be_compared<T, U, Compare>
+inline auto bst<T, Compare, Allocator>::contains(U&& value) const -> bool {
     auto* current{root_};
     while (current) {
         auto const& node_value{current->value()};
         if (compare(value, node_value)) {
             current = current->less();
-        } else if (compare(node_value, value)) {
+        } else if (compare(node_value, std::forward<U>(value))) {
             current = current->greater();
         } else {
             return true;

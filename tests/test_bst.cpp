@@ -31,3 +31,14 @@ TEST(bst, contains_string_foo) {
     bst.insert("foo");
     ASSERT_TRUE(bst.contains("foo"));
 }
+TEST(bst, string_contains_lv_const_ptr) {
+    ml::bst<std::string> bst;
+    bst.insert("foo");
+    char const* str{"foo"};
+    ASSERT_TRUE(bst.contains(str));
+}
+TEST(bst, string_contains_rv_const_ptr) {
+    ml::bst<std::string> bst;
+    bst.insert("foo");
+    ASSERT_TRUE(bst.contains("foo"));
+}
