@@ -109,7 +109,7 @@ class bst {
     template <typename U>
     void insert(U&& value);
     // Caller needs to nullify the node afterwards
-    void remove(node_type* node);
+    void remove_from(node_type* node);
   private:
     inline static Compare compare{};
     NO_UNIQUE_ADDRESS allocator_type alloc_;
@@ -161,7 +161,7 @@ METHOD_START()::size() const->bool {
 
 METHOD_START()::clear()->void {
     if (root_) {
-        remove(root_);
+        remove_from(root_);
         root_ = nullptr;
     }
 }
@@ -186,15 +186,15 @@ METHOD_START(template <typename U>)::insert(U&& new_value)->void {
         }
     }
 }
-METHOD_START()::remove(node_type* node)->void {
+METHOD_START()::remove_from(node_type* node)->void {
     if (!node) {
         return;
     }
     if (node->less()) {
-        remove(node->less());
+        remove_from(node->less());
     }
     if (node->greater()) {
-        remove(node->greater());
+        remove_from(node->greater());
     }
     alloc_.deallocate(node, 1);
     size_--;
