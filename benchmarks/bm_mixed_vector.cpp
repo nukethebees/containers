@@ -97,8 +97,8 @@ static void BM_mixed_vector_multipool_t_allocator(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * n_placements * 3);
 }
 
-BENCHMARK(BM_mixed_vector_std);
-BENCHMARK(BM_mixed_vector_single_resource);
-BENCHMARK(BM_mixed_vector_multipool_allocator);
-BENCHMARK(BM_mixed_vector_multipool_t_allocator);
+//BENCHMARK(BM_mixed_vector_std);
+//BENCHMARK(BM_mixed_vector_single_resource);
+//BENCHMARK(BM_mixed_vector_multipool_allocator);
+//BENCHMARK(BM_mixed_vector_multipool_t_allocator);
 
