@@ -10,72 +10,124 @@
 
 constexpr int n_placements{25'000};
 constexpr int n_reserve{100};
-constexpr int arena_elems_to_allocate{10'000};
+constexpr int arena_elems_to_allocate{1'000};
 
-using T = double;
+constexpr int ITER_ELEMS{n_placements * n_reserve};
+constexpr int N_READ_LOOPS{5};
 
-static constexpr auto INITIAL_SIZE{sizeof(T) * arena_elems_to_allocate};
+struct TestStruct {
+    int a;
+    double b;
+    std::string c;
+
+    TestStruct(int i)
+        : a(i)
+        , b(static_cast<int>(i))
+        , c("This is a very long string that will need dynamic allocation.") {}
+};
+struct TestStructPmr {
+    int a;
+    double b;
+    std::pmr::string c;
+
+    TestStructPmr(int i, std::pmr::memory_resource* resource)
+        : a(i)
+        , b(static_cast<int>(i))
+        , c("This is a very long string that will need dynamic allocation.", resource) {}
+};
+
+using TA = TestStruct;
+using TP = TestStructPmr;
+
+static constexpr auto INITIAL_SIZE{sizeof(TP) * arena_elems_to_allocate};
+
+#define ITERATE_AFTER
+
+#define READ_LOOP                                       \
+    for (int i = 0; i < N_READ_LOOPS; i++) {            \
+        for (auto const& inner_container : container) { \
+            for (auto const& item : inner_container) {  \
+                benchmark::DoNotOptimize(item);         \
+            }                                           \
+        }                                               \
+    }
 
 static void BM_vl_vector_std(benchmark::State& state) {
     for (auto _ : state) {
-        std::vector<std::vector<T>> vec{};
+        std::vector<std::vector<TA>> container{};
         for (int i = 0; i < n_placements; ++i) {
-            vec.emplace_back();
-            auto& inner_vec{vec.back()};
+            container.emplace_back();
+            auto& inner_container{container.back()};
 
             for (int j = 0; j < n_reserve; j++) {
-                inner_vec.push_back(static_cast<T>(i));
+                inner_container.emplace_back(i);
             }
         }
+
+#ifdef ITERATE_AFTER
+        READ_LOOP
+#endif
     }
-    state.SetItemsProcessed(state.iterations() * n_placements);
+    state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
 static void BM_vl_list_std(benchmark::State& state) {
     for (auto _ : state) {
-        std::list<std::list<T>> list{};
+        std::list<std::list<TA>> container{};
 
         for (int i = 0; i < n_placements; ++i) {
-            list.emplace_back();
-            auto& inner_list{list.back()};
+            container.emplace_back();
+            auto& inner_container{container.back()};
 
             for (int j = 0; j < n_reserve; j++) {
-                inner_list.push_back(static_cast<T>(i));
+                inner_container.emplace_back(i);
             }
         }
+
+#ifdef ITERATE_AFTER
+        READ_LOOP
+#endif
     }
-    state.SetItemsProcessed(state.iterations() * n_placements);
+    state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
 static void BM_vl_vector_alloc(benchmark::State& state) {
     for (auto _ : state) {
         ml::ArenaMemoryResourcePmr resource{INITIAL_SIZE};
-        std::pmr::vector<std::pmr::vector<T>> vec{&resource};
+        std::pmr::vector<std::pmr::vector<TP>> container{&resource};
 
         for (int i = 0; i < n_placements; ++i) {
-            vec.emplace_back();
-            auto& inner_vec{vec.back()};
+            container.emplace_back();
+            auto& inner_container{container.back()};
 
             for (int j = 0; j < n_reserve; j++) {
-                inner_vec.push_back(static_cast<T>(i));
+                inner_container.emplace_back(i, &resource);
             }
         }
+
+#ifdef ITERATE_AFTER
+        READ_LOOP
+#endif
     }
-    state.SetItemsProcessed(state.iterations() * n_placements);
+    state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
 static void BM_vl_list_alloc(benchmark::State& state) {
     for (auto _ : state) {
         ml::ArenaMemoryResourcePmr resource{INITIAL_SIZE};
-        std::pmr::list<std::pmr::list<T>> list{&resource};
+        std::pmr::list<std::pmr::list<TP>> container{&resource};
 
         for (int i = 0; i < n_placements; ++i) {
-            list.emplace_back();
-            auto& inner_list{list.back()};
+            container.emplace_back();
+            auto& inner_container{container.back()};
 
             for (int j = 0; j < n_reserve; j++) {
-                inner_list.push_back(static_cast<T>(i));
+                inner_container.emplace_back(i, &resource);
             }
         }
+
+#ifdef ITERATE_AFTER
+        READ_LOOP
+#endif
     }
-    state.SetItemsProcessed(state.iterations() * n_placements);
+    state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
 
 BENCHMARK(BM_vl_vector_std);
