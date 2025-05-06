@@ -13,7 +13,7 @@ constexpr int n_reserve{100};
 constexpr int arena_elems_to_allocate{1'000};
 
 constexpr int ITER_ELEMS{n_placements * n_reserve};
-constexpr int N_READ_LOOPS{5};
+constexpr int N_READ_LOOPS{1};
 
 struct TestStruct {
     int a;
@@ -41,7 +41,7 @@ using TP = TestStructPmr;
 
 static constexpr auto INITIAL_SIZE{sizeof(TP) * arena_elems_to_allocate};
 
-#define ITERATE_AFTER
+// #define ITERATE_AFTER
 
 #define READ_LOOP                                       \
     for (int i = 0; i < N_READ_LOOPS; i++) {            \
@@ -52,7 +52,7 @@ static constexpr auto INITIAL_SIZE{sizeof(TP) * arena_elems_to_allocate};
         }                                               \
     }
 
-static void BM_vl_vector_std(benchmark::State& state) {
+static void BM_vl_wr_vector_std(benchmark::State& state) {
     for (auto _ : state) {
         std::vector<std::vector<TA>> container{};
         for (int i = 0; i < n_placements; ++i) {
@@ -70,7 +70,7 @@ static void BM_vl_vector_std(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
-static void BM_vl_list_std(benchmark::State& state) {
+static void BM_vl_wr_list_std(benchmark::State& state) {
     for (auto _ : state) {
         std::list<std::list<TA>> container{};
 
@@ -89,7 +89,7 @@ static void BM_vl_list_std(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
-static void BM_vl_vector_alloc(benchmark::State& state) {
+static void BM_vl_wr_vector_alloc(benchmark::State& state) {
     for (auto _ : state) {
         ml::ArenaMemoryResourcePmr resource{INITIAL_SIZE};
         std::pmr::vector<std::pmr::vector<TP>> container{&resource};
@@ -109,7 +109,7 @@ static void BM_vl_vector_alloc(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
-static void BM_vl_list_alloc(benchmark::State& state) {
+static void BM_vl_wr_list_alloc(benchmark::State& state) {
     for (auto _ : state) {
         ml::ArenaMemoryResourcePmr resource{INITIAL_SIZE};
         std::pmr::list<std::pmr::list<TP>> container{&resource};
@@ -130,7 +130,86 @@ static void BM_vl_list_alloc(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
 
-BENCHMARK(BM_vl_vector_std);
-BENCHMARK(BM_vl_vector_alloc);
-BENCHMARK(BM_vl_list_std);
-BENCHMARK(BM_vl_list_alloc);
+static void BM_vl_rd_vector_std(benchmark::State& state) {
+    std::vector<std::vector<TA>> container{};
+    for (int i = 0; i < n_placements; ++i) {
+        container.emplace_back();
+        auto& inner_container{container.back()};
+
+        for (int j = 0; j < n_reserve; j++) {
+            inner_container.emplace_back(i);
+        }
+    }
+
+    for (auto _ : state) {
+        READ_LOOP
+    }
+
+    state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
+}
+static void BM_vl_rd_list_std(benchmark::State& state) {
+    std::list<std::list<TA>> container{};
+
+    for (int i = 0; i < n_placements; ++i) {
+        container.emplace_back();
+        auto& inner_container{container.back()};
+
+        for (int j = 0; j < n_reserve; j++) {
+            inner_container.emplace_back(i);
+        }
+    }
+
+    for (auto _ : state) {
+        READ_LOOP
+    }
+
+    state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
+}
+static void BM_vl_rd_vector_alloc(benchmark::State& state) {
+    ml::ArenaMemoryResourcePmr resource{INITIAL_SIZE};
+    std::pmr::vector<std::pmr::vector<TP>> container{&resource};
+
+    for (int i = 0; i < n_placements; ++i) {
+        container.emplace_back();
+        auto& inner_container{container.back()};
+
+        for (int j = 0; j < n_reserve; j++) {
+            inner_container.emplace_back(i, &resource);
+        }
+    }
+
+    for (auto _ : state) {
+        READ_LOOP
+    }
+
+    state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
+}
+static void BM_vl_rd_list_alloc(benchmark::State& state) {
+    ml::ArenaMemoryResourcePmr resource{INITIAL_SIZE};
+    std::pmr::list<std::pmr::list<TP>> container{&resource};
+
+    for (int i = 0; i < n_placements; ++i) {
+        container.emplace_back();
+        auto& inner_container{container.back()};
+
+        for (int j = 0; j < n_reserve; j++) {
+            inner_container.emplace_back(i, &resource);
+        }
+    }
+
+    for (auto _ : state) {
+        READ_LOOP
+    }
+
+    state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
+}
+
+BENCHMARK(BM_vl_wr_vector_std);
+BENCHMARK(BM_vl_wr_vector_alloc);
+BENCHMARK(BM_vl_wr_list_std);
+BENCHMARK(BM_vl_wr_list_alloc);
+
+BENCHMARK(BM_vl_rd_vector_std);
+BENCHMARK(BM_vl_rd_vector_alloc);
+BENCHMARK(BM_vl_rd_list_std);
+BENCHMARK(BM_vl_rd_list_alloc);
