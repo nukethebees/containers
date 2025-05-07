@@ -199,6 +199,49 @@ METHOD_START::operator++(int)->bst_iterator {
     return temp;
 }
 METHOD_START::operator--()->bst_iterator& {
+    // Reverse the process of ++
+
+    if (node_) {
+        auto* next{node_->less()};
+
+        if (next) {
+            while (next->greater()) {
+                next = next->greater();
+            }
+
+            node_ = next;
+        } else {
+            auto* current{node_};
+            auto const& current_value{node_->value()};
+
+            while (current->parent()) {
+                auto const& parent_value{current->parent()->value()};
+
+                if (compare(parent_value, current_value)) {
+                    current = current->parent();
+                    break;
+                }
+
+                current = current->parent();
+            }
+
+            if (current->value() >= current_value) {
+                this->parent_ = node_->parent();
+                this->node_ = node_;
+            } else {
+                node_ = current;
+                parent_ = node_->parent();
+            }
+        }
+    } else {
+        if (parent_) {
+            // If the parent is not null, assign the parent to the node
+            node_ = parent_;
+            if (node_->parent()) {
+                parent_ = node_->parent();
+            }
+        }
+    }
 
     return *this;
 }
