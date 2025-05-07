@@ -197,8 +197,36 @@ TEST(bst, accumulate_reverse_const) {
 }
 
 TEST(bst, iterator_forward_order) {
-    FAIL();
+    ml::bst<int> bst;
+    for (auto const& value : values2) {
+        bst.insert(value);
+    }
+
+    auto b_it{bst.cbegin()};
+    auto b_end{bst.cend()};
+
+    auto vals{values2};
+    std::sort(vals.begin(), vals.end(), std::less<int>());
+    auto v_it{vals.cbegin()};
+
+    for (; b_it != b_end; ++b_it, ++v_it) {
+        EXPECT_EQ(*b_it, *v_it);
+    }
 }
 TEST(bst, iterator_reverse_order) {
-    FAIL();
+    ml::bst<int> bst;
+    for (auto const& value : values2) {
+        bst.insert(value);
+    }
+
+    auto b_it{bst.crbegin()};
+    auto b_end{bst.crend()};
+
+    auto vals{values2};
+    std::sort(vals.begin(), vals.end(), std::less<int>());
+    auto v_it{vals.crbegin()};
+
+    for (; b_it != b_end; ++b_it, ++v_it) {
+        EXPECT_EQ(*b_it, *v_it);
+    }
 }
