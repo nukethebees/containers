@@ -8,6 +8,9 @@
 
 #include "configure_warning_pragmas.hpp"
 
+static std::vector<int> many_values{50, 55, 60, 35, 25, 20, 5, 15, 22, 57, 59};
+static auto many_values_sum{std::accumulate(many_values.begin(), many_values.end(), 0)};
+
 TEST(bst, empty_bst) {
     ml::bst<int> bst;
     ASSERT_TRUE(bst.empty());
@@ -91,6 +94,21 @@ TEST(bst, range_based_for_sum) {
 
     EXPECT_EQ(sum, 15);
 }
+TEST(bst, range_based_for_sum_2) {
+    ml::bst<int> bst;
+
+    for (auto const& value : many_values) {
+        bst.insert(value);
+    }
+
+    auto sum = 0;
+    auto end{bst.end()};
+    for (auto it{bst.begin()}; it != end; ++it) {
+        sum += *it;
+    }
+
+    EXPECT_EQ(sum, many_values_sum);
+}
 TEST(bst, accumulate) {
     ml::bst<int> bst;
     std::vector<int> values{1, 2, 3, 4, 5};
@@ -99,6 +117,21 @@ TEST(bst, accumulate) {
     }
     auto sum = std::accumulate(bst.begin(), bst.end(), 0);
     EXPECT_EQ(sum, 15);
+}
+TEST(bst, accumulate_complicated_tree) {
+    ml::bst<int> bst;
+
+    auto sum{0};
+    auto expected_sum{0};
+
+    for (auto const& value : many_values) {
+        bst.insert(value);
+        expected_sum += value;
+    }
+
+    sum = std::accumulate(bst.begin(), bst.end(), 0);
+
+    EXPECT_EQ(sum, expected_sum);
 }
 TEST(bst, accumulate_const) {
     ml::bst<int> bst;

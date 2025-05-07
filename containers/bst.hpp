@@ -104,7 +104,7 @@ concept bst_can_be_compared = requires(T t, U u) {
 };
 }
 
-template <typename T, bool is_const>
+template <typename T, bool is_const, typename Compare>
 class bst_iterator {
   public:
     using difference_type = std::ptrdiff_t;
@@ -117,7 +117,7 @@ class bst_iterator {
     using iterator_category = std::bidirectional_iterator_tag;
 
     bst_iterator() noexcept = default;
-    bst_iterator(node_type* parent, node_type* node, bool is_end = false) noexcept;
+    bst_iterator(node_type* parent, node_type* node) noexcept;
 
     auto operator*() const -> reference;
     auto operator*() -> reference;
@@ -128,20 +128,19 @@ class bst_iterator {
     auto operator--(int) -> bst_iterator;
     auto operator<=>(bst_iterator const& other) const = default;
   private:
+    inline static Compare compare{};
     node_type* node_{nullptr};
     node_type* parent_{nullptr};
-    bool is_end_{false};
 };
 
-#define METHOD_START                     \
-    template <typename T, bool is_const> \
-    inline auto bst_iterator<T, is_const>
+#define METHOD_START                                       \
+    template <typename T, bool is_const, typename Compare> \
+    inline auto bst_iterator<T, is_const, Compare>
 
-template <typename T, bool is_const>
-inline bst_iterator<T, is_const>::bst_iterator(node_type* parent, node_type* node, bool is_end) noexcept
+template <typename T, bool is_const, typename Compare>
+inline bst_iterator<T, is_const, Compare>::bst_iterator(node_type* parent, node_type* node) noexcept
     : node_{node}
-    , parent_{parent}
-    , is_end_{is_end && false} {}
+    , parent_{parent} {}
 
 METHOD_START::operator*() const->reference {
     return node_->value();
@@ -150,9 +149,46 @@ METHOD_START::operator*()->reference {
     return node_->value();
 }
 METHOD_START::operator++()->bst_iterator& {
+    // Follow the greater path until it's null
+    // If there's no greater value then ascend to the next larger value
+
     if (node_) {
-        parent_ = node_;
-        node_ = node_->greater();
+        auto* next{node_->greater()};
+
+        if (next) {
+            // Go to the smallest value in the greater path
+            while (next->less()) {
+                next = next->less();
+            }
+
+            node_ = next;
+        } else {
+            // Ascend to the next larger value
+            auto* current{node_};
+            auto const& current_value{node_->value()};
+
+            while (current->parent()) {
+                // Ascend to the parent with a value greater than the current value
+                auto const& parent_value{current->parent()->value()};
+
+                if (compare(current_value, parent_value)) {
+                    current = current->parent();
+                    break;
+                }
+
+                current = current->parent();
+            }
+
+            if (current->value() <= current_value) {
+                // If the current value is the same as the parent value
+                // We've reached the end
+                // Assign the max value as the parent and nullify the node
+                this->parent_ = node_;
+                this->node_ = nullptr;
+            } else {
+                node_ = current;
+            }
+        }
     }
 
     return *this;
@@ -163,18 +199,7 @@ METHOD_START::operator++(int)->bst_iterator {
     return temp;
 }
 METHOD_START::operator--()->bst_iterator& {
-    if (node_) {
-        if (node_->less()) {
-            parent_ = node_;
-            node_ = node_->less();
-        } else if (parent_) {
-            node_ = parent_;
-            parent_ = parent_->parent();
-        }
-    } else if (parent_) {
-        node_ = parent_;
-        parent_ = parent_->parent();
-    }
+
     return *this;
 }
 METHOD_START::operator--(int)->bst_iterator {
@@ -183,10 +208,10 @@ METHOD_START::operator--(int)->bst_iterator {
     return temp;
 }
 
-static_assert(std::input_or_output_iterator<bst_iterator<int, false>>);
-static_assert(std::input_iterator<bst_iterator<int, false>>);
-static_assert(std::forward_iterator<bst_iterator<int, false>>);
-static_assert(std::bidirectional_iterator<bst_iterator<int, false>>);
+static_assert(std::input_or_output_iterator<bst_iterator<int, false, std::less<int>>>);
+static_assert(std::input_iterator<bst_iterator<int, false, std::less<int>>>);
+static_assert(std::forward_iterator<bst_iterator<int, false, std::less<int>>>);
+static_assert(std::bidirectional_iterator<bst_iterator<int, false, std::less<int>>>);
 
 #undef METHOD_START
 
@@ -201,8 +226,8 @@ class bst {
     using const_reference = value_type const&;
     using pointer = value_type*;
     using const_pointer = value_type const*;
-    using iterator = bst_iterator<value_type, false>;
-    using const_iterator = bst_iterator<value_type const, true>;
+    using iterator = bst_iterator<value_type, false, Compare>;
+    using const_iterator = bst_iterator<value_type const, true, Compare>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -342,7 +367,7 @@ METHOD_START()::cbegin() const->const_iterator {
     return {node->parent(), node};
 }
 METHOD_START()::cend() const->const_iterator {
-    return {max_node(), nullptr, true};
+    return {max_node(), nullptr};
 }
 METHOD_START()::crbegin() const->const_reverse_iterator {
     return const_reverse_iterator{cend()};
@@ -351,10 +376,10 @@ METHOD_START()::crend() const->const_reverse_iterator {
     return const_reverse_iterator{cbegin()};
 }
 METHOD_START()::end()->iterator {
-    return {max_node(), nullptr, true};
+    return {max_node(), nullptr};
 }
 METHOD_START()::end() const->const_iterator {
-    return {max_node(), nullptr, true};
+    return {max_node(), nullptr};
 }
 METHOD_START()::rbegin()->reverse_iterator {
     return reverse_iterator{end()};
