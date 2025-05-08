@@ -24,8 +24,8 @@ class bst {
     using const_reference = value_type const&;
     using pointer = value_type*;
     using const_pointer = value_type const*;
-    using iterator = bst_iterator<value_type, false, Compare>;
-    using const_iterator = bst_iterator<value_type const, true, Compare>;
+    using iterator = bst_iterator<node_type, Compare>;
+    using const_iterator = bst_iterator<node_type const, Compare>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 

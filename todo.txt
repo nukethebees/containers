@@ -1,4 +1,3 @@
-Remove is_const from bst iterator
 Clean up bst iterator compare member
 
 Clean up bst unit tests
