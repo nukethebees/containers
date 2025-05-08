@@ -4,6 +4,7 @@
 
 #include "linked_vector_segment.hpp"
 #include "linked_vector_iterator.hpp"
+#include "allocator.hpp"
 
 #include "platform_def.hpp"
 
@@ -20,7 +21,8 @@ Hybrid elements: X<->XX<->XXXX<->XXXXXXXX<->XXXXXXXXXXXXXXXX
 The initial capacity can be set by explicitly reserving the memory.
 The growth factor is 2x.
 */
-template <typename T, typename Allocator = std::allocator<T>>
+template <typename T, typename Allocator = ml::allocator<std::byte>>
+    requires can_allocate_bytes<Allocator>
 class linked_vector {
   public:
     using value_type = T;
@@ -50,9 +52,10 @@ class linked_vector {
     segment_type* tail_{nullptr};
 };
 
-#define METHOD_START(...)                     \
-    template <typename T, typename Allocator> \
-    __VA_OPT__(__VA_ARGS__)                   \
+#define METHOD_START(...)                      \
+    template <typename T, typename Allocator>  \
+        requires can_allocate_bytes<Allocator> \
+    __VA_OPT__(__VA_ARGS__)                    \
     inline auto linked_vector<T, Allocator>
 
 // Capacity
