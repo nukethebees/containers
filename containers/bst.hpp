@@ -1,9 +1,5 @@
 #pragma once
 
-#include <cstddef>
-#include <compare>
-#include <iterator>
-#include <functional>
 #include <memory>
 #include <type_traits>
 
@@ -13,7 +9,7 @@
 
 // Binary search tree
 namespace ml {
-template <typename T, typename Compare = std::less<T>, template <typename> typename Allocator = std::allocator>
+template <typename T, typename Compare = std::less<>, template <typename> typename Allocator = std::allocator>
 class bst {
   public:
     using value_type = T;
