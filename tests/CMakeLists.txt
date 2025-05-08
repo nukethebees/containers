@@ -17,7 +17,8 @@ target_sources(tests PRIVATE
   "test_dlist.cpp"
   "test_static_vector.cpp"
   "test_rbset.cpp" 
-  "test_bst.cpp")
+  "test_bst.cpp" 
+  "test_linked_vector.cpp")
 
 if (MSVC)
   target_compile_options(tests PRIVATE 
