@@ -54,41 +54,48 @@ METHOD_START::operator++()->bst_iterator& {
     // Follow the greater path until it's null
     // If there's no greater value then ascend to the next larger value
 
-    if (node_) {
-        auto* next{node_->greater()};
+    // Local copy to keep it in registers
+    auto* current_node{node_};
 
-        if (next) {
-            // Go to the smallest value in the greater path
-            while (next->less()) {
-                next = next->less();
+    if (current_node) {
+        if (auto* new_node{current_node->greater()}) {
+            auto* new_least_node{new_node->less()};
+
+            if (new_least_node) {
+                // Go to the smallest value in the greater path
+                do {
+                    new_node = new_least_node;
+                    new_least_node = new_least_node->less();
+                } while (new_least_node);
             }
 
-            node_ = next;
+            node_ = new_node;
+            parent_ = new_node->parent();
         } else {
             // Ascend to the next larger value
-            auto* current{node_};
             auto const& current_value{node_->value()};
 
-            while (current->parent()) {
+            auto* new_parent{current_node->parent()};
+            while (new_parent) {
                 // Ascend to the parent with a value greater than the current value
-                auto const& parent_value{current->parent()->value()};
+                auto const& parent_value{new_parent->value()};
 
+                // Check parent is greater than current value
                 if (compare(current_value, parent_value)) {
-                    current = current->parent();
+                    current_node = new_parent;
                     break;
                 }
 
-                current = current->parent();
+                new_parent = new_parent->parent();
             }
 
-            if (current->value() <= current_value) {
-                // If the current value is the same as the parent value
-                // We've reached the end
+            if (current_node->value() <= current_value) {
+                // If the current value is the same as the parent value then we've reached the end
                 // Assign the max value as the parent and nullify the node
-                this->parent_ = node_;
-                this->node_ = nullptr;
+                parent_ = node_;
+                node_ = nullptr;
             } else {
-                node_ = current;
+                node_ = current_node;
             }
         }
     }

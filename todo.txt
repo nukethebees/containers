@@ -1,5 +1,3 @@
-Clean up bst iterator compare member
-
 Clean up bst unit tests
 
 Add test to generate stream of random values for bst
