@@ -128,8 +128,7 @@ METHOD_START::operator--()->bst_iterator& {
             }
 
             if (current->value() >= current_value) {
-                this->parent_ = node_->parent();
-                this->node_ = node_;
+                // Must be at the beginning
             } else {
                 node_ = current;
                 parent_ = node_->parent();
@@ -138,6 +137,7 @@ METHOD_START::operator--()->bst_iterator& {
     } else {
         if (parent_) {
             // If the parent is not null, assign the parent to the node
+            // This should only happen when we're at the max value
             node_ = parent_;
             if (node_->parent()) {
                 parent_ = node_->parent();
