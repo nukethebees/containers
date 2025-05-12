@@ -88,10 +88,15 @@ class ArenaMemoryResource {
     auto operator=(ArenaMemoryResource const&) -> ArenaMemoryResource& = delete;
     auto operator=(ArenaMemoryResource&& other) -> ArenaMemoryResource&;
 
-    auto initial_capacity() const -> std::size_t;
-    auto pool() const -> ArenaMemoryResourcePool const*;
+    // Access
+    auto pool() const->ArenaMemoryResourcePool const*;
+    
+    // Capacity
+    auto initial_capacity() const -> std::size_t;   
     auto n_pools() const -> std::size_t;
     auto total_size() const -> std::size_t;
+
+    // Allocation
     auto allocate(std::size_t n_bytes, std::size_t alignment) -> void*;
     auto deallocate(void* ptr, std::size_t n_bytes, std::size_t alignment) -> void;
 };
@@ -102,11 +107,15 @@ inline ArenaMemoryResource::~ArenaMemoryResource() {
         delete[] reinterpret_cast<std::byte*>(pool_);
     }
 }
-inline auto ArenaMemoryResource::initial_capacity() const -> std::size_t {
-    return initial_capacity_;
-}
+
+// Access
 inline auto ArenaMemoryResource::pool() const -> ArenaMemoryResourcePool const* {
     return pool_;
+}
+
+// Capacity
+inline auto ArenaMemoryResource::initial_capacity() const -> std::size_t {
+    return initial_capacity_;
 }
 inline auto ArenaMemoryResource::n_pools() const -> std::size_t {
     std::size_t count{0};
@@ -122,6 +131,8 @@ inline auto ArenaMemoryResource::total_size() const -> std::size_t {
     }
     return total;
 }
+
+// Allocation
 inline auto ArenaMemoryResource::deallocate(void* ptr, std::size_t n_bytes, std::size_t alignment) -> void {
     if (pool_) {
         pool_->deallocate(ptr, n_bytes, alignment);

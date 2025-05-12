@@ -32,20 +32,16 @@ auto ArenaMemoryResource::operator=(ArenaMemoryResource&& other) -> ArenaMemoryR
 }
 
 auto ArenaMemoryResource::allocate(std::size_t n_bytes, std::size_t alignment) -> void* {
+    auto make_new_size{[](auto cap, auto n_b) { return ml::max(cap, (n_b / cap) * std::size_t{2} * cap); }};
+
     if (!last_pool_) {
         auto const cap{initial_capacity_};
-        auto const new_size{ml::max(cap, (n_bytes / cap) * std::size_t{2} * cap)};
-        pool_ = ArenaMemoryResourcePool::create_pool(new_size);
+        pool_ = ArenaMemoryResourcePool::create_pool(make_new_size(cap, n_bytes));
         last_pool_ = pool_;
-        return last_pool_->allocate(n_bytes, alignment);
-    }
-
-    if (last_pool_->remaining_capacity() <= n_bytes) {
+    } else if (last_pool_->remaining_capacity() <= n_bytes) {
         auto const cap{last_pool_->total_capacity()};
-        auto const new_size{ml::max(cap * 2, (n_bytes / cap) * std::size_t{2} * cap)};
-        last_pool_->next_pool_ = ArenaMemoryResourcePool::create_pool(new_size);
+        last_pool_->next_pool_ = ArenaMemoryResourcePool::create_pool(make_new_size(cap, n_bytes));
         last_pool_ = last_pool_->next_pool_;
-        return last_pool_->allocate(n_bytes, alignment);
     }
 
     return last_pool_->allocate(n_bytes, alignment);
