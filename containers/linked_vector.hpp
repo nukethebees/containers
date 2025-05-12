@@ -41,6 +41,10 @@ class linked_vector {
     linked_vector() noexcept = default;
     ~linked_vector();
 
+    // Element access
+    auto data() -> pointer;
+    auto data() const -> const_pointer;
+
     // Capacity
     auto capacity() const -> size_type;
     auto empty() const -> bool;
@@ -87,6 +91,14 @@ inline linked_vector<T, Allocator>::~linked_vector() {
         requires can_allocate_bytes<Allocator> \
     __VA_OPT__(__VA_ARGS__)                    \
     inline auto linked_vector<T, Allocator>
+
+// Element access
+METHOD_START()::data()->pointer {
+    return head_ ? head_->data : nullptr;
+}
+METHOD_START()::data() const->const_pointer {
+    return head_ ? head_->data : nullptr;
+}
 
 // Capacity
 METHOD_START()::capacity() const->size_type {
