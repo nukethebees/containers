@@ -80,6 +80,25 @@ TEST(linked_vector, accumulate_const_reverse) {
     int sum = std::accumulate(values.crbegin(), values.crend(), 0);
     EXPECT_EQ(sum, 10);
 }
+TEST(linked_vector, iter_sum_empty) {
+    ml::linked_vector<int> values;
+    values.reserve(5);
+    int sum = 0;
+    for (auto it = values.begin(); it != values.end(); ++it) {
+        sum += *it;
+    }
+    EXPECT_EQ(sum, 0);
+}
+TEST(linked_vector, iter_sum_reverse_empty) {
+    ml::linked_vector<int> values;
+    values.reserve(5);
+    int sum = 0;
+    auto rend{values.rend()};
+    for (auto it = values.rbegin(); it != rend; ++it) {
+        sum += *it;
+    }
+    EXPECT_EQ(sum, 0);
+}
 
 // Modification
 TEST(linked_vector, reserve_one_elem) {

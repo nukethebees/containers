@@ -130,7 +130,7 @@ METHOD_START()::cbegin() const->const_iterator {
     return const_iterator(head_);
 }
 METHOD_START()::cend() const->const_iterator {
-    return const_iterator(tail_, nullptr, 0);
+    return const_iterator(tail_, nullptr, 0, tail_ ? tail_->size : 0);
 }
 METHOD_START()::crbegin() const->const_reverse_iterator {
     return const_reverse_iterator(cend());
@@ -139,7 +139,7 @@ METHOD_START()::crend() const->const_reverse_iterator {
     return const_reverse_iterator(cbegin());
 }
 METHOD_START()::end()->iterator {
-    return iterator(tail_, nullptr, 0);
+    return iterator(tail_, nullptr, 0, tail_ ? tail_->size : 0);
 }
 METHOD_START()::end() const->const_iterator {
     return cend();
