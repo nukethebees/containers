@@ -34,6 +34,10 @@ class linked_vector {
     using pointer = value_type*;
     using const_pointer = value_type const*;
     using allocator_type = Allocator;
+    using iterator = linked_vector_iterator<segment_type>;
+    using const_iterator = linked_vector_iterator<segment_type const>;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     static constexpr auto data_alignment{alignof(value_type)};
     static constexpr auto segment_alignment{alignof(segment_type)};
@@ -44,6 +48,20 @@ class linked_vector {
     // Element access
     auto data() -> pointer;
     auto data() const -> const_pointer;
+
+    // Iterators
+    auto begin() -> iterator;
+    auto begin() const -> const_iterator;
+    auto cbegin() const -> const_iterator;
+    auto cend() const -> const_iterator;
+    auto crbegin() const -> const_reverse_iterator;
+    auto crend() const -> const_reverse_iterator;
+    auto end() -> iterator;
+    auto end() const -> const_iterator;
+    auto rbegin() -> reverse_iterator;
+    auto rbegin() const -> const_reverse_iterator;
+    auto rend() -> reverse_iterator;
+    auto rend() const -> const_reverse_iterator;
 
     // Capacity
     auto capacity() const -> size_type;
@@ -98,6 +116,44 @@ METHOD_START()::data()->pointer {
 }
 METHOD_START()::data() const->const_pointer {
     return head_ ? head_->data : nullptr;
+}
+
+// Iterators
+METHOD_START()::begin()->iterator {
+    return iterator(head_);
+}
+METHOD_START()::begin() const->const_iterator {
+    return cbegin();
+}
+METHOD_START()::cbegin() const->const_iterator {
+    return const_iterator(head_);
+}
+METHOD_START()::cend() const->const_iterator {
+    return const_iterator(tail_, nullptr, 0);
+}
+METHOD_START()::crbegin() const->const_reverse_iterator {
+    return const_reverse_iterator(cend());
+}
+METHOD_START()::crend() const->const_reverse_iterator {
+    return const_reverse_iterator(cbegin());
+}
+METHOD_START()::end()->iterator {
+    return iterator(tail_, nullptr, 0);
+}
+METHOD_START()::end() const->const_iterator {
+    return cend();
+}
+METHOD_START()::rbegin()->reverse_iterator {
+    return reverse_iterator(end());
+}
+METHOD_START()::rbegin() const->const_reverse_iterator {
+    return crbegin();
+}
+METHOD_START()::rend()->reverse_iterator {
+    return reverse_iterator(begin());
+}
+METHOD_START()::rend() const->const_reverse_iterator {
+    return crend();
 }
 
 // Capacity

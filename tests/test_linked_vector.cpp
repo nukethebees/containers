@@ -57,3 +57,30 @@ TEST(linked_vector, emplace_string) {
     EXPECT_EQ(values.size(), 1);
     EXPECT_FALSE(values.empty());
 }
+TEST(linked_vector, range_for_sum) {
+    ml::linked_vector<int> values;
+
+    values.reserve(5);
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+
+    int sum = 0;
+    for (auto const& value : values) {
+        sum += value;
+    }
+
+    EXPECT_EQ(sum, 10);
+}
+TEST(linked_vector, const_reverse_iter_sum) {
+    ml::linked_vector<int> values;
+    values.reserve(5);
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+    int sum = 0;
+    for (auto it = values.crbegin(); it != values.crend(); ++it) {
+        sum += *it;
+    }
+    EXPECT_EQ(sum, 10);
+}
