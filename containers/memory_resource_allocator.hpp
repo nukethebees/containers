@@ -30,8 +30,9 @@ class MemoryResourceAllocator {
     auto operator=(MemoryResourceAllocator&&) -> MemoryResourceAllocator& = default;
 
     [[nodiscard]] auto allocate(size_type n_elems) -> pointer;
-    [[nodiscard]] auto reallocate(pointer p, size_type n_elems) -> pointer;
-    auto deallocate(pointer, size_type) -> void;
+    [[nodiscard]] auto allocate_bytes(size_type n_bytes, size_type alignment) -> pointer;
+    auto deallocate(pointer ptr, size_type n_elems) -> void;
+    auto deallocate_bytes(pointer ptr, size_type n_bytes, size_type alignment) -> void;
 
     template <typename... Args>
     auto construct(pointer p, Args&&... args) -> void;
@@ -43,35 +44,43 @@ class MemoryResourceAllocator {
 };
 
 template <typename T, typename MemoryResource>
-auto MemoryResourceAllocator<T, MemoryResource>::allocate(size_type n_elems) -> pointer {
+inline auto MemoryResourceAllocator<T, MemoryResource>::allocate(size_type n_elems) -> pointer {
     if (!resource_) {
         throw std::bad_alloc{};
     }
     return static_cast<pointer>(resource_->allocate(n_elems * sizeof(T), alignof(T)));
 }
+template <typename T, typename MemoryResource>
+inline auto MemoryResourceAllocator<T, MemoryResource>::allocate_bytes(size_type n_bytes, size_type alignment)
+    -> pointer {
+    if (!resource_) {
+        throw std::bad_alloc{};
+    }
+    return static_cast<pointer>(resource_->allocate(n_bytes, alignment));
+}
 
 template <typename T, typename MemoryResource>
-auto MemoryResourceAllocator<T, MemoryResource>::reallocate(pointer p, size_type n_elems) -> pointer {
-    if (n_elems == 0) {
-        deallocate(p, n_elems);
-        return nullptr;
+inline auto MemoryResourceAllocator<T, MemoryResource>::deallocate(pointer ptr, size_type n_elems) -> void {
+    auto const n_bytes{n_elems * sizeof(T)};
+    return deallocate_bytes(ptr, n_bytes, alignof(T));
+}
+template <typename T, typename MemoryResource>
+inline auto MemoryResourceAllocator<T, MemoryResource>::deallocate_bytes(pointer ptr,
+                                                                         size_type n_bytes,
+                                                                         size_type alignment) -> void {
+    if (!ptr) {
+        return;
     }
     if (!resource_) {
         throw std::bad_alloc{};
     }
-    return static_cast<pointer>(resource_->reallocate(p, n_elems * sizeof(T), alignof(T)));
-}
-
-template <typename T, typename MemoryResource>
-auto MemoryResourceAllocator<T, MemoryResource>::deallocate(pointer, size_type) -> void {
-    // No-op
-    // The memory will be deallocated when the resource is destroyed
+    resource_->deallocate(ptr, n_bytes, alignment);
     return;
 }
 
 template <typename T, typename MemoryResource>
 template <typename... Args>
-auto MemoryResourceAllocator<T, MemoryResource>::construct(pointer p, Args&&... args) -> void {
+inline auto MemoryResourceAllocator<T, MemoryResource>::construct(pointer p, Args&&... args) -> void {
     if (!p) {
         throw std::bad_alloc{};
     }
@@ -80,7 +89,7 @@ auto MemoryResourceAllocator<T, MemoryResource>::construct(pointer p, Args&&... 
 
 template <typename T, typename MemoryResource>
 template <typename... Args>
-auto MemoryResourceAllocator<T, MemoryResource>::construct_new(Args&&... args) -> T& {
+inline auto MemoryResourceAllocator<T, MemoryResource>::construct_new(Args&&... args) -> T& {
     auto* ptr{allocate(1)};
     if (!ptr) {
         throw std::bad_alloc{};

@@ -75,7 +75,6 @@ inline auto ArenaMemoryResourcePool::create_pool(std::size_t initial_size) -> Ar
     return new (buffer) ArenaMemoryResourcePool(initial_size);
 }
 inline auto ArenaMemoryResourcePool::allocate(std::size_t n_bytes, std::size_t alignment) -> void* {
-    auto const cur_size{size()};
     auto* new_start{static_cast<void*>(next_alloc_start())};
 
     if (!std::align(alignment, n_bytes, new_start, remaining_capacity_)) {

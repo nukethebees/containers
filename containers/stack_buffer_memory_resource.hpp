@@ -24,6 +24,7 @@ class StackBufferMemoryResource {
         this->last_allocation_ = new_start;
         return this->last_allocation_;
     }
+    void deallocate(void* /*alloc*/, std::size_t /*n_bytes*/, std::size_t /*alignment*/) { return; }
     [[nodiscard]] auto remaining_capacity() const -> std::size_t { return remaining_capacity_; }
     [[nodiscard]] auto size() const -> std::size_t { return CAPACITY - remaining_capacity_; }
 };
