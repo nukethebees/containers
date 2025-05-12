@@ -73,6 +73,7 @@ class linked_vector {
     void clear();
     template <typename... Args>
     void emplace_back(Args&&... args);
+    void pop_back();
     template <typename U>
     void push_back(U&&);
   private:
@@ -209,6 +210,30 @@ METHOD_START(template <typename U>)::push_back(U&& value)->void {
 
     ++segment->size;
     ++size_;
+}
+METHOD_START()::pop_back()->void {
+    if (size_ == 0) {
+        return;
+    }
+
+    auto* segment{tail_};
+    auto seg_size{segment->size};
+
+    if (!seg_size) {
+        tail_ = segment->prev;
+        seg_size = tail_->size;
+    }
+
+    if (seg_size == 1) {
+        destroy_segment_elements(&segment->data[0], 1);
+        segment->size = 0;
+    } else {
+        auto* last_elem{&segment->data[seg_size - 1]};
+        last_elem->~value_type();
+        --segment->size;
+    }
+
+    --size_;
 }
 
 // Private
