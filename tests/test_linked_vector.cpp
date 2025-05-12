@@ -10,3 +10,10 @@ TEST(linked_vector, init_empty_int_vector) {
     EXPECT_EQ(values.size(), 0);
     EXPECT_TRUE(values.empty());
 }
+TEST(linked_vector, reserve_one_elem) {
+    ml::linked_vector<int> values;
+    values.reserve(1);
+    EXPECT_EQ(values.capacity(), 1);
+    EXPECT_EQ(values.size(), 0);
+    EXPECT_TRUE(values.empty());
+}

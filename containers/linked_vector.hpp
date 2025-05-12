@@ -35,15 +35,21 @@ class linked_vector {
     using const_pointer = value_type const*;
     using allocator_type = Allocator;
 
+    static constexpr auto data_alignment{alignof(value_type)};
+    static constexpr auto segment_alignment{alignof(segment_type)};
+
     linked_vector() noexcept = default;
+    ~linked_vector();
 
     // Capacity
     auto capacity() const -> size_type;
     auto empty() const -> bool;
+    auto reserve(size_type n_elems) -> void;
     auto size() const -> size_type;
   private:
     // Capacity
-    void add_segment(size_type size);
+    void construct_segment(size_type size);
+    void destroy_segment(segment_type* segment);
 
     NO_UNIQUE_ADDRESS Allocator alloc_;
     size_type size_{0};
@@ -51,6 +57,21 @@ class linked_vector {
     segment_type* head_{nullptr};
     segment_type* tail_{nullptr};
 };
+
+template <typename T, typename Allocator>
+    requires can_allocate_bytes<Allocator>
+inline linked_vector<T, Allocator>::~linked_vector() {
+    auto* segment{head_};
+    while (segment) {
+        auto* next_segment{segment->next};
+        destroy_segment(segment);
+        segment = next_segment;
+    }
+    head_ = nullptr;
+    tail_ = nullptr;
+    size_ = 0;
+    capacity_ = 0;
+}
 
 #define METHOD_START(...)                      \
     template <typename T, typename Allocator>  \
@@ -65,13 +86,54 @@ METHOD_START()::capacity() const->size_type {
 METHOD_START()::empty() const->bool {
     return size_ == 0;
 }
+METHOD_START()::reserve(size_type n_elems)->void {
+    if (n_elems > capacity_) {
+        auto const elements_needed{n_elems - capacity_};
+
+        construct_segment(elements_needed);
+        capacity_ = n_elems;
+    }
+}
 METHOD_START()::size() const->size_type {
     return size_;
 }
 
 // Private
 // Capacity
-METHOD_START()::add_segment(size_type n_elems)->void {}
+METHOD_START()::construct_segment(size_type n_elems)->void {
+    static constexpr auto segment_bytes{sizeof(segment_type)};
+    auto data_bytes{sizeof(value_type) * n_elems};
+
+    // Allocate space for the segment and the data
+    void* segment_ptr{alloc_.allocate_bytes(segment_bytes, segment_alignment)};
+    void* data_ptr{alloc_.allocate_bytes(data_bytes, data_alignment)};
+
+    // Construct the segment
+    auto* segment{new (segment_ptr) segment_type(tail_, n_elems, reinterpret_cast<pointer>(data_ptr))};
+
+    if (tail_) {
+        tail_->next = segment;
+    } else {
+        head_ = segment;
+    }
+    tail_ = segment;
+}
+METHOD_START()::destroy_segment(segment_type* segment)->void {
+    auto* const seg_data{segment->data};
+    auto const seg_size{segment->size};
+    auto const seg_capacity{segment->capacity};
+
+    for (size_type i{0}; i < seg_size; ++i) {
+        seg_data[i].~value_type();
+    }
+
+    if (segment) {
+        auto const data_bytes{sizeof(value_type) * seg_capacity};
+
+        alloc_.deallocate_bytes(reinterpret_cast<void*>(seg_data), data_bytes, data_alignment);
+        alloc_.deallocate_bytes(reinterpret_cast<void*>(segment), sizeof(segment_type), segment_alignment);
+    }
+}
 
 #undef METHOD_START
 
