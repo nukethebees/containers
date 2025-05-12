@@ -16,6 +16,7 @@ class ArenaMemoryResourcePool {
 
     // Access
     auto next_pool() const -> ArenaMemoryResourcePool const*;
+    auto data() -> std::byte*;
 
     // Capacity
     auto total_capacity() const -> std::size_t;
@@ -45,6 +46,9 @@ inline ArenaMemoryResourcePool::~ArenaMemoryResourcePool() {
 inline auto ArenaMemoryResourcePool::next_pool() const -> ArenaMemoryResourcePool const* {
     return next_pool_;
 }
+inline auto ArenaMemoryResourcePool::data() -> std::byte* {
+    return static_cast<std::byte*>(static_cast<void*>(this)) + sizeof(ArenaMemoryResourcePool);
+}
 // Capacity
 inline auto ArenaMemoryResourcePool::total_capacity() const -> std::size_t {
     return total_capacity_;
@@ -63,10 +67,7 @@ inline auto ArenaMemoryResourcePool::create_pool(std::size_t initial_size) -> Ar
 }
 inline auto ArenaMemoryResourcePool::allocate(std::size_t n_bytes, std::size_t alignment) -> void* {
     auto const cur_size{size()};
-
-    static constexpr std::size_t this_size{sizeof(std::remove_cvref_t<decltype(*this)>)};
-
-    auto* new_start{static_cast<void*>(static_cast<std::byte*>(static_cast<void*>(this)) + this_size + cur_size)};
+    auto* new_start{static_cast<void*>(data() + cur_size)};
 
     if (!std::align(alignment, n_bytes, new_start, remaining_capacity_)) {
         throw std::bad_alloc{};
