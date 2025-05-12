@@ -4,7 +4,7 @@
 #include "misc.hpp"
 
 namespace ml {
-ArenaMemoryResource::ArenaMemoryResource(std::size_t initial_capacity)
+ArenaMemoryResource::ArenaMemoryResource(size_type initial_capacity)
     : initial_capacity_{initial_capacity} {}
 ArenaMemoryResource::ArenaMemoryResource(ArenaMemoryResource&& other)
     : pool_{other.pool_}
@@ -27,8 +27,8 @@ auto ArenaMemoryResource::operator=(ArenaMemoryResource&& other) -> ArenaMemoryR
     return *this;
 }
 
-auto ArenaMemoryResource::allocate(std::size_t n_bytes, std::size_t alignment) -> void* {
-    auto make_new_size{[](auto cap, auto n_b) { return ml::max(cap, (n_b / cap) * std::size_t{2} * cap); }};
+auto ArenaMemoryResource::allocate(size_type n_bytes, size_type alignment) -> void* {
+    auto make_new_size{[](auto cap, auto n_b) { return ml::max(cap, (n_b / cap) * size_type{2} * cap); }};
 
     if (!last_pool_) {
         auto const cap{initial_capacity_};
