@@ -128,11 +128,18 @@ TEST(arena, total_size_and_add_objects) {
 // Realloc
 TEST(arena, extend) {
     ml::ArenaMemoryResource resource;
-    ml::ArenaAllocator<int> alloc{ &resource };
-    
-    (void)alloc.allocate(1);
+    ml::ArenaAllocator<int> alloc{&resource};
 
+    auto const sz{sizeof(int)};
+    auto const ao{alignof(int)};
 
+    auto* ptr1{alloc.allocate_bytes(sz, ao)};
+    EXPECT_EQ(resource.total_size(), sz);
+
+    auto* ptr2{alloc.extend_bytes(ptr1, sz, sz * 2, ao)};
+    EXPECT_EQ(resource.total_size(), sz * 2);
+
+    EXPECT_EQ(ptr1, ptr2);
 }
 
 // Vector usage
@@ -223,7 +230,7 @@ TEST(arena_pmr, empty_memory_resource) {
     SUCCEED();
 }
 TEST(arena_pmr, resource_request_bytes) {
-    constexpr std::size_t size{ 100 };
+    constexpr std::size_t size{100};
 
     ml::ArenaMemoryResourcePmr resource;
     auto* ptr = resource.allocate(size * sizeof(std::byte), alignof(std::byte));
@@ -261,8 +268,8 @@ TEST(arena_pmr, allocate_large_object) {
 }
 TEST(arena_pmr, pmr_vector_basic_operations) {
     ml::ArenaMemoryResourcePmr resource;
-    std::pmr::polymorphic_allocator<int> alloc{ &resource };
-    std::pmr::vector<int> vec{ alloc };
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec{alloc};
 
     // Push back elements
     vec.push_back(1);
@@ -276,8 +283,8 @@ TEST(arena_pmr, pmr_vector_basic_operations) {
 }
 TEST(arena_pmr, pmr_vector_reserve_and_emplace) {
     ml::ArenaMemoryResourcePmr resource;
-    std::pmr::polymorphic_allocator<int> alloc{ &resource };
-    std::pmr::vector<int> vec{ alloc };
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec{alloc};
 
     // Reserve space and emplace elements
     vec.reserve(10);
@@ -291,25 +298,25 @@ TEST(arena_pmr, pmr_vector_reserve_and_emplace) {
 }
 TEST(arena_pmr, pmr_vector_resize_and_access) {
     ml::ArenaMemoryResourcePmr resource;
-    std::pmr::polymorphic_allocator<int> alloc{ &resource };
-    std::pmr::vector<int> vec{ alloc };
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec{alloc};
 
     // Resize and access elements
     vec.resize(5, 42);
 
     EXPECT_EQ(vec.size(), 5);
-    for (std::size_t i{ 0 }; i < 5; ++i) {
+    for (std::size_t i{0}; i < 5; ++i) {
         EXPECT_EQ(vec[i], 42);
     }
 }
 TEST(arena_pmr, pmr_vector_large_allocation) {
     ml::ArenaMemoryResourcePmr resource;
-    std::pmr::polymorphic_allocator<int> alloc{ &resource };
-    std::pmr::vector<int> vec{ alloc };
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec{alloc};
 
     // Add a large number of elements
     constexpr int num_elements = 10000;
-    for (int i{ 0 }; i < num_elements; ++i) {
+    for (int i{0}; i < num_elements; ++i) {
         vec.push_back(i);
     }
 
@@ -319,8 +326,8 @@ TEST(arena_pmr, pmr_vector_large_allocation) {
 }
 TEST(arena_pmr, pmr_vector_copy_and_move) {
     ml::ArenaMemoryResourcePmr resource;
-    std::pmr::polymorphic_allocator<int> alloc{ &resource };
-    std::pmr::vector<int> vec1{ alloc };
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec1{alloc};
 
     vec1.push_back(1);
     vec1.push_back(2);

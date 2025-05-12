@@ -29,6 +29,7 @@ class ArenaMemoryResourcePool {
     // Allocation
     [[nodiscard]] auto allocate(std::size_t n_bytes, std::size_t alignment) -> void*;
     void deallocate(void* alloc, std::size_t n_bytes, std::size_t alignment);
+    void extend_by(std::size_t n_bytes);
   private:
     ArenaMemoryResourcePool* next_pool_{nullptr};
     std::size_t total_capacity_{0};
@@ -87,5 +88,8 @@ inline auto ArenaMemoryResourcePool::allocate(std::size_t n_bytes, std::size_t a
 inline void ArenaMemoryResourcePool::deallocate(void* /*alloc*/, std::size_t /*n_bytes*/, std::size_t /*alignment*/) {
     // no-op
     return;
+}
+inline void ArenaMemoryResourcePool::extend_by(std::size_t n_bytes) {
+    remaining_capacity_ -= n_bytes;
 }
 }

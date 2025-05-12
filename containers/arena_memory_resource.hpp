@@ -80,12 +80,16 @@ inline auto ArenaMemoryResource::extend(void* ptr, std::size_t old_bytes, std::s
         return allocate(new_bytes, alignment);
     }
 
+    if (new_bytes <= old_bytes) {
+        return ptr;
+    }
+
     auto* const pool{last_pool_};
     auto* const pool_cur_pos{pool->next_alloc_start()};
     auto const pool_size{pool->size()};
 
     // Do a size check to see if the allocation could have been made in the current pool
-    if (pool_size < new_bytes) {
+    if (old_bytes > pool_size) {
         return allocate(new_bytes, alignment);
     }
 
@@ -95,7 +99,9 @@ inline auto ArenaMemoryResource::extend(void* ptr, std::size_t old_bytes, std::s
         return allocate(new_bytes, alignment);
     }
 
-    return nullptr;
+    auto const alloc_diff{new_bytes - old_bytes};
+    pool->extend_by(alloc_diff);
+    return ptr;
 }
 
 template <typename T>
