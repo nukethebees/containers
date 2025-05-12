@@ -46,10 +46,17 @@ class linked_vector {
     auto empty() const -> bool;
     auto reserve(size_type n_elems) -> void;
     auto size() const -> size_type;
+
+    // Modifiers
+    void clear();
+    template <typename U>
+    void push_back(U&&);
   private:
     // Capacity
     void construct_segment(size_type size);
     void destroy_segment(segment_type* segment);
+    // Modifiers
+    void destroy_segment_elements(pointer ptr, size_type n);
 
     NO_UNIQUE_ADDRESS Allocator alloc_;
     size_type size_{0};
@@ -98,6 +105,30 @@ METHOD_START()::size() const->size_type {
     return size_;
 }
 
+// Modifiers
+METHOD_START()::clear()->void {
+    auto* segment{head_};
+    while (segment) {
+        destroy_segment_elements(segment->data, segment->size);
+        segment->size = 0;
+        segment = segment->next;
+    }
+
+    size_ = 0;
+}
+METHOD_START(template <typename U>)::push_back(U&& value)->void {
+    if (size_ == capacity_) {
+        auto const new_capacity{capacity_ ? capacity_ * 2 : 1};
+        reserve(new_capacity);
+    }
+
+    auto* segment{tail_};
+    new (&segment->data[segment->size]) value_type(std::forward<U>(value));
+
+    ++segment->size;
+    ++size_;
+}
+
 // Private
 // Capacity
 METHOD_START()::construct_segment(size_type n_elems)->void {
@@ -123,15 +154,19 @@ METHOD_START()::destroy_segment(segment_type* segment)->void {
     auto const seg_size{segment->size};
     auto const seg_capacity{segment->capacity};
 
-    for (size_type i{0}; i < seg_size; ++i) {
-        seg_data[i].~value_type();
-    }
+    destroy_segment_elements(seg_data, seg_size);
 
     if (segment) {
         auto const data_bytes{sizeof(value_type) * seg_capacity};
 
         alloc_.deallocate_bytes(reinterpret_cast<void*>(seg_data), data_bytes, data_alignment);
         alloc_.deallocate_bytes(reinterpret_cast<void*>(segment), sizeof(segment_type), segment_alignment);
+    }
+}
+// Modifiers
+METHOD_START()::destroy_segment_elements(pointer ptr, size_type n)->void {
+    for (size_type i{0}; i < n; ++i) {
+        ptr[i].~value_type();
     }
 }
 
