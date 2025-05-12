@@ -4,13 +4,9 @@
 #include <memory>
 #include <new>
 
-namespace ml {
-template <typename T>
-concept can_allocate_bytes = requires(T t, void* ptr, std::size_t size, std::size_t alignment) {
-    { t.allocate_bytes(size, alignment) } -> std::same_as<void*>;
-    { t.deallocate_bytes(ptr, size, alignment) } -> std::same_as<void>;
-};
+#include "allocator_concepts.hpp"
 
+namespace ml {
 // Inherited std::allocator to add allocate_bytes and deallocate_bytes
 template <typename T>
 class allocator : public std::allocator<T> {
