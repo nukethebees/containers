@@ -49,3 +49,11 @@ TEST(linked_vector, push_back_string) {
     EXPECT_EQ(values.size(), 1);
     EXPECT_FALSE(values.empty());
 }
+TEST(linked_vector, emplace_string) {
+    ml::linked_vector<std::string> values;
+    values.reserve(1);
+    values.emplace_back("Hello");
+    EXPECT_EQ(values.capacity(), 1);
+    EXPECT_EQ(values.size(), 1);
+    EXPECT_FALSE(values.empty());
+}

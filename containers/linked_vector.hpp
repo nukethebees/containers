@@ -49,6 +49,8 @@ class linked_vector {
 
     // Modifiers
     void clear();
+    template <typename... Args>
+    void emplace_back(Args&&... args);
     template <typename U>
     void push_back(U&&);
   private:
@@ -115,6 +117,18 @@ METHOD_START()::clear()->void {
     }
 
     size_ = 0;
+}
+METHOD_START(template <typename... Args>)::emplace_back(Args&&... args)->void {
+    if (size_ == capacity_) {
+        auto const new_capacity{capacity_ ? capacity_ * 2 : 1};
+        reserve(new_capacity);
+    }
+
+    auto* segment{tail_};
+    new (&segment->data[segment->size]) value_type(std::forward<Args>(args)...);
+
+    ++segment->size;
+    ++size_;
 }
 METHOD_START(template <typename U>)::push_back(U&& value)->void {
     if (size_ == capacity_) {
