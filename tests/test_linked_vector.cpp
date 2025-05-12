@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <numeric>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -82,5 +84,41 @@ TEST(linked_vector, const_reverse_iter_sum) {
     for (auto it = values.crbegin(); it != values.crend(); ++it) {
         sum += *it;
     }
+    EXPECT_EQ(sum, 10);
+}
+TEST(linked_vector, accumulate_fwd) {
+    ml::linked_vector<int> values;
+    values.reserve(5);
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+    int sum = std::accumulate(values.begin(), values.end(), 0);
+    EXPECT_EQ(sum, 10);
+}
+TEST(linked_vector, accumulate_rev) {
+    ml::linked_vector<int> values;
+    values.reserve(5);
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+    int sum = std::accumulate(values.rbegin(), values.rend(), 0);
+    EXPECT_EQ(sum, 10);
+}
+TEST(linked_vector, accumulate_const) {
+    ml::linked_vector<int> values;
+    values.reserve(5);
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+    int sum = std::accumulate(values.cbegin(), values.cend(), 0);
+    EXPECT_EQ(sum, 10);
+}
+TEST(linked_vector, accumulate_const_reverse) {
+    ml::linked_vector<int> values;
+    values.reserve(5);
+    for (int i = 0; i < 5; ++i) {
+        values.push_back(i);
+    }
+    int sum = std::accumulate(values.crbegin(), values.crend(), 0);
     EXPECT_EQ(sum, 10);
 }
