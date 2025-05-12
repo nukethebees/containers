@@ -4,10 +4,6 @@
 #include "misc.hpp"
 
 namespace ml {
-ArenaMemoryResourcePool::ArenaMemoryResourcePool(std::size_t capacity)
-    : total_capacity_{capacity}
-    , remaining_capacity_{capacity} {}
-
 ArenaMemoryResource::ArenaMemoryResource(std::size_t initial_capacity)
     : initial_capacity_{initial_capacity} {}
 ArenaMemoryResource::ArenaMemoryResource(ArenaMemoryResource&& other)
