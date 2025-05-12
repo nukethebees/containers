@@ -155,3 +155,24 @@ TEST(linked_vector, pop_back_into_previous_segment) {
     EXPECT_EQ(values.size(), 0);
     EXPECT_TRUE(values.empty());
 }
+TEST(linked_vector, add_elems_after_clear_2segs) {
+    ml::linked_vector<int> values;
+
+    // Create first segment
+    values.reserve(1);
+    values.push_back(1);
+
+    // Create a second segment
+    values.push_back(2);
+    EXPECT_EQ(values.size(), 2);
+
+    values.clear();
+    EXPECT_EQ(values.size(), 0);
+    EXPECT_TRUE(values.empty());
+    EXPECT_EQ(values.capacity(), 2);
+
+    // Add elements back
+    values.push_back(0);
+    values.push_back(1);
+    EXPECT_EQ(values.size(), 2);
+}
