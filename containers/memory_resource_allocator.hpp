@@ -9,13 +9,12 @@ class MemoryResourceAllocator {
     using value_type = T;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
-    MemoryResource* resource_{nullptr};
 
-    template <class U>
+    template <typename U>
     struct rebind {
         using other = MemoryResourceAllocator<U, MemoryResource>;
     };
-  public:
+
     MemoryResourceAllocator() = default;
     MemoryResourceAllocator(MemoryResource* resource)
         : resource_{resource} {}
@@ -23,18 +22,22 @@ class MemoryResourceAllocator {
     MemoryResourceAllocator(MemoryResourceAllocator const&) = default;
     template <typename U>
     MemoryResourceAllocator(MemoryResourceAllocator<U, MemoryResource> const& other)
-        : resource_{other.resource_} {}
+        : resource_{const_cast<MemoryResource*>(other.resource())} {}
     MemoryResourceAllocator(MemoryResourceAllocator&&) = default;
 
     auto operator=(MemoryResourceAllocator const&) -> MemoryResourceAllocator& = default;
     auto operator=(MemoryResourceAllocator&&) -> MemoryResourceAllocator& = default;
+
+    // Access
+    auto resource() -> MemoryResource* { return resource_; }
+    auto resource() const -> MemoryResource const* { return resource_; }
 
     // Allocation
     [[nodiscard]] auto allocate(size_type n_elems) -> pointer;
     [[nodiscard]] auto allocate_bytes(size_type n_bytes, size_type alignment) -> void*;
     auto deallocate(pointer ptr, size_type n_elems) -> void;
     auto deallocate_bytes(void* ptr, size_type n_bytes, size_type alignment) -> void;
-    auto extend_bytes(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment) -> void*;
+    [[nodiscard]] auto extend_bytes(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment) -> void*;
 
     // Object construction
     template <typename... Args>
@@ -43,6 +46,8 @@ class MemoryResourceAllocator {
     auto construct_new(Args&&... args) -> T&;
 
     auto operator<=>(MemoryResourceAllocator const&) const noexcept = default;
+  private:
+    MemoryResource* resource_{nullptr};
 };
 
 template <typename T, typename MemoryResource>
