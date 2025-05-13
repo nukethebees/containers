@@ -2,6 +2,7 @@
 
 #include "containers/vector2.hpp"
 #include "containers/arena_memory_resource.hpp"
+#include "containers/arena_allocator.hpp"
 #include "containers/memory_resource_allocator.hpp"
 
 #include "configure_warning_pragmas.hpp"

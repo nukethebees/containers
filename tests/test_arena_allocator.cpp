@@ -4,7 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "containers/arena_memory_resource.hpp"
+#include "containers/arena_allocator.hpp"
+#include "containers/arena_memory_resource_pmr.hpp"
 
 #include "configure_warning_pragmas.hpp"
 

@@ -8,7 +8,9 @@ target_sources(containers PUBLIC
   FILE_SET HEADERS
   BASE_DIRS ../
   FILES
+  "arena_allocator.hpp"
   "arena_memory_resource.hpp"
+  "arena_memory_resource_pmr.hpp"
   "arena_memory_resource_pool.hpp"
   "array.hpp"
   "bst.hpp"

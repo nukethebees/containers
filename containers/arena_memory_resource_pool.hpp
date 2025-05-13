@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 
 namespace ml {
 class ArenaMemoryResource;

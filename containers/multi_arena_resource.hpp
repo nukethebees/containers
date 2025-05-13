@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "arena_memory_resource.hpp"
+#include "arena_memory_resource_pmr.hpp"
 #include "misc.hpp"
 
 namespace ml {
