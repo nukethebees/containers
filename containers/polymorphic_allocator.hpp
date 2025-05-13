@@ -1,12 +1,13 @@
 #pragma once
 
+#include <cstddef>
 #include <compare>
 #include <memory_resource>
 
 namespace ml {
 // A copy of the std polymorphic allocator from C++20
 // The main difference is that this one propagates the memory resource when the container is copied
-template <typename T>
+template <typename T = std::byte>
 class polymorphic_allocator {
   public:
     using pointer = T*;
@@ -38,13 +39,16 @@ class polymorphic_allocator {
     auto operator=(polymorphic_allocator const&) noexcept -> polymorphic_allocator& = default;
     auto operator=(polymorphic_allocator&&) noexcept -> polymorphic_allocator& = default;
 
-    // Allocation/deallocation
-    auto allocate(std::size_t n) -> T* { return static_cast<T*>(resource_->allocate(n * sizeof(T), alignof(T))); }
-    void deallocate(T* p, std::size_t n) noexcept {
+    // Allocation
+    auto allocate(size_type n) -> T* { return static_cast<T*>(resource_->allocate(n * sizeof(T), alignof(T))); }
+    auto allocate_bytes(size_type n, size_type alignment) -> void* { return resource_->allocate_bytes(n, alignment); }
+    // Deallocation
+    void deallocate(T* p, size_type n) noexcept {
         if (p) {
             resource_->deallocate(p, n * sizeof(T), alignof(T));
         }
     }
+    void deallocate_bytes(void* p, size_type n, size_type alignment) { resource_->deallocate_bytes(p, n, alignment); }
 
     // Object construction/destruction
     template <class U, class... Args>
@@ -64,7 +68,7 @@ class polymorphic_allocator {
     // Misc
     auto select_on_container_copy_construction() const noexcept -> polymorphic_allocator { return *this; }
     auto resource() const noexcept -> std::pmr::memory_resource* { return resource_; }
-    auto max_size() const noexcept -> std::size_t { return std::numeric_limits<std::size_t>::max() / sizeof(T); }
+    auto max_size() const noexcept -> size_type { return std::numeric_limits<size_type>::max() / sizeof(T); }
 
     // Comparison
     auto operator<=>(polymorphic_allocator const&) const noexcept = default;
