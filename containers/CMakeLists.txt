@@ -16,6 +16,7 @@ target_sources(containers PUBLIC
   "bst.hpp"
   "bst_node.hpp"
   "bst_iterator.hpp"
+  "memory_resource.hpp"
   "memory_resource_allocator.hpp"
   "multi_arena_resource.hpp"
   "misc.hpp"
