@@ -6,3 +6,5 @@ Make it seeded to replicate failures
 
 // Polymorphic allocator
 implement extend and extend_bytes
+
+use a consistent naming scheme for classes

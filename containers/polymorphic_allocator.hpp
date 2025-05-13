@@ -41,14 +41,14 @@ class polymorphic_allocator {
 
     // Allocation
     auto allocate(size_type n) -> T* { return static_cast<T*>(resource_->allocate(n * sizeof(T), alignof(T))); }
-    auto allocate_bytes(size_type n, size_type alignment) -> void* { return resource_->allocate_bytes(n, alignment); }
+    auto allocate_bytes(size_type n, size_type alignment) -> void* { return resource_->allocate(n, alignment); }
     // Deallocation
     void deallocate(T* p, size_type n) noexcept {
         if (p) {
             resource_->deallocate(p, n * sizeof(T), alignof(T));
         }
     }
-    void deallocate_bytes(void* p, size_type n, size_type alignment) { resource_->deallocate_bytes(p, n, alignment); }
+    void deallocate_bytes(void* p, size_type n, size_type alignment) { resource_->deallocate(p, n, alignment); }
 
     // Object construction/destruction
     template <class U, class... Args>

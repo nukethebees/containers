@@ -1,10 +1,14 @@
 #include <cstdint>
+#include <memory_resource>
 #include <print>
 
 #include <gtest/gtest.h>
 
-#include "containers/stack_buffer_memory_resource.hpp"
+#include "containers/memory_resource.hpp"
 #include "containers/memory_resource_allocator.hpp"
+#include "containers/polymorphic_allocator.hpp"
+#include "containers/stack_buffer_memory_resource.hpp"
+#include "containers/stack_buffer_memory_resource_pmr.hpp"
 
 #include "configure_warning_pragmas.hpp"
 
@@ -21,7 +25,7 @@ TEST(stack_buffer_allocator, resource_init) {
 }
 TEST(stack_buffer_allocator, resource_allocate) {
     ml::StackBufferMemoryResource<1024> resource;
-    auto * ptr{resource.allocate(16, alignof(int))};
+    auto* ptr{resource.allocate(16, alignof(int))};
     ASSERT_NE(ptr, nullptr);
     ASSERT_EQ(resource.remaining_capacity(), 1008);
 }
@@ -70,18 +74,27 @@ TEST(stack_buffer_allocator, vector_push_back_overflow) {
     config::Allocator alloc{&resource};
     config::Vec vec{alloc};
 
-    volatile int i{0};
+    int volatile i{0};
     while (i < 10) {
         try {
             vec.push_back(int{i});
-        }
-        catch (std::bad_alloc const&) {
+        } catch (std::bad_alloc const&) {
             SUCCEED();
             return;
         }
-        
+
         i = i + 1;
     }
-    
+
     FAIL() << "Should have thrown an exception";
+}
+
+// std::pmr
+TEST(stack_buffer_pmr_std_pmr, init) {
+    ml::stack_buffer_pmr<int, 1024, std::pmr::memory_resource> resource;
+}
+
+// ml::pmr
+TEST(stack_buffer_pmr, init) {
+    ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
 }
