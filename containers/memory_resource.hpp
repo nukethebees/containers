@@ -21,6 +21,6 @@ class memory_resource {
     virtual void do_deallocate() = 0;
     virtual auto do_extend(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment) -> void* = 0;
     // Comparison
-    virtual auto do_is_equal(memory_resource const& other) -> bool;
+    virtual auto do_is_equal(memory_resource const& other) const -> bool;
 };
 }

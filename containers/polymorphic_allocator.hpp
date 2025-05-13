@@ -24,16 +24,21 @@ class polymorphic_allocator {
     template <class U>
     friend class polymorphic_allocator;
   public:
+    // Constructors
     polymorphic_allocator() = delete;
     polymorphic_allocator(std::pmr::memory_resource* resource)
         : resource_{resource} {}
-
+    // Copy/move constructors
     polymorphic_allocator(polymorphic_allocator const&) noexcept = default;
     template <typename U>
     polymorphic_allocator(polymorphic_allocator<U> const& other) noexcept
         : resource_{other.resource_} {}
     polymorphic_allocator(polymorphic_allocator&&) noexcept = default;
+    // Assignment operators
+    auto operator=(polymorphic_allocator const&) noexcept -> polymorphic_allocator& = default;
+    auto operator=(polymorphic_allocator&&) noexcept -> polymorphic_allocator& = default;
 
+    // Allocation/deallocation
     auto allocate(std::size_t n) -> T* { return static_cast<T*>(resource_->allocate(n * sizeof(T), alignof(T))); }
     void deallocate(T* p, std::size_t n) noexcept {
         if (p) {
@@ -41,6 +46,7 @@ class polymorphic_allocator {
         }
     }
 
+    // Object construction/destruction
     template <class U, class... Args>
     void construct(U* p, Args&&... args) {
         if (!p) {
@@ -55,15 +61,12 @@ class polymorphic_allocator {
         }
     }
 
+    // Misc
     auto select_on_container_copy_construction() const noexcept -> polymorphic_allocator { return *this; }
-
     auto resource() const noexcept -> std::pmr::memory_resource* { return resource_; }
-
     auto max_size() const noexcept -> std::size_t { return std::numeric_limits<std::size_t>::max() / sizeof(T); }
 
-    auto operator=(polymorphic_allocator const&) noexcept -> polymorphic_allocator& = default;
-    auto operator=(polymorphic_allocator&&) noexcept -> polymorphic_allocator& = default;
-
+    // Comparison
     auto operator<=>(polymorphic_allocator const&) const noexcept = default;
 };
 }
