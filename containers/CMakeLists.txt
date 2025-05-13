@@ -24,6 +24,7 @@ target_sources(containers PUBLIC
   "span_iterator.hpp"
   "stack_buffer_memory_resource.hpp"
   "vector.hpp"
+  "vector2.hpp"
 )
 
 target_compile_options(containers PRIVATE
