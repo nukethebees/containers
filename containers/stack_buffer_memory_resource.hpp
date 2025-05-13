@@ -8,10 +8,10 @@
 namespace ml {
 template <std::size_t CAPACITY>
 class StackBufferMemoryResource {
-    std::array<std::byte, CAPACITY> buffer;
-    std::size_t remaining_capacity_{CAPACITY};
-    void* last_allocation_{nullptr};
   public:
+    StackBufferMemoryResource() = default;
+
+    // Allocation
     [[nodiscard]] auto allocate(std::size_t n_bytes, std::size_t alignment) -> void* {
         auto const cur_size{CAPACITY - remaining_capacity_};
 
@@ -25,8 +25,14 @@ class StackBufferMemoryResource {
         return this->last_allocation_;
     }
     void deallocate(void* /*alloc*/, std::size_t /*n_bytes*/, std::size_t /*alignment*/) { return; }
+
+    // Capacity
     [[nodiscard]] auto remaining_capacity() const -> std::size_t { return remaining_capacity_; }
     [[nodiscard]] auto size() const -> std::size_t { return CAPACITY - remaining_capacity_; }
+  private:
+    std::array<std::byte, CAPACITY> buffer;
+    std::size_t remaining_capacity_{CAPACITY};
+    void* last_allocation_{nullptr};
 };
 
 template <typename T, std::size_t CAPACITY>

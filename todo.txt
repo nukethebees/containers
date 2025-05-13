@@ -2,3 +2,7 @@ Clean up bst unit tests
 
 Add test to generate stream of random values for bst
 Make it seeded to replicate failures
+
+
+// Polymorphic allocator
+implement extend and extend_bytes
