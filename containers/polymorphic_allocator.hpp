@@ -53,7 +53,7 @@ class polymorphic_allocator {
     }
     void deallocate_bytes(void* p, size_type n, size_type alignment) { resource_->deallocate(p, n, alignment); }
     // Extension
-    auto extend(T* ptr, size_type old_elems, size_type new_elems) -> void* {
+    auto extend(T* ptr, size_type old_elems, size_type new_elems) -> T* {
         if constexpr (extendable_memory_resource<ResourceT>) {
             return static_cast<T*>(resource_->extend(ptr, old_elems * sizeof(T), new_elems * sizeof(T), alignof(T)));
         } else {

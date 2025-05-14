@@ -9,7 +9,7 @@
 namespace ml {
 // Vector which can extend an existing allocation instead of allocating a new one
 template <typename T, typename Allocator>
-    requires extendable_allocator<Allocator> && can_allocate_bytes<Allocator>
+    requires (extendable_allocator<Allocator> && can_allocate_bytes<Allocator>)
 class vector2 {
   public:
     using value_type = T;
@@ -24,8 +24,42 @@ class vector2 {
     // Capacity
     auto capacity() const -> size_type { return capacity_; }
     auto empty() const -> bool { return size_ == 0; }
+    auto full() const -> bool { return size_ == capacity_; }
     auto size() const -> size_type { return size_; }
+
+    // Modifiers
+    template <typename U>
+    void push_back(U&& new_elem) {
+        if (full()) {
+            grow();
+        }
+
+        new (data_ + size_) T{std::forward<U>(new_elem)};
+        ++size_;
+    }
   private:
+    // Capacity
+    void grow() {
+        auto const old_size{size_};
+        auto const new_size{size_ ? size_ * 2 : 1};
+
+        auto* current_data{data_};
+        auto* new_data{allocator_.extend(current_data, old_size, new_size)};
+        capacity_ = new_size;
+
+        data_ = new_data;
+
+        if (new_data != current_data) {
+            // Move the objects to the new buffer
+            for (std::size_t i{0}; i < old_size; ++i) {
+                new (new_data + i) T{std::move(current_data[i])};
+            }
+
+            // Deallocate the old buffer
+            allocator_.deallocate(current_data, old_size);
+        }
+    }
+
     NO_UNIQUE_ADDRESS Allocator allocator_;
     size_type size_{0};
     size_type capacity_{0};

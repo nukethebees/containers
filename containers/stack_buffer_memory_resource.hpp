@@ -36,7 +36,8 @@ class StackBufferMemoryResource {
             throw std::bad_alloc{};
         }
 
-        if (last_allocation_ == ptr) {
+        // If it's null or a different allocation then do a fresh allocation
+        if ((ptr == last_allocation_) && ptr) {
             remaining_capacity_ -= extension_size;
             return ptr;
         } else {
