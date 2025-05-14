@@ -53,15 +53,20 @@ class polymorphic_allocator {
     }
     void deallocate_bytes(void* p, size_type n, size_type alignment) { resource_->deallocate(p, n, alignment); }
     // Extension
-    auto extend(T* ptr, size_type old_elems, size_type new_elems)
-        -> void* requires(extendable_memory_resource<ResourceT>) {
+    auto extend(T* ptr, size_type old_elems, size_type new_elems) -> void* {
+        if constexpr (extendable_memory_resource<ResourceT>) {
             return static_cast<T*>(resource_->extend(ptr, old_elems * sizeof(T), new_elems * sizeof(T), alignof(T)));
+        } else {
+            return resource_->allocate(new_elems * sizeof(T), alignof(T));
         }
-
-    auto extend_bytes(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment)
-        -> void* requires(extendable_memory_resource<ResourceT>) {
+    }
+    auto extend_bytes(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment) -> void* {
+        if constexpr (extendable_memory_resource<ResourceT>) {
             return resource_->extend(ptr, old_bytes, new_bytes, alignment);
+        } else {
+            return resource_->allocate(new_bytes, alignment);
         }
+    }
 
     // Object construction/destruction
     template <class U, class... Args>
