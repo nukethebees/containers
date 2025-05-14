@@ -9,6 +9,9 @@
 
 #include "configure_warning_pragmas.hpp"
 
+template <typename T>
+using std_pmr_alloc = ml::polymorphic_allocator<T, std::pmr::memory_resource>;
+
 TEST(polymorphic_allocator, resource_allocate_bytes) {
     ml::ArenaMemoryResourcePmr resource;
 
@@ -53,8 +56,8 @@ TEST(polymorphic_allocator, resource_alignment_check) {
 }
 TEST(polymorphic_allocator, vector_basic_operations) {
     ml::ArenaMemoryResourcePmr resource;
-    ml::polymorphic_allocator<int> alloc{&resource};
-    std::vector<int, ml::polymorphic_allocator<int>> vec{alloc};
+    std_pmr_alloc<int> alloc{&resource};
+    std::vector<int, std_pmr_alloc<int>> vec{alloc};
 
     vec.push_back(1);
     vec.push_back(2);
@@ -67,8 +70,8 @@ TEST(polymorphic_allocator, vector_basic_operations) {
 }
 TEST(polymorphic_allocator, vector_large_allocation) {
     ml::ArenaMemoryResourcePmr resource;
-    ml::polymorphic_allocator<int> alloc{&resource};
-    std::vector<int, ml::polymorphic_allocator<int>> vec{alloc};
+    std_pmr_alloc<int> alloc{&resource};
+    std::vector<int, std_pmr_alloc<int>> vec{alloc};
 
     constexpr int num_elements = 10000;
     for (int i = 0; i < num_elements; ++i) {
@@ -82,8 +85,8 @@ TEST(polymorphic_allocator, vector_large_allocation) {
 
 TEST(polymorphic_allocator, vector_copy_and_shared_resource) {
     ml::ArenaMemoryResourcePmr resource;
-    ml::polymorphic_allocator<int> alloc{&resource};
-    std::vector<int, ml::polymorphic_allocator<int>> vec1{alloc};
+    std_pmr_alloc<int> alloc{&resource};
+    std::vector<int, std_pmr_alloc<int>> vec1{alloc};
 
     // Fill the vector
     vec1.push_back(1);
@@ -91,7 +94,7 @@ TEST(polymorphic_allocator, vector_copy_and_shared_resource) {
     vec1.push_back(3);
 
     // Copy the vector
-    std::vector<int, ml::polymorphic_allocator<int>> vec2 = vec1;
+    std::vector<int, std_pmr_alloc<int>> vec2 = vec1;
 
     // Ensure both vectors are valid and have the same content
     EXPECT_EQ(vec1.size(), 3);
@@ -109,8 +112,8 @@ TEST(polymorphic_allocator, vector_copy_and_shared_resource) {
 
 TEST(polymorphic_allocator, list_basic_operations) {
     ml::ArenaMemoryResourcePmr resource;
-    ml::polymorphic_allocator<int> alloc{&resource};
-    std::list<int, ml::polymorphic_allocator<int>> lst{alloc};
+    std_pmr_alloc<int> alloc{&resource};
+    std::list<int, std_pmr_alloc<int>> lst{alloc};
 
     lst.push_back(1);
     lst.push_back(2);
@@ -124,8 +127,8 @@ TEST(polymorphic_allocator, list_basic_operations) {
 }
 TEST(polymorphic_allocator, list_large_allocation) {
     ml::ArenaMemoryResourcePmr resource;
-    ml::polymorphic_allocator<int> alloc{&resource};
-    std::list<int, ml::polymorphic_allocator<int>> lst{alloc};
+    std_pmr_alloc<int> alloc{&resource};
+    std::list<int, std_pmr_alloc<int>> lst{alloc};
 
     constexpr int num_elements = 10000;
     for (int i = 0; i < num_elements; ++i) {
@@ -137,7 +140,7 @@ TEST(polymorphic_allocator, list_large_allocation) {
     EXPECT_EQ(lst.back(), num_elements - 1);
 }
 
-using int_map_alloc = ml::polymorphic_allocator<std::pair<int const, int>>;
+using int_map_alloc = std_pmr_alloc<std::pair<int const, int>>;
 using int_map = std::unordered_map<int, int, std::hash<int>, std::equal_to<>, int_map_alloc>;
 
 TEST(polymorphic_allocator, unordered_map_basic_operations) {
