@@ -27,13 +27,28 @@ class StackBufferMemoryResource {
         return this->last_allocation_;
     }
     void deallocate(void* /*alloc*/, size_type /*n_bytes*/, size_type /*alignment*/) { return; }
-    auto extend(void* /*ptr*/, size_type /*old_bytes*/, size_type /*new_bytes*/, size_type /*alignment*/) -> void* {
-        return nullptr;
+    auto extend(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment) -> void* {
+        auto const extension_size{new_bytes - old_bytes};
+
+        assert(new_bytes > old_bytes);
+
+        if (extension_size > remaining_capacity_) {
+            throw std::bad_alloc{};
+        }
+
+        if (last_allocation_ == ptr) {
+            remaining_capacity_ -= extension_size;
+            return ptr;
+        } else {
+            return allocate(new_bytes, alignment);
+        }
     }
 
     // Capacity
+    [[nodiscard]] constexpr auto capacity() const -> size_type { return CAPACITY; }
     [[nodiscard]] auto remaining_capacity() const -> size_type { return remaining_capacity_; }
     [[nodiscard]] auto size() const -> size_type { return CAPACITY - remaining_capacity_; }
+    [[nodiscard]] auto empty() const -> bool { return remaining_capacity_ == CAPACITY; }
   private:
     std::array<std::byte, CAPACITY> buffer;
     size_type remaining_capacity_{CAPACITY};

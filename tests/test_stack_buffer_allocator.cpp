@@ -131,14 +131,20 @@ TEST(stack_buffer_pmr, sum_ints_in_vector) {
     ASSERT_EQ(sum, 45);
 }
 TEST(stack_buffer_pmr, extend_alloc) {
+    static constexpr std::size_t old_elems{16};
+    static constexpr std::size_t new_elems{32};
+    std::size_t expected_size{new_elems * sizeof(int)};
+
     ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
     ml::polymorphic_allocator<int> alloc{&resource};
 
-    auto* ptr{alloc.allocate(16)};
+    auto* ptr{alloc.allocate(old_elems)};
     ASSERT_NE(ptr, nullptr);
 
-    auto* extended_ptr{alloc.extend(ptr, 16, 32)};
-    ASSERT_EQ(extended_ptr, ptr);
+    auto* extended_ptr{alloc.extend(ptr, old_elems, new_elems)};
+    EXPECT_EQ(extended_ptr, ptr);
+    EXPECT_EQ(resource.remaining_capacity(), resource.capacity() - expected_size);
+    EXPECT_EQ(resource.size(), expected_size);
 }
 TEST(stack_buffer_pmr, extend_alloc_oob) {
     ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
@@ -147,6 +153,5 @@ TEST(stack_buffer_pmr, extend_alloc_oob) {
     auto* ptr{alloc.allocate(16)};
     ASSERT_NE(ptr, nullptr);
 
-    auto* extended_ptr{alloc.extend(ptr, 16, 3200000000)};
-    ASSERT_EQ(extended_ptr, nullptr);
+    EXPECT_THROW(alloc.extend(ptr, 16, 320000000), std::bad_alloc);
 }

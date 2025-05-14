@@ -31,6 +31,11 @@ class stack_buffer_pmr : public resource_base {
         }
     }
     auto do_is_equal(resource_base const& other) const noexcept -> bool override final { return this == &other; }
+
+    auto size() const noexcept -> size_type { return buffer_resource_.size(); }
+    auto capacity() const noexcept -> size_type { return buffer_resource_.capacity(); }
+    auto remaining_capacity() const noexcept -> size_type { return buffer_resource_.remaining_capacity(); }
+    auto empty() const noexcept -> bool { return buffer_resource_.empty(); }
   private:
     StackBufferMemoryResource<CAPACITY> buffer_resource_;
 };
