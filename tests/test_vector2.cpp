@@ -19,8 +19,6 @@ using stack_pmr = ml::stack_buffer_pmr<T, CAPACITY, ml::memory_resource>;
 using intvec = arena_vec<int>;
 
 // smr = stack memory resource
-
-// Construction
 TEST(vector2, smr_init_empty) {
     stack_pmr<int, 100> resource;
     intvec values{&resource};
@@ -51,4 +49,12 @@ TEST(vector2, smr_push_back_int_multiple) {
 
     EXPECT_EQ(values.size(), n_elems);
     EXPECT_FALSE(values.empty());
+}
+TEST(vector2, smr_push_back_int_oob) {
+    // Force multiple extensions
+    stack_pmr<int, 1> resource;
+    intvec values{&resource};
+
+    values.push_back(1);
+    EXPECT_THROW(values.push_back(1), std::bad_alloc);
 }
