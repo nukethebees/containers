@@ -130,3 +130,23 @@ TEST(stack_buffer_pmr, sum_ints_in_vector) {
 
     ASSERT_EQ(sum, 45);
 }
+TEST(stack_buffer_pmr, extend_alloc) {
+    ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
+    ml::polymorphic_allocator<int> alloc{&resource};
+
+    auto* ptr{alloc.allocate(16)};
+    ASSERT_NE(ptr, nullptr);
+
+    auto* extended_ptr{alloc.extend(ptr, 16, 32)};
+    ASSERT_EQ(extended_ptr, ptr);
+}
+TEST(stack_buffer_pmr, extend_alloc_oob) {
+    ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
+    ml::polymorphic_allocator<int> alloc{&resource};
+
+    auto* ptr{alloc.allocate(16)};
+    ASSERT_NE(ptr, nullptr);
+
+    auto* extended_ptr{alloc.extend(ptr, 16, 3200000000)};
+    ASSERT_EQ(extended_ptr, nullptr);
+}
