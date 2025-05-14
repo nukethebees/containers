@@ -26,7 +26,8 @@ class stack_buffer_pmr : public resource_base {
         if constexpr (resource_can_extend) {
             return buffer_resource_.extend(ptr, old_bytes, new_bytes, alignment);
         } else {
-            return nullptr;
+            // If the resource cannot extend, we can only allocate a new block of memory
+            return buffer_resource_.allocate(new_bytes, alignment);
         }
     }
     auto do_is_equal(resource_base const& other) const noexcept -> bool override final { return this == &other; }
