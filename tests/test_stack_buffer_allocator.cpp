@@ -90,11 +90,43 @@ TEST(stack_buffer_allocator, vector_push_back_overflow) {
 }
 
 // std::pmr
-TEST(stack_buffer_pmr_std_pmr, init) {
+TEST(stack_buffer_pmr_std, init) {
     ml::stack_buffer_pmr<int, 1024, std::pmr::memory_resource> resource;
+}
+TEST(stack_buffer_pmr_std, sum_ints_in_vector) {
+    ml::stack_buffer_pmr<int, 1024, std::pmr::memory_resource> resource;
+    std::pmr::polymorphic_allocator<int> alloc{&resource};
+    std::pmr::vector<int> vec{alloc};
+
+    int sum{0};
+    for (int i{0}; i < 10; ++i) {
+        vec.push_back(i);
+    }
+
+    for (auto const& i : vec) {
+        sum += i;
+    }
+
+    ASSERT_EQ(sum, 45);
 }
 
 // ml::pmr
 TEST(stack_buffer_pmr, init) {
     ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
+}
+TEST(stack_buffer_pmr, DISABLED_sum_ints_in_vector) {
+    //ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
+    //ml::polymorphic_allocator<int> alloc{&resource};
+    //std::vector<int, ml::polymorphic_allocator<int>> vec{alloc};
+    //
+    //int sum{0};
+    //for (int i{0}; i < 10; ++i) {
+    //    vec.push_back(i);
+    //}
+    //
+    //for (auto const& i : vec) {
+    //    sum += i;
+    //}
+    //
+    //ASSERT_EQ(sum, 45);
 }
