@@ -14,6 +14,7 @@ template <typename T, std::size_t CAPACITY>
 using stack_pmr = ml::stack_buffer_pmr<T, CAPACITY, ml::memory_resource>;
 
 static constexpr int n_placements{400};
+static constexpr int n_stack_capacity{1000};
 
 static void BM_vector2_std(benchmark::State& state) {
     for (auto _ : state) {
@@ -27,7 +28,7 @@ static void BM_vector2_std(benchmark::State& state) {
 }
 static void BM_vector2_v2_stack(benchmark::State& state) {
     for (auto _ : state) {
-        stack_pmr<int, 1000> resource;
+        stack_pmr<int, n_stack_capacity> resource;
         vec_pmr<int> vec{&resource};
 
         for (int i = 0; i < n_placements; ++i) {
@@ -36,6 +37,36 @@ static void BM_vector2_v2_stack(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n_placements);
 }
+static void BM_vector2_std_iter(benchmark::State& state) {
+    std::vector<int> vec;
+    for (int i = 0; i < n_placements; ++i) {
+        vec.emplace_back(i);
+    }
 
-BENCHMARK(BM_vector2_std);
-BENCHMARK(BM_vector2_v2_stack);
+    for (auto _ : state) {
+        for (auto const& elem : vec) {
+            benchmark::DoNotOptimize(elem);
+        }
+    }
+    state.SetItemsProcessed(state.iterations() * n_placements);
+}
+static void BM_vector2_v2_stack_iter(benchmark::State& state) {
+    stack_pmr<int, n_stack_capacity> resource;
+    vec_pmr<int> vec{&resource};
+    for (int i = 0; i < n_placements; ++i) {
+        vec.emplace_back(i);
+    }
+
+    for (auto _ : state) {
+        for (auto const& elem : vec) {
+            benchmark::DoNotOptimize(elem);
+        }
+    }
+    state.SetItemsProcessed(state.iterations() * n_placements);
+}
+
+//BENCHMARK(BM_vector2_std);
+//BENCHMARK(BM_vector2_v2_stack);
+
+BENCHMARK(BM_vector2_std_iter);
+BENCHMARK(BM_vector2_v2_stack_iter);
