@@ -100,3 +100,10 @@ TEST(vector2, smr_pop_back_multiple_ints) {
     EXPECT_EQ(values.size(), to_add - to_pop);
     EXPECT_FALSE(values.empty());
 }
+TEST(vector2, smr_pop_back_empty) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+    EXPECT_TRUE(values.empty());
+    EXPECT_NO_THROW(values.pop_back());
+    EXPECT_TRUE(values.empty());
+}
