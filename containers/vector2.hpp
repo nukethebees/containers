@@ -1,12 +1,14 @@
 #pragma once
 
 #include <cstddef>
+#include <iterator>
 #include <limits>
 #include <utility>
 
 #include "allocator_concepts.hpp"
-#include "preprocessor/platform_def.hpp"
 #include "preprocessor/noexcept_release_def.hpp"
+#include "preprocessor/platform_def.hpp"
+#include "span_iterator.hpp"
 
 namespace ml {
 // Vector which can extend an existing allocation instead of allocating a new one
@@ -18,6 +20,14 @@ class vector2 {
     using allocator_type = Allocator;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
+    using reference = T&;
+    using const_reference = T const&;
+    using pointer = T*;
+    using const_pointer = T const*;
+    using iterator = span_iterator<T>;
+    using const_iterator = span_iterator<T const>;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     // Constructors
     vector2() noexcept = default;
@@ -50,7 +60,7 @@ class vector2 {
         return std::forward<Self>(self).data_[i];
     }
     template <typename Self>
-    auto data(this Self&& self) NOEXCEPT_RELEASE -> auto& {
+    auto data(this Self&& self) NOEXCEPT_RELEASE -> auto* {
         return std::forward<Self>(self).data_;
     }
     template <typename Self>
@@ -72,6 +82,20 @@ class vector2 {
 #endif
         return std::forward<Self>(self).data_[index];
     }
+
+    // Iterators
+    auto begin() -> iterator { return iterator(data_); }
+    auto begin() const -> const_iterator { return cbegin(); }
+    auto cbegin() const -> const_iterator { return const_iterator(data_); }
+    auto cend() const -> const_iterator { return const_iterator(data_ + size_); }
+    auto crbegin() const -> const_reverse_iterator { return const_reverse_iterator(cend()); }
+    auto crend() const -> const_reverse_iterator { return const_reverse_iterator(cbegin()); }
+    auto end() -> iterator { return iterator(data_ + size_); }
+    auto end() const -> const_iterator { return cend(); }
+    auto rbegin() -> reverse_iterator { return reverse_iterator(end()); }
+    auto rbegin() const -> const_reverse_iterator { return const_reverse_iterator(end()); }
+    auto rend() -> reverse_iterator { return reverse_iterator(begin()); }
+    auto rend() const -> const_reverse_iterator { return crend(); }
 
     // Capacity
     auto capacity() const noexcept -> size_type { return capacity_; }
@@ -129,10 +153,10 @@ class vector2 {
         }
     }
 
-    NO_UNIQUE_ADDRESS Allocator allocator_;
+    NO_UNIQUE_ADDRESS allocator_type allocator_;
     size_type size_{0};
     size_type capacity_{0};
-    T* data_{nullptr};
+    pointer data_{nullptr};
 };
 }
 
