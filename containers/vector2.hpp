@@ -18,7 +18,7 @@ class vector2 {
     using size_type = std::size_t;
 
     // Constructors
-    vector2() = default;
+    vector2() noexcept = default;
     template <typename U>
     vector2(U&& allocator)
         : allocator_{std::forward<U>(allocator)} {}
