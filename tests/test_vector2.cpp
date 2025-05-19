@@ -238,6 +238,9 @@ TEST(vector2, smr_pop_back_empty) {
     stack_pmr<int, 100> resource;
     intvec values{&resource};
     EXPECT_TRUE(values.empty());
-    EXPECT_NO_THROW(values.pop_back());
-    EXPECT_TRUE(values.empty());
+#ifdef DEBUG_ENABLED
+    EXPECT_THROW(values.pop_back(), std::out_of_range);
+#else
+    SUCCEED();
+#endif
 }
