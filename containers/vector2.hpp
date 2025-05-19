@@ -16,10 +16,17 @@ class vector2 {
     using allocator_type = Allocator;
     using size_type = std::size_t;
 
+    // Constructors
     vector2() = default;
     template <typename U>
     vector2(U&& allocator)
         : allocator_{std::forward<U>(allocator)} {}
+    ~vector2() {
+        for (size_type i{0}; i < size_; ++i) {
+            data_[i].~value_type();
+        }
+        allocator_.deallocate(data_, capacity_);
+    }
 
     // Capacity
     auto capacity() const -> size_type { return capacity_; }
