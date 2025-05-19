@@ -46,19 +46,13 @@ class vector2 {
     // Element access
     template <typename Self>
     auto at(this Self&& self, size_type index) -> auto& {
-        if (index >= self.size_) {
-            throw std::out_of_range{"Index out of range"};
-        }
+        self.index_check(index);
         return std::forward<Self>(self).data_[index];
     }
     template <typename Self>
     auto back(this Self&& self) NOEXCEPT_RELEASE -> auto& {
-#ifdef DEBUG_ENABLED
-        if (self.empty()) {
-            throw std::out_of_range{"Vector is empty."};
-        }
-#endif
         auto const i{self.size_ - 1};
+        self.index_check_DEBUG(i);
         return std::forward<Self>(self).data_[i];
     }
     template <typename Self>
@@ -67,21 +61,12 @@ class vector2 {
     }
     template <typename Self>
     auto front(this Self&& self) NOEXCEPT_RELEASE -> auto& {
-#ifdef DEBUG_ENABLED
-        if (self.empty()) {
-            throw std::out_of_range{"Vector is empty."};
-        }
-#endif
-
+        self.index_check_DEBUG(0);
         return std::forward<Self>(self).data_[0];
     }
     template <typename Self>
     auto operator[](this Self&& self, size_type index) NOEXCEPT_RELEASE->auto& {
-#ifdef DEBUG_ENABLED
-        if (index >= self.size_) {
-            throw std::out_of_range{"Index out of range"};
-        }
-#endif
+        self.index_check_DEBUG(index);
         return std::forward<Self>(self).data_[index];
     }
 
@@ -132,6 +117,17 @@ class vector2 {
         ++size_;
     }
   private:
+    // Element access
+    void index_check_DEBUG(size_type i) const {
+#ifdef DEBUG_ENABLED
+        index_check(i);
+#endif
+    }
+    void index_check(size_type i) const {
+        if (i >= size_) {
+            throw std::out_of_range{"Index out of range"};
+        }
+    }
     // Capacity
     void grow() {
         auto const old_size{size_};
