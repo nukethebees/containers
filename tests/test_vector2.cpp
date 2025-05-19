@@ -58,3 +58,24 @@ TEST(vector2, smr_push_back_int_oob) {
     values.push_back(1);
     EXPECT_THROW(values.push_back(1), std::bad_alloc);
 }
+TEST(vector2, smr_emplace_back_struct_multiple) {
+    struct TestStruct {
+        int a;
+        int b;
+        TestStruct(int a, int b)
+            : a(a)
+            , b(b) {}
+    };
+
+    stack_pmr<TestStruct, 100> resource;
+    arena_vec<TestStruct> values{&resource};
+
+    static constexpr std::size_t n_elems{10};
+
+    for (int i{0}; i < static_cast<int>(n_elems); ++i) {
+        values.emplace_back(i, i + 1);
+    }
+
+    EXPECT_EQ(values.size(), n_elems);
+    EXPECT_FALSE(values.empty());
+}

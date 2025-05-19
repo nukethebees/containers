@@ -28,13 +28,16 @@ class vector2 {
     auto size() const -> size_type { return size_; }
 
     // Modifiers
+    template <typename... Args>
+    void emplace_back(Args&&... args) {
+        grow_if_full();
+        new (data_ + size_) value_type{std::forward<Args>(args)...};
+        ++size_;
+    }
     template <typename U>
     void push_back(U&& new_elem) {
-        if (full()) {
-            grow();
-        }
-
-        new (data_ + size_) T{std::forward<U>(new_elem)};
+        grow_if_full();
+        new (data_ + size_) value_type{std::forward<U>(new_elem)};
         ++size_;
     }
   private:
@@ -57,6 +60,11 @@ class vector2 {
 
             // Deallocate the old buffer
             allocator_.deallocate(current_data, old_size);
+        }
+    }
+    void grow_if_full() {
+        if (full()) {
+            grow();
         }
     }
 
