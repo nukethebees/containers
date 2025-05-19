@@ -79,3 +79,24 @@ TEST(vector2, smr_emplace_back_struct_multiple) {
     EXPECT_EQ(values.size(), n_elems);
     EXPECT_FALSE(values.empty());
 }
+TEST(vector2, smr_pop_back_multiple_ints) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+
+    static constexpr std::size_t to_add{10};
+    static constexpr std::size_t to_pop{2};
+
+    for (std::size_t i{0}; i < to_add; ++i) {
+        values.push_back(int(i));
+    }
+
+    EXPECT_EQ(values.size(), to_add);
+    EXPECT_FALSE(values.empty());
+
+    for (std::size_t i{0}; i < to_pop; ++i) {
+        values.pop_back();
+    }
+
+    EXPECT_EQ(values.size(), to_add - to_pop);
+    EXPECT_FALSE(values.empty());
+}

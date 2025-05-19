@@ -34,6 +34,12 @@ class vector2 {
         new (data_ + size_) value_type{std::forward<Args>(args)...};
         ++size_;
     }
+    void pop_back() {
+        if (size_ > 0) {
+            --size_;
+            data_[size_].~value_type();
+        }
+    }
     template <typename U>
     void push_back(U&& new_elem) {
         grow_if_full();
