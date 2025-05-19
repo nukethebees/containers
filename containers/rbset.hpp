@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include "platform_def.hpp"
+#include "preprocessor/platform_def.hpp"
 
 namespace ml {
 namespace detail {
@@ -68,4 +68,4 @@ METHOD_START::size() const->size_type {
 
 #undef METHOD_START
 }
-#include "platform_undef.hpp"
+#include "preprocessor/platform_undef.hpp"

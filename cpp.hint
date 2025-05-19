@@ -3,3 +3,4 @@
 // For more information see https://go.microsoft.com/fwlink/?linkid=865984
 #define METHOD_START
 #define NO_UNIQUE_ADDRESS
+#define NOEXCEPT_RELEASE

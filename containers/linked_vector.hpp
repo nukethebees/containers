@@ -6,7 +6,7 @@
 #include "linked_vector_iterator.hpp"
 #include "allocator.hpp"
 
-#include "platform_def.hpp"
+#include "preprocessor/platform_def.hpp"
 
 namespace ml {
 /*
@@ -281,4 +281,4 @@ METHOD_START()::destroy_segment_elements(pointer ptr, size_type n)->void {
 
 }
 
-#include "platform_undef.hpp"
+#include "preprocessor/platform_undef.hpp"

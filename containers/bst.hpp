@@ -3,7 +3,7 @@
 #include <memory>
 #include <type_traits>
 
-#include "platform_def.hpp"
+#include "preprocessor/platform_def.hpp"
 #include "bst_node.hpp"
 #include "bst_iterator.hpp"
 
@@ -327,4 +327,4 @@ METHOD_START()::remove_from_inner(node_type* node)->void {
 #undef METHOD_START
 }
 
-#include "platform_undef.hpp"
+#include "preprocessor/platform_undef.hpp"

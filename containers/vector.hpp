@@ -7,7 +7,7 @@
 #include <type_traits>
 
 #include "span_iterator.hpp"
-#include "platform_def.hpp"
+#include "preprocessor/platform_def.hpp"
 
 namespace ml {
 template <typename T, typename Allocator = std::allocator<T>>
@@ -241,4 +241,4 @@ inline void vector<T, Allocator>::grow(this vector& self) {
 
 }
 
-#include "platform_undef.hpp"
+#include "preprocessor/platform_undef.hpp"

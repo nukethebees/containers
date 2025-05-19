@@ -3,7 +3,7 @@
 #include <memory>
 #include <utility>
 
-#include "platform_def.hpp"
+#include "preprocessor/platform_def.hpp"
 
 namespace ml {
 // Doubly-linked list
@@ -203,4 +203,4 @@ class dlist {
 };
 }
 
-#include "platform_undef.hpp"
+#include "preprocessor/platform_undef.hpp"

@@ -4,7 +4,8 @@
 #include <utility>
 
 #include "allocator_concepts.hpp"
-#include "platform_def.hpp"
+#include "preprocessor/platform_def.hpp"
+#include "preprocessor/noexcept_release_def.hpp"
 
 namespace ml {
 // Vector which can extend an existing allocation instead of allocating a new one
@@ -37,7 +38,7 @@ class vector2 {
         return std::forward<Self>(self).data_[index];
     }
     template <typename Self>
-    auto front(this Self&& self) -> auto& {
+    auto front(this Self&& self) NOEXCEPT_RELEASE -> auto& {
 #ifdef DEBUG_ENABLED
         if (self.empty()) {
             throw std::out_of_range{"Vector is empty."};
@@ -48,10 +49,10 @@ class vector2 {
     }
 
     // Capacity
-    auto capacity() const -> size_type { return capacity_; }
-    auto empty() const -> bool { return size_ == 0; }
-    auto full() const -> bool { return size_ == capacity_; }
-    auto size() const -> size_type { return size_; }
+    auto capacity() const noexcept -> size_type { return capacity_; }
+    auto empty() const noexcept -> bool { return size_ == 0; }
+    auto full() const noexcept -> bool { return size_ == capacity_; }
+    auto size() const noexcept -> size_type { return size_; }
 
     // Modifiers
     template <typename... Args>
@@ -106,3 +107,6 @@ class vector2 {
     T* data_{nullptr};
 };
 }
+
+#include "preprocessor/platform_undef.hpp"
+#include "preprocessor/noexcept_release_undef.hpp"
