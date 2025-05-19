@@ -155,3 +155,18 @@ TEST(vector2, smr_front) {
     values.push_back(1);
     EXPECT_EQ(values.front(), 1);
 }
+TEST(vector2, index_operator) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+    values.push_back(1);
+    EXPECT_EQ(values[0], 1);
+}
+TEST(vector2, index_operator_oob) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+#ifdef DEBUG_ENABLED
+    EXPECT_THROW(values[0], std::out_of_range);
+#else
+    SUCCEED();
+#endif
+}

@@ -57,6 +57,15 @@ class vector2 {
 
         return std::forward<Self>(self).data_[0];
     }
+    template <typename Self>
+    auto operator[](this Self&& self, size_type index) NOEXCEPT_RELEASE -> auto& {
+#ifdef DEBUG_ENABLED
+        if (index >= self.size_) {
+            throw std::out_of_range{"Index out of range"};
+        }
+#endif
+        return std::forward<Self>(self).data_[index];
+    }
 
     // Capacity
     auto capacity() const noexcept -> size_type { return capacity_; }
