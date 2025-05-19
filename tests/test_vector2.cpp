@@ -18,7 +18,10 @@ using stack_pmr = ml::stack_buffer_pmr<T, CAPACITY, ml::memory_resource>;
 
 using intvec = arena_vec<int>;
 
-// smr = stack memory resource
+/*
+smr = stack memory resource
+*/
+// Construction
 TEST(vector2, smr_init_empty) {
     stack_pmr<int, 100> resource;
     intvec values{&resource};
@@ -26,6 +29,7 @@ TEST(vector2, smr_init_empty) {
     EXPECT_EQ(values.size(), 0);
     EXPECT_TRUE(values.empty());
 }
+// Element insertion
 TEST(vector2, smr_push_back_int) {
     stack_pmr<int, 100> resource;
     intvec values{&resource};
@@ -79,6 +83,7 @@ TEST(vector2, smr_emplace_back_struct_multiple) {
     EXPECT_EQ(values.size(), n_elems);
     EXPECT_FALSE(values.empty());
 }
+// Removal
 TEST(vector2, smr_pop_back_multiple_ints) {
     stack_pmr<int, 100> resource;
     intvec values{&resource};
@@ -107,6 +112,7 @@ TEST(vector2, smr_pop_back_empty) {
     EXPECT_NO_THROW(values.pop_back());
     EXPECT_TRUE(values.empty());
 }
+// Element access
 TEST(vector2, smr_at_elem0) {
     stack_pmr<int, 100> resource;
     intvec values{&resource};
@@ -117,4 +123,19 @@ TEST(vector2, smr_at_oob) {
     stack_pmr<int, 100> resource;
     intvec values{&resource};
     EXPECT_THROW(values.at(0), std::out_of_range);
+}
+TEST(vector2, smr_front_empty) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+#ifdef DEBUG_ENABLED
+    EXPECT_THROW(values.front(), std::out_of_range);
+#else
+    SUCCEED();
+#endif
+}
+TEST(vector2, smr_front) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+    values.push_back(1);
+    EXPECT_EQ(values.front(), 1);
 }

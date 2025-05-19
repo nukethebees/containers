@@ -36,6 +36,16 @@ class vector2 {
         }
         return std::forward<Self>(self).data_[index];
     }
+    template <typename Self>
+    auto front(this Self&& self) -> auto& {
+#ifdef DEBUG_ENABLED
+        if (self.empty()) {
+            throw std::out_of_range{"Vector is empty."};
+        }
+#endif
+
+        return std::forward<Self>(self).data_[0];
+    }
 
     // Capacity
     auto capacity() const -> size_type { return capacity_; }
@@ -96,5 +106,3 @@ class vector2 {
     T* data_{nullptr};
 };
 }
-
-#include "platform_undef.hpp"

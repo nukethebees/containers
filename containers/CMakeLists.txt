@@ -35,6 +35,6 @@ target_compile_options(containers PRIVATE
   $<$<CXX_COMPILER_ID:MSVC>:/FAs /Fa${CMAKE_BINARY_DIR}/asm\\>
 )
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  target_compile_definitions(containers PRIVATE DEBUG_ENABLED)
-endif()
+target_compile_definitions(containers PUBLIC
+    $<$<CONFIG:Debug>:DEBUG_ENABLED>
+)
