@@ -38,6 +38,16 @@ class vector2 {
         return std::forward<Self>(self).data_[index];
     }
     template <typename Self>
+    auto back(this Self&& self) NOEXCEPT_RELEASE -> auto& {
+#ifdef DEBUG_ENABLED
+        if (self.empty()) {
+            throw std::out_of_range{"Vector is empty."};
+        }
+#endif
+        auto const i{self.size_ - 1};
+        return std::forward<Self>(self).data_[i];
+    }
+    template <typename Self>
     auto front(this Self&& self) NOEXCEPT_RELEASE -> auto& {
 #ifdef DEBUG_ENABLED
         if (self.empty()) {

@@ -124,6 +124,22 @@ TEST(vector2, smr_at_oob) {
     intvec values{&resource};
     EXPECT_THROW(values.at(0), std::out_of_range);
 }
+TEST(vector2, smr_back_empty) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+#ifdef DEBUG_ENABLED
+    EXPECT_THROW(values.back(), std::out_of_range);
+#else
+    SUCCEED();
+#endif
+}
+TEST(vector2, smr_back) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+    values.push_back(1);
+    values.push_back(2);
+    EXPECT_EQ(values.back(), 2);
+}
 TEST(vector2, smr_front_empty) {
     stack_pmr<int, 100> resource;
     intvec values{&resource};
