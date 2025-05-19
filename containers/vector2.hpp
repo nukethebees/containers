@@ -28,6 +28,15 @@ class vector2 {
         allocator_.deallocate(data_, capacity_);
     }
 
+    // Element access
+    template <typename Self>
+    auto at(this Self&& self, size_type index) -> value_type& {
+        if (index >= self.size_) {
+            throw std::out_of_range{"Index out of range"};
+        }
+        return std::forward<Self>(self).data_[index];
+    }
+
     // Capacity
     auto capacity() const -> size_type { return capacity_; }
     auto empty() const -> bool { return size_ == 0; }

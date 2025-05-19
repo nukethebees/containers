@@ -107,3 +107,14 @@ TEST(vector2, smr_pop_back_empty) {
     EXPECT_NO_THROW(values.pop_back());
     EXPECT_TRUE(values.empty());
 }
+TEST(vector2, smr_at_elem0) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+    values.push_back(1);
+    EXPECT_EQ(values.at(0), 1);
+}
+TEST(vector2, smr_at_oob) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+    EXPECT_THROW(values.at(0), std::out_of_range);
+}
