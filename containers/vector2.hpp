@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <iterator>
 #include <limits>
+#include <type_traits>
 #include <utility>
 
 #include "allocator_concepts.hpp"
@@ -29,15 +30,16 @@ class vector2 {
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+    inline static constexpr bool elems_must_be_destroyed =
+        std::is_destructible_v<value_type> && !std::is_trivially_destructible_v<value_type>;
+
     // Constructors
     vector2() noexcept = default;
     template <typename U>
     vector2(U&& allocator)
         : allocator_{std::forward<U>(allocator)} {}
     ~vector2() {
-        for (size_type i{0}; i < size_; ++i) {
-            data_[i].~value_type();
-        }
+        destroy_all_elements();
         allocator_.deallocate(data_, capacity_);
     }
 
@@ -107,6 +109,10 @@ class vector2 {
     auto size() const noexcept -> size_type { return size_; }
 
     // Modifiers
+    void clear() {
+        destroy_all_elements();
+        size_ = 0;
+    }
     template <typename... Args>
     void emplace_back(Args&&... args) {
         grow_if_full();
@@ -150,6 +156,14 @@ class vector2 {
     void grow_if_full() {
         if (full()) {
             grow();
+        }
+    }
+    // Modifiers
+    void destroy_all_elements() {
+        if constexpr (elems_must_be_destroyed) {
+            for (size_type i{0}; i < size_; ++i) {
+                data_[i].~value_type();
+            }
         }
     }
 
