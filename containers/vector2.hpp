@@ -31,14 +31,14 @@ class vector2 {
 
     // Element access
     template <typename Self>
-    auto at(this Self&& self, size_type index) {
+    auto at(this Self&& self, size_type index) -> auto& {
         if (index >= self.size_) {
             throw std::out_of_range{"Index out of range"};
         }
         return std::forward<Self>(self).data_[index];
     }
     template <typename Self>
-    auto back(this Self&& self) NOEXCEPT_RELEASE {
+    auto back(this Self&& self) NOEXCEPT_RELEASE -> auto& {
 #ifdef DEBUG_ENABLED
         if (self.empty()) {
             throw std::out_of_range{"Vector is empty."};
@@ -48,7 +48,11 @@ class vector2 {
         return std::forward<Self>(self).data_[i];
     }
     template <typename Self>
-    auto front(this Self&& self) NOEXCEPT_RELEASE {
+    auto data(this Self&& self) NOEXCEPT_RELEASE -> auto& {
+        return std::forward<Self>(self).data_;
+    }
+    template <typename Self>
+    auto front(this Self&& self) NOEXCEPT_RELEASE -> auto& {
 #ifdef DEBUG_ENABLED
         if (self.empty()) {
             throw std::out_of_range{"Vector is empty."};
@@ -58,7 +62,7 @@ class vector2 {
         return std::forward<Self>(self).data_[0];
     }
     template <typename Self>
-    auto operator[](this Self&& self, size_type index) NOEXCEPT_RELEASE {
+    auto operator[](this Self&& self, size_type index) NOEXCEPT_RELEASE->auto& {
 #ifdef DEBUG_ENABLED
         if (index >= self.size_) {
             throw std::out_of_range{"Index out of range"};

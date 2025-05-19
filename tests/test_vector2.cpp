@@ -170,3 +170,14 @@ TEST(vector2, index_operator_oob) {
     SUCCEED();
 #endif
 }
+TEST(vector2, data_member_empty) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+    EXPECT_EQ(nullptr, values.data());
+}
+TEST(vector2, data_member) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+    values.push_back(1);
+    EXPECT_EQ(values.data(), &values.front());
+}
