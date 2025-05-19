@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <limits>
 #include <utility>
 
 #include "allocator_concepts.hpp"
@@ -16,6 +17,7 @@ class vector2 {
     using value_type = T;
     using allocator_type = Allocator;
     using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
 
     // Constructors
     vector2() noexcept = default;
@@ -74,6 +76,9 @@ class vector2 {
     // Capacity
     auto capacity() const noexcept -> size_type { return capacity_; }
     auto empty() const noexcept -> bool { return size_ == 0; }
+    constexpr auto max_size() const noexcept -> size_type {
+        return std::numeric_limits<difference_type>::max() / sizeof(int);
+    }
     auto full() const noexcept -> bool { return size_ == capacity_; }
     auto size() const noexcept -> size_type { return size_; }
 

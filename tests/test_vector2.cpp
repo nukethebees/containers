@@ -181,3 +181,9 @@ TEST(vector2, data_member) {
     values.push_back(1);
     EXPECT_EQ(values.data(), &values.front());
 }
+// Capacity
+TEST(vector2, max_size_int) {
+    stack_pmr<int, 100> resource;
+    intvec values{&resource};
+    EXPECT_EQ(values.max_size(), std::numeric_limits<typename intvec::difference_type>::max() / sizeof(int));
+}
