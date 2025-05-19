@@ -108,7 +108,10 @@ class vector2 {
     void pop_back() {
         if (size_ > 0) {
             --size_;
-            data_[size_].~value_type();
+
+            if constexpr (elems_must_be_destroyed) {
+                data_[size_].~value_type();
+            }
         }
     }
     template <typename U>
