@@ -121,11 +121,12 @@ class vector2 {
     }
   private:
     // Element access
-    void index_check_DEBUG(size_type i) const NOEXCEPT_RELEASE {
 #ifdef DEBUG_ENABLED
-        index_check(i);
+    void index_check_DEBUG(size_type i) const { index_check(i); }
+#else
+    void index_check_DEBUG(size_type) const noexcept {}
 #endif
-    }
+
     void index_check(size_type i) const {
         if (i >= size_) {
             throw std::out_of_range{"Index out of range"};

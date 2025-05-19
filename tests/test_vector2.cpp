@@ -21,6 +21,12 @@ using stack_pmr = ml::stack_buffer_pmr<T, CAPACITY, ml::memory_resource>;
 
 using intvec = vec_pmr<int>;
 
+#ifndef DEBUG_ENABLED
+#define SKIP_IF_RELEASE GTEST_SKIP() << "Not tested in release mode."
+#else
+#define SKIP_IF_RELEASE
+#endif
+
 /*
 smr = stack memory resource
 */
@@ -45,13 +51,10 @@ TEST(vector2, smr_at_oob) {
     EXPECT_THROW(values.at(0), std::out_of_range);
 }
 TEST(vector2, smr_back_empty) {
+    SKIP_IF_RELEASE;
     stack_pmr<int, 100> resource;
     intvec values{&resource};
-#ifdef DEBUG_ENABLED
     EXPECT_THROW(values.back(), std::out_of_range);
-#else
-    SUCCEED();
-#endif
 }
 TEST(vector2, smr_back) {
     stack_pmr<int, 100> resource;
@@ -61,13 +64,10 @@ TEST(vector2, smr_back) {
     EXPECT_EQ(values.back(), 2);
 }
 TEST(vector2, smr_front_empty) {
+    SKIP_IF_RELEASE;
     stack_pmr<int, 100> resource;
     intvec values{&resource};
-#ifdef DEBUG_ENABLED
     EXPECT_THROW(values.front(), std::out_of_range);
-#else
-    SUCCEED();
-#endif
 }
 TEST(vector2, smr_front) {
     stack_pmr<int, 100> resource;
@@ -82,13 +82,10 @@ TEST(vector2, smr_index_operator) {
     EXPECT_EQ(values[0], 1);
 }
 TEST(vector2, smr_index_operator_oob) {
+    SKIP_IF_RELEASE;
     stack_pmr<int, 100> resource;
     intvec values{&resource};
-#ifdef DEBUG_ENABLED
     EXPECT_THROW(values[0], std::out_of_range);
-#else
-    SUCCEED();
-#endif
 }
 TEST(vector2, smr_data_member_empty) {
     stack_pmr<int, 100> resource;
@@ -235,12 +232,10 @@ TEST(vector2, smr_pop_back_multiple_ints) {
     EXPECT_FALSE(values.empty());
 }
 TEST(vector2, smr_pop_back_empty) {
+    SKIP_IF_RELEASE;
+
     stack_pmr<int, 100> resource;
     intvec values{&resource};
     EXPECT_TRUE(values.empty());
-#ifdef DEBUG_ENABLED
     EXPECT_THROW(values.pop_back(), std::out_of_range);
-#else
-    SUCCEED();
-#endif
 }
