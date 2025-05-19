@@ -14,12 +14,12 @@
 #include "configure_warning_pragmas.hpp"
 
 template <typename T>
-using arena_vec = ml::vector2<T, ml::polymorphic_allocator<T>>;
+using vec_pmr = ml::vector2<T, ml::polymorphic_allocator<T>>;
 
 template <typename T, std::size_t CAPACITY>
 using stack_pmr = ml::stack_buffer_pmr<T, CAPACITY, ml::memory_resource>;
 
-using intvec = arena_vec<int>;
+using intvec = vec_pmr<int>;
 
 /*
 smr = stack memory resource
@@ -170,7 +170,7 @@ TEST(vector2, smr_emplace_back_struct_multiple) {
     };
 
     stack_pmr<TestStruct, 100> resource;
-    arena_vec<TestStruct> values{&resource};
+    vec_pmr<TestStruct> values{&resource};
 
     static constexpr std::size_t n_elems{10};
 

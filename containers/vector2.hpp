@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <iterator>
 #include <limits>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
@@ -118,7 +119,7 @@ class vector2 {
     }
   private:
     // Element access
-    void index_check_DEBUG(size_type i) const {
+    void index_check_DEBUG(size_type i) const NOEXCEPT_RELEASE {
 #ifdef DEBUG_ENABLED
         index_check(i);
 #endif

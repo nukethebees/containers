@@ -204,12 +204,13 @@ static void BM_vl_rd_list_alloc(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
 
-BENCHMARK(BM_vl_wr_vector_std);
-BENCHMARK(BM_vl_wr_vector_alloc);
-BENCHMARK(BM_vl_wr_list_std);
-BENCHMARK(BM_vl_wr_list_alloc);
-
-BENCHMARK(BM_vl_rd_vector_std);
-BENCHMARK(BM_vl_rd_vector_alloc);
-BENCHMARK(BM_vl_rd_list_std);
-BENCHMARK(BM_vl_rd_list_alloc);
+//BENCHMARK(BM_vl_wr_vector_std);
+//BENCHMARK(BM_vl_wr_vector_alloc);
+//BENCHMARK(BM_vl_wr_list_std);
+//BENCHMARK(BM_vl_wr_list_alloc);
+//
+//BENCHMARK(BM_vl_rd_vector_std);
+//BENCHMARK(BM_vl_rd_vector_alloc);
+//BENCHMARK(BM_vl_rd_list_std);
+//BENCHMARK(BM_vl_rd_list_alloc);
+//
