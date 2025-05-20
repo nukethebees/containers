@@ -10,7 +10,7 @@ target_sources(tests PRIVATE
   "test_vector.cpp"
   "test_vector2.cpp"
   "test_arena_allocator.cpp"
-  "test_stack_buffer_allocator.cpp"
+  "test_buffer_memory_resource.cpp"
   "test_multi_arena_resource.cpp" 
   "test_misc.cpp"
   "test_polymorphic_allocator.cpp"

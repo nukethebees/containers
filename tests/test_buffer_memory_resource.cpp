@@ -19,22 +19,22 @@ struct VecConfig : ml::StackAllocConfig<T, CAPACITY> {
     using Vec = std::vector<T, Allocator>;
 };
 
-TEST(stack_buffer_allocator, resource_init) {
+TEST(buffer_mmr, resource_init) {
     ml::buffer_mmr<1024> resource;
     ASSERT_EQ(resource.remaining_capacity(), 1024);
 }
-TEST(stack_buffer_allocator, resource_allocate) {
+TEST(buffer_mmr, resource_allocate) {
     ml::buffer_mmr<1024> resource;
     auto* ptr{resource.allocate(16, alignof(int))};
     ASSERT_NE(ptr, nullptr);
     ASSERT_EQ(resource.remaining_capacity(), 1008);
 }
-TEST(stack_buffer_allocator, resource_allocate_overflow) {
+TEST(buffer_mmr, resource_allocate_overflow) {
     ml::buffer_mmr<1024> resource;
     ASSERT_THROW((void)resource.allocate(1025, alignof(int)), std::bad_alloc);
 }
 
-TEST(stack_buffer_allocator, vector_init) {
+TEST(buffer_mmr, vector_init) {
     static constexpr std::size_t n_ints{1024};
     using config = VecConfig<int, n_ints>;
     config::Resource resource;
@@ -42,7 +42,7 @@ TEST(stack_buffer_allocator, vector_init) {
 
     std::vector<int, config::Allocator> vec{alloc};
 }
-TEST(stack_buffer_allocator, vector_push_back) {
+TEST(buffer_mmr, vector_push_back) {
     static constexpr std::size_t n_ints{1024};
     using config = VecConfig<int, n_ints>;
     config::Resource resource;
@@ -55,7 +55,7 @@ TEST(stack_buffer_allocator, vector_push_back) {
     vec.push_back(5);
     ASSERT_EQ(vec.size(), 5);
 }
-TEST(stack_buffer_allocator, feed_two_vectors) {
+TEST(buffer_mmr, feed_two_vectors) {
     static constexpr std::size_t n_ints{1024};
     using config = VecConfig<int, n_ints>;
     config::Resource resource;
@@ -67,7 +67,7 @@ TEST(stack_buffer_allocator, feed_two_vectors) {
     ASSERT_EQ(vec1.size(), 1);
     ASSERT_EQ(vec2.size(), 1);
 }
-TEST(stack_buffer_allocator, vector_push_back_overflow) {
+TEST(buffer_mmr, vector_push_back_overflow) {
     static constexpr std::size_t n_ints{5};
     using config = VecConfig<int, n_ints>;
     config::Resource resource;
