@@ -4,14 +4,14 @@
 #include <cstddef>
 #include <memory_resource>
 
-#include "memory_resource.hpp"
+#include "pmr.hpp"
 #include "memory_resource_concepts.hpp"
 
 namespace ml {
 // A copy of the std polymorphic allocator from C++20
 // The main difference is that this one propagates the memory resource when the container is copied
-template <typename T = std::byte, typename ResourceT = ml::memory_resource>
-class polymorphic_allocator {
+template <typename T = std::byte, typename ResourceT = ml::pmr>
+class pmr_allocator {
   public:
     using pointer = T*;
     using const_pointer = T const*;
@@ -25,22 +25,22 @@ class polymorphic_allocator {
 
     template <typename NewAllocT>
     struct rebind {
-        using other = polymorphic_allocator<NewAllocT, ResourceT>;
+        using other = pmr_allocator<NewAllocT, ResourceT>;
     };
 
     // Constructors
-    polymorphic_allocator() = delete;
-    polymorphic_allocator(ResourceT* resource)
+    pmr_allocator() = delete;
+    pmr_allocator(ResourceT* resource)
         : resource_{resource} {}
     // Copy/move constructors
-    polymorphic_allocator(polymorphic_allocator const&) noexcept = default;
+    pmr_allocator(pmr_allocator const&) noexcept = default;
     template <typename U>
-    polymorphic_allocator(polymorphic_allocator<U, ResourceT> const& other) noexcept
+    pmr_allocator(pmr_allocator<U, ResourceT> const& other) noexcept
         : resource_{other.resource()} {}
-    polymorphic_allocator(polymorphic_allocator&&) noexcept = default;
+    pmr_allocator(pmr_allocator&&) noexcept = default;
     // Assignment operators
-    auto operator=(polymorphic_allocator const&) noexcept -> polymorphic_allocator& = default;
-    auto operator=(polymorphic_allocator&&) noexcept -> polymorphic_allocator& = default;
+    auto operator=(pmr_allocator const&) noexcept -> pmr_allocator& = default;
+    auto operator=(pmr_allocator&&) noexcept -> pmr_allocator& = default;
 
     // Allocation
     auto allocate(size_type n) -> T* { return static_cast<T*>(resource_->allocate(n * sizeof(T), alignof(T))); }
@@ -84,12 +84,12 @@ class polymorphic_allocator {
     }
 
     // Misc
-    auto select_on_container_copy_construction() const noexcept -> polymorphic_allocator { return *this; }
+    auto select_on_container_copy_construction() const noexcept -> pmr_allocator { return *this; }
     auto resource() const noexcept -> ResourceT* { return resource_; }
     auto max_size() const noexcept -> size_type { return std::numeric_limits<size_type>::max() / sizeof(T); }
 
     // Comparison
-    auto operator<=>(polymorphic_allocator const&) const noexcept = default;
+    auto operator<=>(pmr_allocator const&) const noexcept = default;
   private:
     ResourceT* resource_{nullptr};
 };

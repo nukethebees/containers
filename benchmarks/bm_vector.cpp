@@ -2,9 +2,9 @@
 
 #include <benchmark/benchmark.h>
 
-#include "containers/arena_allocator.hpp"
+#include "containers/arena_mmr_allocator.hpp"
 #include "containers/arena_mmr.hpp"
-#include "containers/arena_memory_resource_pmr.hpp"
+#include "containers/arena_pmr.hpp"
 
 #include "compiler_pragmas.hpp"
 
@@ -28,11 +28,11 @@ static void BM_vector_alloc_std(benchmark::State& state) {
 static void BM_vector_alloc_arena(benchmark::State& state) {
     for (auto _ : state) {
         ml::arena_mmr char_resource{ sizeof(char) * arena_elems_to_allocate };
-        ml::ArenaAllocator<char> c_alloc{ &char_resource };
-        std::vector<std::vector<char, ml::ArenaAllocator<char>>> c_vecs;
+        ml::arena_mmr_allocator<char> c_alloc{ &char_resource };
+        std::vector<std::vector<char, ml::arena_mmr_allocator<char>>> c_vecs;
 
         for (int i = 0; i < n_placements; ++i) {
-            std::vector<char, ml::ArenaAllocator<char>> char_vec{ c_alloc };
+            std::vector<char, ml::arena_mmr_allocator<char>> char_vec{ c_alloc };
             char_vec.reserve(n_reserve);
             c_vecs.emplace_back(std::move(char_vec));
         }
@@ -42,7 +42,7 @@ static void BM_vector_alloc_arena(benchmark::State& state) {
 
 static void BM_vector_alloc_arena_pmr(benchmark::State& state) {
     for (auto _ : state) {
-        ml::ArenaMemoryResourcePmr char_resource{ sizeof(char) * arena_elems_to_allocate };
+        ml::arena_pmr char_resource{ sizeof(char) * arena_elems_to_allocate };
         std::vector<std::pmr::vector<char>> c_vecs;
 
         for (int i = 0; i < n_placements; ++i) {

@@ -2,8 +2,8 @@
 
 #include <cstddef>
 
-#include "arena_memory_resource_pool.hpp"
-#include "memory_resource_allocator.hpp"
+#include "arena_mmr_pool.hpp"
+#include "mmr_allocator.hpp"
 
 namespace ml {
 class arena_mmr {
@@ -21,7 +21,7 @@ class arena_mmr {
     auto operator=(arena_mmr&& other) -> arena_mmr&;
 
     // Access
-    auto pool() const -> ArenaMemoryResourcePool const*;
+    auto pool() const -> arena_mmr_pool const*;
 
     // Capacity
     auto initial_capacity() const -> size_type;
@@ -35,20 +35,20 @@ class arena_mmr {
     // otherwise create a new pool and allocate from it
     auto extend(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment) -> void*;
   private:
-    ArenaMemoryResourcePool* pool_{nullptr};
-    ArenaMemoryResourcePool* last_pool_{nullptr};
+    arena_mmr_pool* pool_{nullptr};
+    arena_mmr_pool* last_pool_{nullptr};
     size_type initial_capacity_{1024};
 };
 
 // Ctor
 inline arena_mmr::~arena_mmr() {
     if (pool_) {
-        pool_->~ArenaMemoryResourcePool();
+        pool_->~arena_mmr_pool();
         delete[] reinterpret_cast<std::byte*>(pool_);
     }
 }
 // Access
-inline auto arena_mmr::pool() const -> ArenaMemoryResourcePool const* {
+inline auto arena_mmr::pool() const -> arena_mmr_pool const* {
     return pool_;
 }
 // Capacity

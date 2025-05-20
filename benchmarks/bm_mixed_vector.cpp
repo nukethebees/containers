@@ -3,7 +3,7 @@
 #include <benchmark/benchmark.h>
 
 #include "containers/arena_mmr.hpp"
-#include "containers/multi_arena_resource.hpp"
+#include "containers/multi_pmr.hpp"
 
 #include "compiler_pragmas.hpp"
 
@@ -28,7 +28,7 @@ static void BM_mixed_vector_std(benchmark::State& state) {
 }
 static void BM_mixed_vector_single_resource(benchmark::State& state) {
     for (auto _ : state) {
-        ml::ArenaMemoryResourcePmr resource{ sizeof(char) * arena_elems_to_allocate };
+        ml::arena_pmr resource{ sizeof(char) * arena_elems_to_allocate };
         std::pmr::polymorphic_allocator<char> char_alloc{ &resource };
         std::pmr::polymorphic_allocator<double> double_alloc{ &resource };
         std::pmr::polymorphic_allocator<std::string> string_alloc{ &resource };
@@ -49,7 +49,7 @@ static void BM_mixed_vector_multipool_allocator(benchmark::State& state) {
     for (auto _ : state) {
         constexpr std::size_t n_resources = 3;
 
-        ml::MultiArenaMemoryResourcePmr resource{ n_resources, sizeof(char) * arena_elems_to_allocate };
+        ml::multi_arena_pmr resource{ n_resources, sizeof(char) * arena_elems_to_allocate };
 
         auto* char_arena = resource.get_resource(0);
         auto* double_arena = resource.get_resource(1);
@@ -73,7 +73,7 @@ static void BM_mixed_vector_multipool_allocator(benchmark::State& state) {
 }
 static void BM_mixed_vector_multipool_t_allocator(benchmark::State& state) {
     for (auto _ : state) {
-        ml::MultiTArenaMemoryResourcePmr<char, double, std::pmr::string> resource{ sizeof(char) *
+        ml::multi_t_arena_pmr<char, double, std::pmr::string> resource{ sizeof(char) *
                                                                                   arena_elems_to_allocate };
 
         auto* char_arena = resource.get_resource<char>();

@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 
-#include "containers/memory_resource.hpp"
-#include "containers/memory_resource_allocator.hpp"
-#include "containers/polymorphic_allocator.hpp"
-#include "containers/stack_buffer_memory_resource.hpp"
-#include "containers/stack_buffer_memory_resource_pmr.hpp"
+#include "containers/pmr.hpp"
+#include "containers/mmr_allocator.hpp"
+#include "containers/pmr_allocator.hpp"
+#include "containers/buffer_mmr.hpp"
+#include "containers/buffer_pmr.hpp"
 
 #include "configure_warning_pragmas.hpp"
 
@@ -20,17 +20,17 @@ struct VecConfig : ml::StackAllocConfig<T, CAPACITY> {
 };
 
 TEST(stack_buffer_allocator, resource_init) {
-    ml::StackBufferMemoryResource<1024> resource;
+    ml::buffer_mmr<1024> resource;
     ASSERT_EQ(resource.remaining_capacity(), 1024);
 }
 TEST(stack_buffer_allocator, resource_allocate) {
-    ml::StackBufferMemoryResource<1024> resource;
+    ml::buffer_mmr<1024> resource;
     auto* ptr{resource.allocate(16, alignof(int))};
     ASSERT_NE(ptr, nullptr);
     ASSERT_EQ(resource.remaining_capacity(), 1008);
 }
 TEST(stack_buffer_allocator, resource_allocate_overflow) {
-    ml::StackBufferMemoryResource<1024> resource;
+    ml::buffer_mmr<1024> resource;
     ASSERT_THROW((void)resource.allocate(1025, alignof(int)), std::bad_alloc);
 }
 
@@ -91,10 +91,10 @@ TEST(stack_buffer_allocator, vector_push_back_overflow) {
 
 // std::pmr
 TEST(stack_buffer_pmr_std, init_pmr) {
-    ml::stack_buffer_pmr<int, 1024, std::pmr::memory_resource> resource;
+    ml::buffer_pmr<int, 1024, std::pmr::memory_resource> resource;
 }
 TEST(stack_buffer_pmr_std, sum_ints_in_vector) {
-    ml::stack_buffer_pmr<int, 1024, std::pmr::memory_resource> resource;
+    ml::buffer_pmr<int, 1024, std::pmr::memory_resource> resource;
     std::pmr::polymorphic_allocator<int> alloc{&resource};
     std::pmr::vector<int> vec{alloc};
 
@@ -111,13 +111,13 @@ TEST(stack_buffer_pmr_std, sum_ints_in_vector) {
 }
 
 // ml::pmr
-TEST(stack_buffer_pmr, init_pmr) {
-    ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
+TEST(buffer_pmr, init_pmr) {
+    ml::buffer_pmr<int, 1024, ml::pmr> resource;
 }
-TEST(stack_buffer_pmr, sum_ints_in_vector) {
-    ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
-    ml::polymorphic_allocator<int> alloc{&resource};
-    std::vector<int, ml::polymorphic_allocator<int>> vec{alloc};
+TEST(buffer_pmr, sum_ints_in_vector) {
+    ml::buffer_pmr<int, 1024, ml::pmr> resource;
+    ml::pmr_allocator<int> alloc{&resource};
+    std::vector<int, ml::pmr_allocator<int>> vec{alloc};
 
     int sum{0};
     for (int i{0}; i < 10; ++i) {
@@ -130,13 +130,13 @@ TEST(stack_buffer_pmr, sum_ints_in_vector) {
 
     ASSERT_EQ(sum, 45);
 }
-TEST(stack_buffer_pmr, extend_alloc) {
+TEST(buffer_pmr, extend_alloc) {
     static constexpr std::size_t old_elems{16};
     static constexpr std::size_t new_elems{32};
     std::size_t expected_size{new_elems * sizeof(int)};
 
-    ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
-    ml::polymorphic_allocator<int> alloc{&resource};
+    ml::buffer_pmr<int, 1024, ml::pmr> resource;
+    ml::pmr_allocator<int> alloc{&resource};
 
     auto* ptr{alloc.allocate(old_elems)};
     ASSERT_NE(ptr, nullptr);
@@ -146,9 +146,9 @@ TEST(stack_buffer_pmr, extend_alloc) {
     EXPECT_EQ(resource.remaining_capacity(), resource.capacity() - expected_size);
     EXPECT_EQ(resource.size(), expected_size);
 }
-TEST(stack_buffer_pmr, extend_alloc_oob) {
-    ml::stack_buffer_pmr<int, 1024, ml::memory_resource> resource;
-    ml::polymorphic_allocator<int> alloc{&resource};
+TEST(buffer_pmr, extend_alloc_oob) {
+    ml::buffer_pmr<int, 1024, ml::pmr> resource;
+    ml::pmr_allocator<int> alloc{&resource};
 
     auto* ptr{alloc.allocate(16)};
     ASSERT_NE(ptr, nullptr);

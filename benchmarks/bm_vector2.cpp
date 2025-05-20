@@ -3,15 +3,15 @@
 #include <benchmark/benchmark.h>
 
 #include "containers/vector2.hpp"
-#include "containers/polymorphic_allocator.hpp"
-#include "containers/stack_buffer_memory_resource_pmr.hpp"
+#include "containers/pmr_allocator.hpp"
+#include "containers/buffer_pmr.hpp"
 
 #include "compiler_pragmas.hpp"
 
 template <typename T>
-using vec_pmr = ml::vector2<T, ml::polymorphic_allocator<T>>;
+using vec_pmr = ml::vector2<T, ml::pmr_allocator<T>>;
 template <typename T, std::size_t CAPACITY>
-using stack_pmr = ml::stack_buffer_pmr<T, CAPACITY, ml::memory_resource>;
+using stack_pmr = ml::buffer_pmr<T, CAPACITY, ml::pmr>;
 
 static constexpr int n_placements{400};
 static constexpr int n_stack_capacity{1000};

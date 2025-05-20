@@ -16,7 +16,7 @@ arena_mmr::arena_mmr(arena_mmr&& other)
 auto arena_mmr::operator=(arena_mmr&& other) -> arena_mmr& {
     if (this != &other) {
         if (pool_) {
-            pool_->~ArenaMemoryResourcePool();
+            pool_->~arena_mmr_pool();
             delete[] reinterpret_cast<std::byte*>(pool_);
         }
         pool_ = other.pool_;
@@ -32,11 +32,11 @@ auto arena_mmr::allocate(size_type n_bytes, size_type alignment) -> void* {
 
     if (!last_pool_) {
         auto const cap{initial_capacity_};
-        pool_ = ArenaMemoryResourcePool::create_pool(make_new_size(cap, n_bytes));
+        pool_ = arena_mmr_pool::create_pool(make_new_size(cap, n_bytes));
         last_pool_ = pool_;
     } else if (last_pool_->remaining_capacity() <= n_bytes) {
         auto const cap{last_pool_->total_capacity()};
-        last_pool_->next_pool_ = ArenaMemoryResourcePool::create_pool(make_new_size(cap, n_bytes));
+        last_pool_->next_pool_ = arena_mmr_pool::create_pool(make_new_size(cap, n_bytes));
         last_pool_ = last_pool_->next_pool_;
     }
 

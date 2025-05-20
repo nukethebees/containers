@@ -3,30 +3,30 @@ add_library(containers::containers ALIAS containers)
 
 target_sources(containers PRIVATE
   "arena_mmr.cpp"
-  "multi_arena_resource.cpp")
+  "multi_pmr.cpp")
 target_sources(containers PUBLIC
   FILE_SET HEADERS
   BASE_DIRS ../
   FILES
-  "arena_allocator.hpp"
+  "arena_mmr_allocator.hpp"
   "arena_mmr.hpp"
-  "arena_memory_resource_pmr.hpp"
-  "arena_memory_resource_pool.hpp"
+  "arena_pmr.hpp"
+  "arena_mmr_pool.hpp"
   "array.hpp"
   "bst.hpp"
   "bst_node.hpp"
   "bst_iterator.hpp"
-  "memory_resource.hpp"
-  "memory_resource_allocator.hpp"
-  "multi_arena_resource.hpp"
+  "pmr.hpp"
+  "mmr_allocator.hpp"
+  "multi_pmr.hpp"
   "misc.hpp"
-  "polymorphic_allocator.hpp"
+  "pmr_allocator.hpp"
   "rbset.hpp"
   "slist.hpp"
   "span.hpp"
   "span_iterator.hpp"
-  "stack_buffer_memory_resource.hpp"
-  "stack_buffer_memory_resource_pmr.hpp"
+  "buffer_mmr.hpp"
+  "buffer_pmr.hpp"
   "vector.hpp"
   "vector2.hpp"
 )

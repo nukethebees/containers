@@ -3,15 +3,15 @@
 #include <array>
 #include <cstddef>
 
-#include "memory_resource_allocator.hpp"
+#include "mmr_allocator.hpp"
 
 namespace ml {
 template <std::size_t CAPACITY>
-class StackBufferMemoryResource {
+class buffer_mmr {
   public:
     using size_type = std::size_t;
 
-    StackBufferMemoryResource() = default;
+    buffer_mmr() = default;
 
     // Allocation
     [[nodiscard]] auto allocate(size_type n_bytes, size_type alignment) -> void* {
@@ -58,7 +58,7 @@ class StackBufferMemoryResource {
 
 template <typename T, std::size_t CAPACITY>
 struct StackAllocConfig {
-    using Resource = StackBufferMemoryResource<CAPACITY * sizeof(T)>;
+    using Resource = buffer_mmr<CAPACITY * sizeof(T)>;
     using Allocator = mmr_allocator<T, Resource>;
 };
 }

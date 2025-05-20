@@ -4,7 +4,7 @@
 #include <benchmark/benchmark.h>
 
 #include "containers/arena_mmr.hpp"
-#include "containers/multi_arena_resource.hpp"
+#include "containers/multi_pmr.hpp"
 
 #include "compiler_pragmas.hpp"
 
@@ -91,7 +91,7 @@ static void BM_vl_wr_list_std(benchmark::State& state) {
 }
 static void BM_vl_wr_vector_alloc(benchmark::State& state) {
     for (auto _ : state) {
-        ml::ArenaMemoryResourcePmr resource{INITIAL_SIZE};
+        ml::arena_pmr resource{INITIAL_SIZE};
         std::pmr::vector<std::pmr::vector<TP>> container{&resource};
 
         for (int i = 0; i < n_placements; ++i) {
@@ -111,7 +111,7 @@ static void BM_vl_wr_vector_alloc(benchmark::State& state) {
 }
 static void BM_vl_wr_list_alloc(benchmark::State& state) {
     for (auto _ : state) {
-        ml::ArenaMemoryResourcePmr resource{INITIAL_SIZE};
+        ml::arena_pmr resource{INITIAL_SIZE};
         std::pmr::list<std::pmr::list<TP>> container{&resource};
 
         for (int i = 0; i < n_placements; ++i) {
@@ -166,7 +166,7 @@ static void BM_vl_rd_list_std(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
 static void BM_vl_rd_vector_alloc(benchmark::State& state) {
-    ml::ArenaMemoryResourcePmr resource{INITIAL_SIZE};
+    ml::arena_pmr resource{INITIAL_SIZE};
     std::pmr::vector<std::pmr::vector<TP>> container{&resource};
 
     for (int i = 0; i < n_placements; ++i) {
@@ -185,7 +185,7 @@ static void BM_vl_rd_vector_alloc(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
 static void BM_vl_rd_list_alloc(benchmark::State& state) {
-    ml::ArenaMemoryResourcePmr resource{INITIAL_SIZE};
+    ml::arena_pmr resource{INITIAL_SIZE};
     std::pmr::list<std::pmr::list<TP>> container{&resource};
 
     for (int i = 0; i < n_placements; ++i) {

@@ -4,16 +4,16 @@
 
 #include <gtest/gtest.h>
 
-#include "containers/polymorphic_allocator.hpp"
-#include "containers/arena_memory_resource_pmr.hpp"
+#include "containers/pmr_allocator.hpp"
+#include "containers/arena_pmr.hpp"
 
 #include "configure_warning_pragmas.hpp"
 
 template <typename T>
-using std_pmr_alloc = ml::polymorphic_allocator<T, std::pmr::memory_resource>;
+using std_pmr_alloc = ml::pmr_allocator<T, std::pmr::memory_resource>;
 
-TEST(polymorphic_allocator, resource_allocate_bytes) {
-    ml::ArenaMemoryResourcePmr resource;
+TEST(pmr_allocator, resource_allocate_bytes) {
+    ml::arena_pmr resource;
 
     constexpr std::size_t size = 128;
     constexpr std::size_t alignment = alignof(std::max_align_t);
@@ -24,8 +24,8 @@ TEST(polymorphic_allocator, resource_allocate_bytes) {
     resource.deallocate(ptr, size, alignment);
 }
 
-TEST(polymorphic_allocator, resource_allocate_and_deallocate_multiple) {
-    ml::ArenaMemoryResourcePmr resource;
+TEST(pmr_allocator, resource_allocate_and_deallocate_multiple) {
+    ml::arena_pmr resource;
 
     constexpr std::size_t size1 = 64;
     constexpr std::size_t size2 = 256;
@@ -42,8 +42,8 @@ TEST(polymorphic_allocator, resource_allocate_and_deallocate_multiple) {
     resource.deallocate(ptr2, size2, alignment);
 }
 
-TEST(polymorphic_allocator, resource_alignment_check) {
-    ml::ArenaMemoryResourcePmr resource;
+TEST(pmr_allocator, resource_alignment_check) {
+    ml::arena_pmr resource;
 
     constexpr std::size_t size = 128;
     constexpr std::size_t alignment = 64;
@@ -54,8 +54,8 @@ TEST(polymorphic_allocator, resource_alignment_check) {
 
     resource.deallocate(ptr, size, alignment);
 }
-TEST(polymorphic_allocator, vector_basic_operations) {
-    ml::ArenaMemoryResourcePmr resource;
+TEST(pmr_allocator, vector_basic_operations) {
+    ml::arena_pmr resource;
     std_pmr_alloc<int> alloc{&resource};
     std::vector<int, std_pmr_alloc<int>> vec{alloc};
 
@@ -68,8 +68,8 @@ TEST(polymorphic_allocator, vector_basic_operations) {
     EXPECT_EQ(vec[1], 2);
     EXPECT_EQ(vec[2], 3);
 }
-TEST(polymorphic_allocator, vector_large_allocation) {
-    ml::ArenaMemoryResourcePmr resource;
+TEST(pmr_allocator, vector_large_allocation) {
+    ml::arena_pmr resource;
     std_pmr_alloc<int> alloc{&resource};
     std::vector<int, std_pmr_alloc<int>> vec{alloc};
 
@@ -83,8 +83,8 @@ TEST(polymorphic_allocator, vector_large_allocation) {
     EXPECT_EQ(vec.back(), num_elements - 1);
 }
 
-TEST(polymorphic_allocator, vector_copy_and_shared_resource) {
-    ml::ArenaMemoryResourcePmr resource;
+TEST(pmr_allocator, vector_copy_and_shared_resource) {
+    ml::arena_pmr resource;
     std_pmr_alloc<int> alloc{&resource};
     std::vector<int, std_pmr_alloc<int>> vec1{alloc};
 
@@ -110,8 +110,8 @@ TEST(polymorphic_allocator, vector_copy_and_shared_resource) {
     EXPECT_EQ(vec1.get_allocator().resource(), vec2.get_allocator().resource());
 }
 
-TEST(polymorphic_allocator, list_basic_operations) {
-    ml::ArenaMemoryResourcePmr resource;
+TEST(pmr_allocator, list_basic_operations) {
+    ml::arena_pmr resource;
     std_pmr_alloc<int> alloc{&resource};
     std::list<int, std_pmr_alloc<int>> lst{alloc};
 
@@ -125,8 +125,8 @@ TEST(polymorphic_allocator, list_basic_operations) {
     EXPECT_EQ(*it++, 2);
     EXPECT_EQ(*it++, 3);
 }
-TEST(polymorphic_allocator, list_large_allocation) {
-    ml::ArenaMemoryResourcePmr resource;
+TEST(pmr_allocator, list_large_allocation) {
+    ml::arena_pmr resource;
     std_pmr_alloc<int> alloc{&resource};
     std::list<int, std_pmr_alloc<int>> lst{alloc};
 
@@ -143,8 +143,8 @@ TEST(polymorphic_allocator, list_large_allocation) {
 using int_map_alloc = std_pmr_alloc<std::pair<int const, int>>;
 using int_map = std::unordered_map<int, int, std::hash<int>, std::equal_to<>, int_map_alloc>;
 
-TEST(polymorphic_allocator, unordered_map_basic_operations) {
-    ml::ArenaMemoryResourcePmr resource;
+TEST(pmr_allocator, unordered_map_basic_operations) {
+    ml::arena_pmr resource;
     int_map_alloc alloc{&resource};
     int_map map{alloc};
 
@@ -157,8 +157,8 @@ TEST(polymorphic_allocator, unordered_map_basic_operations) {
     EXPECT_EQ(map[2], 20);
     EXPECT_EQ(map[3], 30);
 }
-TEST(polymorphic_allocator, unordered_map_large_allocation) {
-    ml::ArenaMemoryResourcePmr resource;
+TEST(pmr_allocator, unordered_map_large_allocation) {
+    ml::arena_pmr resource;
     int_map_alloc alloc{&resource};
     int_map map{alloc};
 

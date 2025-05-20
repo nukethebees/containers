@@ -3,18 +3,18 @@
 #include <type_traits>
 
 #include "allocator_concepts.hpp"
-#include "stack_buffer_memory_resource.hpp"
+#include "buffer_mmr.hpp"
 
 namespace ml {
 template <typename T, std::size_t CAPACITY, typename resource_base>
-class stack_buffer_pmr : public resource_base {
+class buffer_pmr : public resource_base {
   public:
     static inline constexpr bool resource_can_extend{extendable_memory_resource<resource_base>};
 
     using size_type = std::size_t;
 
-    stack_buffer_pmr() = default;
-    ~stack_buffer_pmr() override = default;
+    buffer_pmr() = default;
+    ~buffer_pmr() override = default;
 
     auto do_allocate(size_type n_bytes, size_type alignment) -> void* override final {
         return buffer_resource_.allocate(n_bytes, alignment);
@@ -37,6 +37,6 @@ class stack_buffer_pmr : public resource_base {
     auto remaining_capacity() const noexcept -> size_type { return buffer_resource_.remaining_capacity() / sizeof(T); }
     auto empty() const noexcept -> bool { return buffer_resource_.empty(); }
   private:
-    StackBufferMemoryResource<CAPACITY * sizeof(T)> buffer_resource_;
+    buffer_mmr<CAPACITY * sizeof(T)> buffer_resource_;
 };
 }
