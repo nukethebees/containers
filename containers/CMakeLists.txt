@@ -3,7 +3,7 @@ add_library(containers::containers ALIAS containers)
 
 target_sources(containers PRIVATE
   "arena_mmr.cpp"
-  "multi_pmr.cpp")
+  "multi_arena_pmr.cpp")
 target_sources(containers PUBLIC
   FILE_SET HEADERS
   BASE_DIRS ../
@@ -18,7 +18,7 @@ target_sources(containers PUBLIC
   "bst_iterator.hpp"
   "pmr.hpp"
   "mmr_allocator.hpp"
-  "multi_pmr.hpp"
+  "multi_arena_pmr.hpp"
   "misc.hpp"
   "pmr_allocator.hpp"
   "rbset.hpp"

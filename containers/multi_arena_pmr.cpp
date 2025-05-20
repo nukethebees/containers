@@ -1,6 +1,6 @@
 #include <stdexcept>
 
-#include "multi_pmr.hpp"
+#include "multi_arena_pmr.hpp"
 
 namespace ml {
 multi_arena_pmr::multi_arena_pmr(std::size_t n_resources, std::size_t initial_capacity) {

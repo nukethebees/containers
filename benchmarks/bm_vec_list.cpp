@@ -4,7 +4,7 @@
 #include <benchmark/benchmark.h>
 
 #include "containers/arena_mmr.hpp"
-#include "containers/multi_pmr.hpp"
+#include "containers/multi_arena_pmr.hpp"
 
 #include "compiler_pragmas.hpp"
 

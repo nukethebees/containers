@@ -2,7 +2,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 
-#include "containers/multi_pmr.hpp"
+#include "containers/multi_arena_pmr.hpp"
 
 #include "configure_warning_pragmas.hpp"
 
