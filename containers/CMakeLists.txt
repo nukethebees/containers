@@ -2,14 +2,14 @@
 add_library(containers::containers ALIAS containers)
 
 target_sources(containers PRIVATE
-  "arena_memory_resource.cpp"
+  "arena_mmr.cpp"
   "multi_arena_resource.cpp")
 target_sources(containers PUBLIC
   FILE_SET HEADERS
   BASE_DIRS ../
   FILES
   "arena_allocator.hpp"
-  "arena_memory_resource.hpp"
+  "arena_mmr.hpp"
   "arena_memory_resource_pmr.hpp"
   "arena_memory_resource_pool.hpp"
   "array.hpp"

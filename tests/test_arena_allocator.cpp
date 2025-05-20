@@ -10,21 +10,21 @@
 #include "configure_warning_pragmas.hpp"
 
 TEST(arena, empty_memory_resource) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
     // No pools should exist initially
     ASSERT_EQ(resource.pool(), nullptr);
 }
 TEST(arena, resource_request_bytes) {
     constexpr std::size_t size{100};
 
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
     auto* ptr = resource.allocate(size * sizeof(std::byte), alignof(std::byte));
     EXPECT_NE(ptr, nullptr);
 }
 TEST(arena, resource_emplace_and_use_value) {
     constexpr std::size_t value{42};
 
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
     auto* ptr = resource.allocate(sizeof(std::size_t), alignof(std::size_t));
     auto* emplaced_value = new (ptr) std::size_t(value);
 
@@ -33,7 +33,7 @@ TEST(arena, resource_emplace_and_use_value) {
 TEST(arena, create_arena_and_allocate_int) {
     constexpr int value{15};
 
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
     auto* ptr = resource.allocate(sizeof(int), alignof(int));
     EXPECT_NE(ptr, nullptr);
 
@@ -41,7 +41,7 @@ TEST(arena, create_arena_and_allocate_int) {
     EXPECT_EQ(*emplaced_value, value);
 }
 TEST(arena, allocate_and_deallocate) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
 
     auto* ptr = resource.allocate(10 * sizeof(char), alignof(char));
     EXPECT_NE(ptr, nullptr);
@@ -50,7 +50,7 @@ TEST(arena, allocate_and_deallocate) {
     // Deallocate should not throw or cause issues
 }
 TEST(arena, allocate_multiple_pools) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
 
     std::size_t large_size = resource.initial_capacity() * 2;
     auto* ptr1 = resource.allocate(resource.initial_capacity(), alignof(std::byte));
@@ -61,7 +61,7 @@ TEST(arena, allocate_multiple_pools) {
     EXPECT_NE(ptr1, ptr2);
 }
 TEST(arena, allocate_with_alignment) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
 
     constexpr std::size_t alignment = 64;
     auto* ptr = resource.allocate(128, alignment);
@@ -70,7 +70,7 @@ TEST(arena, allocate_with_alignment) {
     EXPECT_EQ(reinterpret_cast<std::uintptr_t>(ptr) % alignment, 0);
 }
 TEST(arena, reallocate_within_pool) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
 
     auto* ptr = resource.allocate(10, alignof(std::byte));
     auto* ptr2 = resource.allocate(20, alignof(std::byte));
@@ -79,7 +79,7 @@ TEST(arena, reallocate_within_pool) {
     EXPECT_NE(ptr2, nullptr);
 }
 TEST(arena, allocate_large_object) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
 
     std::size_t large_size = resource.initial_capacity() * 10;
     auto* ptr = resource.allocate(large_size, alignof(std::byte));
@@ -87,7 +87,7 @@ TEST(arena, allocate_large_object) {
     EXPECT_NE(ptr, nullptr);
 }
 TEST(arena, count_number_of_pools) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
 
     EXPECT_EQ(resource.n_pools(), 0); // Initially, no pools should exist.
 
@@ -98,7 +98,7 @@ TEST(arena, count_number_of_pools) {
     EXPECT_EQ(resource.n_pools(), 2); // After a larger allocation, a second pool should be created.
 }
 TEST(arena, total_size_and_add_objects) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
 
     EXPECT_EQ(resource.total_size(), 0); // Initially, total size should be 0.
 
@@ -128,7 +128,7 @@ TEST(arena, total_size_and_add_objects) {
 
 // Realloc
 TEST(arena, extend) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
     ml::ArenaAllocator<int> alloc{&resource};
 
     auto const sz{sizeof(int)};
@@ -145,7 +145,7 @@ TEST(arena, extend) {
 
 // Vector usage
 TEST(arena, vector_basic_operations) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
     ml::ArenaAllocator<int> alloc{&resource};
     std::vector<int, ml::ArenaAllocator<int>> vec{alloc};
 
@@ -160,7 +160,7 @@ TEST(arena, vector_basic_operations) {
     EXPECT_EQ(vec[2], 3);
 }
 TEST(arena, vector_reserve_and_emplace) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
     ml::ArenaAllocator<int> alloc{&resource};
     std::vector<int, ml::ArenaAllocator<int>> vec{alloc};
 
@@ -175,7 +175,7 @@ TEST(arena, vector_reserve_and_emplace) {
     EXPECT_EQ(vec[1], 20);
 }
 TEST(arena, vector_resize_and_access) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
     ml::ArenaAllocator<int> alloc{&resource};
     std::vector<int, ml::ArenaAllocator<int>> vec{alloc};
 
@@ -189,7 +189,7 @@ TEST(arena, vector_resize_and_access) {
     }
 }
 TEST(arena, vector_large_allocation) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
     ml::ArenaAllocator<int> alloc{&resource};
     std::vector<int, ml::ArenaAllocator<int>> vec{alloc};
 
@@ -204,7 +204,7 @@ TEST(arena, vector_large_allocation) {
     EXPECT_EQ(vec.back(), num_elements - 1);
 }
 TEST(arena, vector_copy_and_move) {
-    ml::ArenaMemoryResource resource;
+    ml::arena_mmr resource;
     ml::ArenaAllocator<int> alloc{&resource};
     std::vector<int, ml::ArenaAllocator<int>> vec1{alloc};
 

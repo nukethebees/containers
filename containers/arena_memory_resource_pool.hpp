@@ -4,14 +4,14 @@
 #include <memory>
 
 namespace ml {
-class ArenaMemoryResource;
+class arena_mmr;
 
 class ArenaMemoryResourcePool {
   public:
     ArenaMemoryResourcePool(std::size_t capacity);
     ~ArenaMemoryResourcePool();
 
-    friend class ArenaMemoryResource;
+    friend class arena_mmr;
 
     static auto create_pool(std::size_t initial_size) -> ArenaMemoryResourcePool*;
 

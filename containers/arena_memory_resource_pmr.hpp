@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <memory_resource>
 
-#include "arena_memory_resource.hpp"
+#include "arena_mmr.hpp"
 
 namespace ml {
 class ArenaMemoryResourcePmr : public std::pmr::memory_resource {
@@ -22,7 +22,7 @@ class ArenaMemoryResourcePmr : public std::pmr::memory_resource {
     void do_deallocate(void* p, std::size_t n_bytes, std::size_t alignment) override final;
     auto do_is_equal(std::pmr::memory_resource const& other) const noexcept -> bool override final;
   private:
-    ArenaMemoryResource arena;
+    arena_mmr arena;
 };
 
 // Ctor

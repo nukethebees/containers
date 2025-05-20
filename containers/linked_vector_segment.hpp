@@ -14,8 +14,7 @@ struct linked_vector_segment {
     linked_vector_segment(linked_vector_segment* prev_, size_type capacity_, T* data_)
         : prev(prev_)
         , capacity(capacity_)
-        , data(data_) {
-    }
+        , data(data_) {}
 
     linked_vector_segment(linked_vector_segment const&) = delete;
     linked_vector_segment(linked_vector_segment&&) = delete;
@@ -31,8 +30,5 @@ struct linked_vector_segment {
     size_type capacity{0};
     T* data{nullptr};
 };
-
-
-
 
 }

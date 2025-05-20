@@ -6,19 +6,19 @@
 #include "memory_resource_allocator.hpp"
 
 namespace ml {
-class ArenaMemoryResource {
+class arena_mmr {
   public:
     using size_type = std::size_t;
 
-    ArenaMemoryResource() = default;
-    explicit ArenaMemoryResource(size_type initial_capacity);
-    ~ArenaMemoryResource();
+    arena_mmr() = default;
+    explicit arena_mmr(size_type initial_capacity);
+    ~arena_mmr();
 
-    ArenaMemoryResource(ArenaMemoryResource const&) = delete;
-    ArenaMemoryResource(ArenaMemoryResource&& other);
+    arena_mmr(arena_mmr const&) = delete;
+    arena_mmr(arena_mmr&& other);
 
-    auto operator=(ArenaMemoryResource const&) -> ArenaMemoryResource& = delete;
-    auto operator=(ArenaMemoryResource&& other) -> ArenaMemoryResource&;
+    auto operator=(arena_mmr const&) -> arena_mmr& = delete;
+    auto operator=(arena_mmr&& other) -> arena_mmr&;
 
     // Access
     auto pool() const -> ArenaMemoryResourcePool const*;
@@ -41,28 +41,28 @@ class ArenaMemoryResource {
 };
 
 // Ctor
-inline ArenaMemoryResource::~ArenaMemoryResource() {
+inline arena_mmr::~arena_mmr() {
     if (pool_) {
         pool_->~ArenaMemoryResourcePool();
         delete[] reinterpret_cast<std::byte*>(pool_);
     }
 }
 // Access
-inline auto ArenaMemoryResource::pool() const -> ArenaMemoryResourcePool const* {
+inline auto arena_mmr::pool() const -> ArenaMemoryResourcePool const* {
     return pool_;
 }
 // Capacity
-inline auto ArenaMemoryResource::initial_capacity() const -> size_type {
+inline auto arena_mmr::initial_capacity() const -> size_type {
     return initial_capacity_;
 }
-inline auto ArenaMemoryResource::n_pools() const -> size_type {
+inline auto arena_mmr::n_pools() const -> size_type {
     size_type count{0};
     for (auto const* p{pool()}; p; p = p->next_pool()) {
         ++count;
     }
     return count;
 }
-inline auto ArenaMemoryResource::total_size() const -> size_type {
+inline auto arena_mmr::total_size() const -> size_type {
     size_type total{0};
     for (auto const* p{pool()}; p; p = p->next_pool()) {
         total += p->size();
@@ -70,13 +70,12 @@ inline auto ArenaMemoryResource::total_size() const -> size_type {
     return total;
 }
 // Allocation
-inline auto ArenaMemoryResource::deallocate(void* ptr, size_type n_bytes, size_type alignment) -> void {
+inline auto arena_mmr::deallocate(void* ptr, size_type n_bytes, size_type alignment) -> void {
     if (pool_) {
         pool_->deallocate(ptr, n_bytes, alignment);
     }
 }
-inline auto ArenaMemoryResource::extend(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment)
-    -> void* {
+inline auto arena_mmr::extend(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment) -> void* {
     if (!last_pool_) {
         return allocate(new_bytes, alignment);
     }

@@ -1,19 +1,19 @@
 #include <cmath>
 
-#include "arena_memory_resource.hpp"
+#include "arena_mmr.hpp"
 #include "misc.hpp"
 
 namespace ml {
-ArenaMemoryResource::ArenaMemoryResource(size_type initial_capacity)
+arena_mmr::arena_mmr(size_type initial_capacity)
     : initial_capacity_{initial_capacity} {}
-ArenaMemoryResource::ArenaMemoryResource(ArenaMemoryResource&& other)
+arena_mmr::arena_mmr(arena_mmr&& other)
     : pool_{other.pool_}
     , last_pool_{other.last_pool_} {
     other.pool_ = nullptr;
     other.last_pool_ = nullptr;
 }
 
-auto ArenaMemoryResource::operator=(ArenaMemoryResource&& other) -> ArenaMemoryResource& {
+auto arena_mmr::operator=(arena_mmr&& other) -> arena_mmr& {
     if (this != &other) {
         if (pool_) {
             pool_->~ArenaMemoryResourcePool();
@@ -27,7 +27,7 @@ auto ArenaMemoryResource::operator=(ArenaMemoryResource&& other) -> ArenaMemoryR
     return *this;
 }
 
-auto ArenaMemoryResource::allocate(size_type n_bytes, size_type alignment) -> void* {
+auto arena_mmr::allocate(size_type n_bytes, size_type alignment) -> void* {
     auto make_new_size{[](auto cap, auto n_b) { return ml::max(cap, (n_b / cap) * size_type{2} * cap); }};
 
     if (!last_pool_) {

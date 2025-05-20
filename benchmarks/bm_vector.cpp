@@ -3,7 +3,7 @@
 #include <benchmark/benchmark.h>
 
 #include "containers/arena_allocator.hpp"
-#include "containers/arena_memory_resource.hpp"
+#include "containers/arena_mmr.hpp"
 #include "containers/arena_memory_resource_pmr.hpp"
 
 #include "compiler_pragmas.hpp"
@@ -27,7 +27,7 @@ static void BM_vector_alloc_std(benchmark::State& state) {
 }
 static void BM_vector_alloc_arena(benchmark::State& state) {
     for (auto _ : state) {
-        ml::ArenaMemoryResource char_resource{ sizeof(char) * arena_elems_to_allocate };
+        ml::arena_mmr char_resource{ sizeof(char) * arena_elems_to_allocate };
         ml::ArenaAllocator<char> c_alloc{ &char_resource };
         std::vector<std::vector<char, ml::ArenaAllocator<char>>> c_vecs;
 

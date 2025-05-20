@@ -2,7 +2,7 @@
 
 #include <benchmark/benchmark.h>
 
-#include "containers/arena_memory_resource.hpp"
+#include "containers/arena_mmr.hpp"
 #include "containers/multi_arena_resource.hpp"
 
 #include "compiler_pragmas.hpp"
