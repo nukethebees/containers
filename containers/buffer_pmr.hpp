@@ -6,10 +6,11 @@
 #include "buffer_mmr.hpp"
 
 namespace ml {
-template <typename T, std::size_t CAPACITY, typename resource_base>
+template <typename T, std::size_t CAPACITY_ELEMS, typename resource_base>
 class buffer_pmr : public resource_base {
   public:
     static inline constexpr bool resource_can_extend{extendable_memory_resource<resource_base>};
+    static inline constexpr auto CAPACITY_BYTES{CAPACITY_ELEMS * sizeof(T)};
 
     using size_type = std::size_t;
 
@@ -33,10 +34,13 @@ class buffer_pmr : public resource_base {
     auto do_is_equal(resource_base const& other) const noexcept -> bool override final { return this == &other; }
 
     auto size() const noexcept -> size_type { return buffer_resource_.size(); }
-    auto capacity() const noexcept -> size_type { return CAPACITY; }
-    auto remaining_capacity() const noexcept -> size_type { return buffer_resource_.remaining_capacity() / sizeof(T); }
+    auto size_bytes() const noexcept -> size_type { return size() * sizeof(T); }
+    auto capacity() const noexcept -> size_type { return CAPACITY_ELEMS; }
+    auto capacity_bytes() const noexcept -> size_type { return CAPACITY_BYTES; }
+    auto remaining_capacity() const noexcept -> size_type { return remaining_capacity_bytes() / sizeof(T); }
+    auto remaining_capacity_bytes() const noexcept -> size_type { return buffer_resource_.remaining_capacity(); }
     auto empty() const noexcept -> bool { return buffer_resource_.empty(); }
   private:
-    buffer_mmr<CAPACITY * sizeof(T)> buffer_resource_;
+    buffer_mmr<CAPACITY_BYTES> buffer_resource_;
 };
 }

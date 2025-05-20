@@ -90,10 +90,10 @@ TEST(buffer_mmr, vector_push_back_overflow) {
 }
 
 // std::pmr
-TEST(stack_buffer_pmr_std, init_pmr) {
+TEST(buffer_pmr_std, init_pmr) {
     ml::buffer_pmr<int, 1024, std::pmr::memory_resource> resource;
 }
-TEST(stack_buffer_pmr_std, sum_ints_in_vector) {
+TEST(buffer_pmr_std, sum_ints_in_vector) {
     ml::buffer_pmr<int, 1024, std::pmr::memory_resource> resource;
     std::pmr::polymorphic_allocator<int> alloc{&resource};
     std::pmr::vector<int> vec{alloc};
@@ -133,18 +133,23 @@ TEST(buffer_pmr, sum_ints_in_vector) {
 TEST(buffer_pmr, extend_alloc) {
     static constexpr std::size_t old_elems{16};
     static constexpr std::size_t new_elems{32};
-    std::size_t expected_size{new_elems * sizeof(int)};
+    static constexpr auto expected_old_bytes{old_elems * sizeof(int)};
+    static constexpr auto expected_new_bytes{new_elems * sizeof(int)};
 
     ml::buffer_pmr<int, 1024, ml::pmr> resource;
     ml::pmr_allocator<int> alloc{&resource};
 
     auto* ptr{alloc.allocate(old_elems)};
     ASSERT_NE(ptr, nullptr);
+    EXPECT_EQ(resource.size(), expected_old_bytes);
+    EXPECT_EQ(resource.remaining_capacity(), resource.capacity() - old_elems);
+    EXPECT_EQ(resource.remaining_capacity_bytes(), resource.capacity_bytes() - expected_old_bytes);
 
     auto* extended_ptr{alloc.extend(ptr, old_elems, new_elems)};
     EXPECT_EQ(extended_ptr, ptr);
-    EXPECT_EQ(resource.remaining_capacity(), resource.capacity() - expected_size);
-    EXPECT_EQ(resource.size(), expected_size);
+    EXPECT_EQ(resource.remaining_capacity(), resource.capacity() - new_elems);
+    EXPECT_EQ(resource.remaining_capacity_bytes(), resource.capacity_bytes() - expected_new_bytes);
+    EXPECT_EQ(resource.size(), expected_new_bytes);
 }
 TEST(buffer_pmr, extend_alloc_oob) {
     ml::buffer_pmr<int, 1024, ml::pmr> resource;
