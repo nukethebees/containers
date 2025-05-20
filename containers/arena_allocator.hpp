@@ -5,5 +5,5 @@
 
 namespace ml {
 template <typename T>
-using ArenaAllocator = MemoryResourceAllocator<T, arena_mmr>;
+using ArenaAllocator = mmr_allocator<T, arena_mmr>;
 }

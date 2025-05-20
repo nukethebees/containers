@@ -2,7 +2,7 @@
 
 namespace ml {
 template <typename T, typename MemoryResource>
-class MemoryResourceAllocator {
+class mmr_allocator {
   public:
     using pointer = T*;
     using const_pointer = T const*;
@@ -12,21 +12,21 @@ class MemoryResourceAllocator {
 
     template <typename U>
     struct rebind {
-        using other = MemoryResourceAllocator<U, MemoryResource>;
+        using other = mmr_allocator<U, MemoryResource>;
     };
 
-    MemoryResourceAllocator() = default;
-    MemoryResourceAllocator(MemoryResource* resource)
+    mmr_allocator() = default;
+    mmr_allocator(MemoryResource* resource)
         : resource_{resource} {}
 
-    MemoryResourceAllocator(MemoryResourceAllocator const&) = default;
+    mmr_allocator(mmr_allocator const&) = default;
     template <typename U>
-    MemoryResourceAllocator(MemoryResourceAllocator<U, MemoryResource> const& other)
+    mmr_allocator(mmr_allocator<U, MemoryResource> const& other)
         : resource_{const_cast<MemoryResource*>(other.resource())} {}
-    MemoryResourceAllocator(MemoryResourceAllocator&&) = default;
+    mmr_allocator(mmr_allocator&&) = default;
 
-    auto operator=(MemoryResourceAllocator const&) -> MemoryResourceAllocator& = default;
-    auto operator=(MemoryResourceAllocator&&) -> MemoryResourceAllocator& = default;
+    auto operator=(mmr_allocator const&) -> mmr_allocator& = default;
+    auto operator=(mmr_allocator&&) -> mmr_allocator& = default;
 
     // Access
     auto resource() -> MemoryResource* { return resource_; }
@@ -45,20 +45,20 @@ class MemoryResourceAllocator {
     template <typename... Args>
     auto construct_new(Args&&... args) -> T&;
 
-    auto operator<=>(MemoryResourceAllocator const&) const noexcept = default;
+    auto operator<=>(mmr_allocator const&) const noexcept = default;
   private:
     MemoryResource* resource_{nullptr};
 };
 
 template <typename T, typename MemoryResource>
-inline auto MemoryResourceAllocator<T, MemoryResource>::allocate(size_type n_elems) -> pointer {
+inline auto mmr_allocator<T, MemoryResource>::allocate(size_type n_elems) -> pointer {
     if (!resource_) {
         throw std::bad_alloc{};
     }
     return static_cast<pointer>(resource_->allocate(n_elems * sizeof(T), alignof(T)));
 }
 template <typename T, typename MemoryResource>
-inline auto MemoryResourceAllocator<T, MemoryResource>::allocate_bytes(size_type n_bytes, size_type alignment)
+inline auto mmr_allocator<T, MemoryResource>::allocate_bytes(size_type n_bytes, size_type alignment)
     -> void* {
     if (!resource_) {
         throw std::bad_alloc{};
@@ -66,7 +66,7 @@ inline auto MemoryResourceAllocator<T, MemoryResource>::allocate_bytes(size_type
     return resource_->allocate(n_bytes, alignment);
 }
 template <typename T, typename MemoryResource>
-inline auto MemoryResourceAllocator<T, MemoryResource>::extend_bytes(void* ptr,
+inline auto mmr_allocator<T, MemoryResource>::extend_bytes(void* ptr,
                                                                      size_type old_bytes,
                                                                      size_type new_bytes,
                                                                      size_type alignment) -> void* {
@@ -74,12 +74,12 @@ inline auto MemoryResourceAllocator<T, MemoryResource>::extend_bytes(void* ptr,
 }
 
 template <typename T, typename MemoryResource>
-inline auto MemoryResourceAllocator<T, MemoryResource>::deallocate(pointer ptr, size_type n_elems) -> void {
+inline auto mmr_allocator<T, MemoryResource>::deallocate(pointer ptr, size_type n_elems) -> void {
     auto const n_bytes{n_elems * sizeof(T)};
     return deallocate_bytes(ptr, n_bytes, alignof(T));
 }
 template <typename T, typename MemoryResource>
-inline auto MemoryResourceAllocator<T, MemoryResource>::deallocate_bytes(void* ptr,
+inline auto mmr_allocator<T, MemoryResource>::deallocate_bytes(void* ptr,
                                                                          size_type n_bytes,
                                                                          size_type alignment) -> void {
     if (!ptr) {
@@ -94,7 +94,7 @@ inline auto MemoryResourceAllocator<T, MemoryResource>::deallocate_bytes(void* p
 
 template <typename T, typename MemoryResource>
 template <typename... Args>
-inline auto MemoryResourceAllocator<T, MemoryResource>::construct(pointer p, Args&&... args) -> void {
+inline auto mmr_allocator<T, MemoryResource>::construct(pointer p, Args&&... args) -> void {
     if (!p) {
         throw std::bad_alloc{};
     }
@@ -103,7 +103,7 @@ inline auto MemoryResourceAllocator<T, MemoryResource>::construct(pointer p, Arg
 
 template <typename T, typename MemoryResource>
 template <typename... Args>
-inline auto MemoryResourceAllocator<T, MemoryResource>::construct_new(Args&&... args) -> T& {
+inline auto mmr_allocator<T, MemoryResource>::construct_new(Args&&... args) -> T& {
     auto* ptr{allocate(1)};
     if (!ptr) {
         throw std::bad_alloc{};

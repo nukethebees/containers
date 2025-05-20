@@ -59,6 +59,6 @@ class StackBufferMemoryResource {
 template <typename T, std::size_t CAPACITY>
 struct StackAllocConfig {
     using Resource = StackBufferMemoryResource<CAPACITY * sizeof(T)>;
-    using Allocator = MemoryResourceAllocator<T, Resource>;
+    using Allocator = mmr_allocator<T, Resource>;
 };
 }
