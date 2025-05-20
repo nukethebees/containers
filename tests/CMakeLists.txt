@@ -19,7 +19,8 @@ target_sources(tests PRIVATE
   "test_static_vector.cpp"
   "test_rbset.cpp" 
   "test_bst.cpp" 
-  "test_linked_vector.cpp")
+  "test_linked_vector.cpp" 
+  "test_bubble_sort.cpp")
 
 if (MSVC)
   target_compile_options(tests PRIVATE 
