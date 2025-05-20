@@ -14,7 +14,7 @@ class allocator : public std::allocator<T> {
     using parent_allocator = std::allocator<T>;
     using size_type = typename parent_allocator::size_type;
 
-    allocator() = default;
+    using std::allocator<T>::allocator;
 
     auto allocate_bytes(size_type size, size_type alignment = alignof(std::max_align_t)) -> void*;
     void deallocate_bytes(void* ptr, size_type size, size_type alignment = alignof(std::max_align_t));
