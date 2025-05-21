@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 
 #include "containers/bubble_sort.hpp"
+#include "containers/insertion_sort.hpp"
 #include "containers/selection_sort.hpp"
 
 template <typename T>
@@ -22,6 +23,9 @@ void test_simple_int_sort() {
 
 TEST(bubble_sort, simple_ints) {
     test_simple_int_sort<WRAP_FN(ml::bubble_sort)>();
+}
+TEST(insertion_sort, simple_ints) {
+    test_simple_int_sort<WRAP_FN(ml::insertion_sort)>();
 }
 TEST(selection_sort, simple_ints) {
     test_simple_int_sort<WRAP_FN(ml::selection_sort)>();
