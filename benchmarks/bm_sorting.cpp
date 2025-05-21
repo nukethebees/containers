@@ -8,6 +8,7 @@
 #include "containers/bubble_sort.hpp"
 #include "containers/insertion_sort.hpp"
 #include "containers/merge_sort.hpp"
+#include "containers/quick_sort.hpp"
 #include "containers/selection_sort.hpp"
 
 static constexpr std::size_t n_elems{25000};
@@ -59,6 +60,13 @@ static void BM_sorting_merge(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations());
 }
+static void BM_sorting_quick(benchmark::State& state) {
+    for (auto _ : state) {
+        auto nums{create_elems()};
+        ml::quick_sort(nums.begin(), nums.end());
+    }
+    state.SetItemsProcessed(state.iterations());
+}
 static void BM_sorting_selection(benchmark::State& state) {
     for (auto _ : state) {
         auto nums{create_elems()};
@@ -71,4 +79,5 @@ BENCHMARK(BM_sorting_std);
 BENCHMARK(BM_sorting_bubble);
 BENCHMARK(BM_sorting_insertion);
 BENCHMARK(BM_sorting_merge);
+BENCHMARK(BM_sorting_quick);
 BENCHMARK(BM_sorting_selection);

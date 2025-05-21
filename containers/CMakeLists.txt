@@ -32,6 +32,7 @@ target_sources(containers PUBLIC
   "multi_arena_pmr.hpp"
   "pmr.hpp"
   "pmr_allocator.hpp"
+  "quick_sort.hpp"
   "rbset.hpp"
   "selection_sort.hpp"
   "slist.hpp"
