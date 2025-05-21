@@ -68,5 +68,5 @@ static void BM_vector2_v2_stack_iter(benchmark::State& state) {
 //BENCHMARK(BM_vector2_std);
 //BENCHMARK(BM_vector2_v2_stack);
 
-BENCHMARK(BM_vector2_std_iter);
-BENCHMARK(BM_vector2_v2_stack_iter);
+//BENCHMARK(BM_vector2_std_iter);
+//BENCHMARK(BM_vector2_v2_stack_iter);
