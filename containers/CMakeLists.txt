@@ -26,6 +26,7 @@ target_sources(containers PUBLIC
   "linked_vector.hpp"
   "linked_vector_iterator.hpp"
   "memory_resource_concepts.hpp"
+  "merge_sort.hpp"
   "misc.hpp"
   "mmr_allocator.hpp"
   "multi_arena_pmr.hpp"

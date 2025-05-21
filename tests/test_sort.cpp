@@ -5,6 +5,7 @@
 
 #include "containers/bubble_sort.hpp"
 #include "containers/insertion_sort.hpp"
+#include "containers/merge_sort.hpp"
 #include "containers/selection_sort.hpp"
 
 template <typename T>
@@ -26,6 +27,9 @@ TEST(bubble_sort, simple_ints) {
 }
 TEST(insertion_sort, simple_ints) {
     test_simple_int_sort<WRAP_FN(ml::insertion_sort)>();
+}
+TEST(merge_sort, simple_ints) {
+    test_simple_int_sort<WRAP_FN(ml::merge_sort)>();
 }
 TEST(selection_sort, simple_ints) {
     test_simple_int_sort<WRAP_FN(ml::selection_sort)>();
