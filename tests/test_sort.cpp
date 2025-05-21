@@ -12,8 +12,8 @@ class SortTest : public testing::Test {};
 
 template <auto sort_fn>
 void test_simple_int_sort() {
-    std::array<int, 5> v{5, 4, 3, 2, 1};
-    std::array<int, 5> v_exp{1, 2, 3, 4, 5};
+    std::array<int, 20> v{22, 10, 11, 27, 67, 44, 76, 22, 74, 22, 84, 16, 20, 98, 38, 41, 8, 41, 75, 18};
+    std::array<int, 20> v_exp{8, 10, 11, 16, 18, 20, 22, 22, 22, 27, 38, 41, 41, 44, 67, 74, 75, 76, 84, 98};
 
     sort_fn(v.begin(), v.end());
     EXPECT_EQ(v, v_exp);
