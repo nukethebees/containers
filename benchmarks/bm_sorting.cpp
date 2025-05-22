@@ -6,6 +6,7 @@
 #include <benchmark/benchmark.h>
 
 #include "containers/bubble_sort.hpp"
+#include "containers/heap_sort.hpp"
 #include "containers/insertion_sort.hpp"
 #include "containers/merge_sort.hpp"
 #include "containers/quick_sort.hpp"
@@ -46,6 +47,13 @@ static void BM_sorting_bubble(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations());
 }
+static void BM_sorting_heap(benchmark::State& state) {
+    for (auto _ : state) {
+        auto nums{create_elems()};
+        ml::heap_sort(nums.begin(), nums.end());
+    }
+    state.SetItemsProcessed(state.iterations());
+}
 static void BM_sorting_insertion(benchmark::State& state) {
     for (auto _ : state) {
         auto nums{create_elems()};
@@ -77,6 +85,7 @@ static void BM_sorting_selection(benchmark::State& state) {
 
 BENCHMARK(BM_sorting_std);
 BENCHMARK(BM_sorting_bubble);
+BENCHMARK(BM_sorting_heap);
 BENCHMARK(BM_sorting_insertion);
 BENCHMARK(BM_sorting_merge);
 BENCHMARK(BM_sorting_quick);
