@@ -5,22 +5,24 @@ find_package(GTest CONFIG REQUIRED)
 add_executable(tests)
 add_executable(containers::tests ALIAS tests)
 target_sources(tests PRIVATE
-  "test_span.cpp"
   "test_array.cpp"
+  "test_arena_allocator.cpp"
+  "test_binary_heap.cpp"
+  "test_bst.cpp" 
+  "test_buffer_memory_resource.cpp"
+  "test_dlist.cpp"
+  "test_linked_vector.cpp" 
+  "test_misc.cpp"
+  "test_multi_arena_resource.cpp" 
+  "test_polymorphic_allocator.cpp"
+  "test_rbset.cpp" 
+  "test_slist.cpp"
+  "test_sort.cpp"
+  "test_span.cpp"
+  "test_static_vector.cpp"  
   "test_vector.cpp"
   "test_vector2.cpp"
-  "test_arena_allocator.cpp"
-  "test_buffer_memory_resource.cpp"
-  "test_multi_arena_resource.cpp" 
-  "test_misc.cpp"
-  "test_polymorphic_allocator.cpp"
-  "test_slist.cpp"
-  "test_dlist.cpp"
-  "test_static_vector.cpp"
-  "test_rbset.cpp" 
-  "test_bst.cpp" 
-  "test_linked_vector.cpp" 
-  "test_sort.cpp")
+)
 
 if (MSVC)
   target_compile_options(tests PRIVATE 

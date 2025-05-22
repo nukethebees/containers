@@ -15,6 +15,7 @@ target_sources(containers PUBLIC
   "arena_mmr_pool.hpp"
   "arena_pmr.hpp"
   "array.hpp"
+  "binary_heap.hpp"
   "bst.hpp"
   "bst_iterator.hpp"
   "bst_node.hpp"
