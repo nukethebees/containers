@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 
 #include "containers/bubble_sort.hpp"
+#include "containers/heap_sort.hpp"
 #include "containers/insertion_sort.hpp"
 #include "containers/merge_sort.hpp"
 #include "containers/quick_sort.hpp"
@@ -42,6 +43,9 @@ void test_simple_int_sort() {
 
 TEST(bubble_sort, simple_ints) {
     test_simple_int_sort<WRAP_FN(ml::bubble_sort)>();
+}
+TEST(heap_sort, simple_ints) {
+    test_simple_int_sort<WRAP_FN(ml::heap_sort)>();
 }
 TEST(insertion_sort, simple_ints) {
     test_simple_int_sort<WRAP_FN(ml::insertion_sort)>();

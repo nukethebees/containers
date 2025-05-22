@@ -22,6 +22,7 @@ target_sources(containers PUBLIC
   "buffer_mmr.hpp"
   "buffer_pmr.hpp"
   "dlist.hpp"
+  "heap_sort.hpp"
   "insertion_sort.hpp"
   "linked_vector.hpp"
   "linked_vector_iterator.hpp"
