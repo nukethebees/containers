@@ -1,11 +1,12 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <type_traits>
 
-#include "preprocessor/platform_def.hpp"
-#include "bst_node.hpp"
 #include "bst_iterator.hpp"
+#include "bst_node.hpp"
+#include "preprocessor/platform_def.hpp"
 
 // Binary search tree
 namespace ml {
