@@ -8,3 +8,6 @@ Make it seeded to replicate failures
 implement extend and extend_bytes
 
 use a consistent naming scheme for classes
+
+
+split the four sorting inputs into different functions

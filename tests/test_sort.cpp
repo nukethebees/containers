@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 
 #include "containers/bubble_sort.hpp"
+#include "containers/counting_sort.hpp"
 #include "containers/heap_sort.hpp"
 #include "containers/insertion_sort.hpp"
 #include "containers/merge_sort.hpp"
@@ -32,6 +33,9 @@ static constexpr std::array<int, 8> v3o{3, 7, 11, 19, 29, 42, 56, 84};
 static constexpr std::array<int, 5> v4i{10, 80, 30, 90, 40};
 static constexpr std::array<int, 5> v4o{10, 30, 40, 80, 90};
 
+static constexpr std::array<unsigned int, 5> v5i{10, 80, 30, 90, 40};
+static constexpr std::array<unsigned int, 5> v5o{10, 30, 40, 80, 90};
+
 template <auto sort_fn, std::array vi, std::array vo>
 void test_simple_int_sort() {
     auto input{vi};
@@ -44,6 +48,9 @@ void test_simple_int_sort() {
 
 TEST(bubble_sort, simple_ints) {
     test_simple_int_sort<WRAP_FN(ml::bubble_sort), v1i, v1o>();
+}
+TEST(counting_sort, simple_ints) {
+    test_simple_int_sort<WRAP_FN(ml::counting_sort), v5i, v5o>();
 }
 TEST(heap_sort, simple_ints) {
     test_simple_int_sort<WRAP_FN(ml::heap_sort), v1i, v1o>();
