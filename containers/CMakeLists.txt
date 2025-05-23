@@ -20,6 +20,7 @@ target_sources(containers PUBLIC
   "bst_iterator.hpp"
   "bst_node.hpp"
   "bubble_sort.hpp"
+  "bucket_sort.hpp"
   "buffer_mmr.hpp"
   "buffer_pmr.hpp"
   "dlist.hpp"

@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 
 #include "containers/bubble_sort.hpp"
+#include "containers/bucket_sort.hpp"
 #include "containers/counting_sort.hpp"
 #include "containers/heap_sort.hpp"
 #include "containers/insertion_sort.hpp"
@@ -36,6 +37,11 @@ static constexpr std::array<int, 5> v4o{10, 30, 40, 80, 90};
 static constexpr std::array<unsigned int, 5> v5i{10, 80, 30, 90, 40};
 static constexpr std::array<unsigned int, 5> v5o{10, 30, 40, 80, 90};
 
+static constexpr std::array<unsigned int, 20> v6i{22, 10, 11, 27, 67, 44, 76, 22, 74, 22,
+                                                  84, 16, 20, 98, 38, 41, 8,  41, 75, 18};
+static constexpr std::array<unsigned int, 20> v6o{8,  10, 11, 16, 18, 20, 22, 22, 22, 27,
+                                                  38, 41, 41, 44, 67, 74, 75, 76, 84, 98};
+
 template <auto sort_fn, std::array vi, std::array vo>
 void test_simple_int_sort() {
     auto input{vi};
@@ -49,7 +55,12 @@ void test_simple_int_sort() {
 TEST(bubble_sort, simple_ints) {
     test_simple_int_sort<WRAP_FN(ml::bubble_sort), v1i, v1o>();
 }
-TEST(counting_sort, simple_ints) {
+TEST(bucket_sort, simple_uints) {
+    auto input{v6i};
+    ml::bucket_sort(input.begin(), input.end(), 10);
+    EXPECT_EQ(input, v6o);
+}
+TEST(counting_sort, simple_uints) {
     test_simple_int_sort<WRAP_FN(ml::counting_sort), v5i, v5o>();
 }
 TEST(heap_sort, simple_ints) {

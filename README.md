@@ -23,6 +23,7 @@ C++23 is required to build the code.
 The sorting algorithms use `STL`-style iterators.
 
 - Bubble sort
+- Bucket sort
 - Counting sort
 - Heap sort
 - Insertion sort
