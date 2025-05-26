@@ -1,6 +1,6 @@
 # Containers
 
-My implementations of containers, sorting algorithms, and allocators.
+My implementations of various containers, sorting algorithms, and allocators.
 
 Unit tests are found in `tests` and benchmarks in `benchmarks`.
 
@@ -29,6 +29,7 @@ The sorting algorithms use `STL`-style iterators.
 - Insertion sort
 - Merge sort
 - Quick sort
+- Radix sort
 - Selection sort
 
 # Allocators
