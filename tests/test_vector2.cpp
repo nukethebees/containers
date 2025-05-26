@@ -161,9 +161,9 @@ TEST(vector2, smr_emplace_back_struct_multiple) {
     struct TestStruct {
         int a;
         int b;
-        TestStruct(int a, int b)
-            : a(a)
-            , b(b) {}
+        TestStruct(int a_, int b_)
+            : a(a_)
+            , b(b_) {}
     };
 
     stack_pmr<TestStruct, 100> resource;

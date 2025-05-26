@@ -13,6 +13,8 @@
 #include "containers/radix_sort.hpp"
 #include "containers/selection_sort.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 template <typename T>
 class SortTest : public testing::Test {};
 

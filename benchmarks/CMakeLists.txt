@@ -6,7 +6,7 @@ add_executable (containers::benchmarks ALIAS benchmarks)
 target_sources(benchmarks PRIVATE
   "main.cpp"
   "bm_vector.cpp" 
-  "bm_bector_stackbuf.cpp" 
+  "bm_vector_stackbuf.cpp" 
   "bm_mixed_vector.cpp" "bm_vec_list.cpp" "bm_vector2.cpp" "bm_sorting.cpp")
 
 target_link_libraries(benchmarks PRIVATE

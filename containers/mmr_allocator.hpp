@@ -58,8 +58,7 @@ inline auto mmr_allocator<T, MemoryResource>::allocate(size_type n_elems) -> poi
     return static_cast<pointer>(resource_->allocate(n_elems * sizeof(T), alignof(T)));
 }
 template <typename T, typename MemoryResource>
-inline auto mmr_allocator<T, MemoryResource>::allocate_bytes(size_type n_bytes, size_type alignment)
-    -> void* {
+inline auto mmr_allocator<T, MemoryResource>::allocate_bytes(size_type n_bytes, size_type alignment) -> void* {
     if (!resource_) {
         throw std::bad_alloc{};
     }
@@ -67,9 +66,9 @@ inline auto mmr_allocator<T, MemoryResource>::allocate_bytes(size_type n_bytes, 
 }
 template <typename T, typename MemoryResource>
 inline auto mmr_allocator<T, MemoryResource>::extend_bytes(void* ptr,
-                                                                     size_type old_bytes,
-                                                                     size_type new_bytes,
-                                                                     size_type alignment) -> void* {
+                                                           size_type old_bytes,
+                                                           size_type new_bytes,
+                                                           size_type alignment) -> void* {
     return resource_->extend(ptr, old_bytes, new_bytes, alignment);
 }
 
@@ -79,9 +78,8 @@ inline auto mmr_allocator<T, MemoryResource>::deallocate(pointer ptr, size_type 
     return deallocate_bytes(ptr, n_bytes, alignof(T));
 }
 template <typename T, typename MemoryResource>
-inline auto mmr_allocator<T, MemoryResource>::deallocate_bytes(void* ptr,
-                                                                         size_type n_bytes,
-                                                                         size_type alignment) -> void {
+inline auto mmr_allocator<T, MemoryResource>::deallocate_bytes(void* ptr, size_type n_bytes, size_type alignment)
+    -> void {
     if (!ptr) {
         return;
     }

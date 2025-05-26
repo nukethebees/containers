@@ -5,6 +5,8 @@
 
 #include "containers/binary_heap.hpp"
 
+#include "configure_warning_pragmas.hpp"
+
 TEST(binary_heap, init) {
     ml::binary_heap<int> heap;
 }
@@ -19,7 +21,7 @@ TEST(binary_heap, insert_min_reverse) {
     heap.insert(0);
 
     EXPECT_EQ(heap.size(), 6);
-    for (int i = 0; i < 6; ++i) {
+    for (std::size_t i{0}; i < 6; ++i) {
         auto popped{heap.pop()};
         auto exp{arr[i]};
         EXPECT_EQ(popped, exp);
@@ -36,7 +38,7 @@ TEST(binary_heap, insert_max_reverse) {
     heap.insert(5);
 
     EXPECT_EQ(heap.size(), 6);
-    for (int i = 0; i < 6; ++i) {
+    for (std::size_t i{0}; i < 6; ++i) {
         auto popped{heap.pop()};
         auto exp{arr[i]};
         EXPECT_EQ(popped, exp);

@@ -27,6 +27,12 @@ class linked_vector_iterator {
         , container_index_(container_index) {}
     ~linked_vector_iterator() = default;
 
+    linked_vector_iterator(linked_vector_iterator const&) = default;
+    linked_vector_iterator(linked_vector_iterator&&) = default;
+
+    auto operator=(linked_vector_iterator const&) -> linked_vector_iterator& = default;
+    auto operator=(linked_vector_iterator&&) -> linked_vector_iterator& = default;
+
     auto operator*() const -> reference { return node_->data[segment_index_]; }
     auto operator*() -> reference { return node_->data[segment_index_]; }
     auto operator->() const -> pointer { return &node_->data[segment_index_]; }

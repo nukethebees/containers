@@ -8,10 +8,10 @@
 
 #include "compiler_pragmas.hpp"
 
-constexpr int n_placements{ 25000 };
-constexpr int n_reserve{ 10 };
+constexpr int n_placements{25000};
+constexpr int n_reserve{10};
 
-constexpr int arena_elems_to_allocate{ 10'000 };
+constexpr int arena_elems_to_allocate{10'000};
 
 static void BM_vector_alloc_std(benchmark::State& state) {
     for (auto _ : state) {
@@ -27,12 +27,12 @@ static void BM_vector_alloc_std(benchmark::State& state) {
 }
 static void BM_vector_alloc_arena(benchmark::State& state) {
     for (auto _ : state) {
-        ml::arena_mmr char_resource{ sizeof(char) * arena_elems_to_allocate };
-        ml::arena_mmr_allocator<char> c_alloc{ &char_resource };
+        ml::arena_mmr char_resource{sizeof(char) * arena_elems_to_allocate};
+        ml::arena_mmr_allocator<char> c_alloc{&char_resource};
         std::vector<std::vector<char, ml::arena_mmr_allocator<char>>> c_vecs;
 
         for (int i = 0; i < n_placements; ++i) {
-            std::vector<char, ml::arena_mmr_allocator<char>> char_vec{ c_alloc };
+            std::vector<char, ml::arena_mmr_allocator<char>> char_vec{c_alloc};
             char_vec.reserve(n_reserve);
             c_vecs.emplace_back(std::move(char_vec));
         }
@@ -42,11 +42,11 @@ static void BM_vector_alloc_arena(benchmark::State& state) {
 
 static void BM_vector_alloc_arena_pmr(benchmark::State& state) {
     for (auto _ : state) {
-        ml::arena_pmr char_resource{ sizeof(char) * arena_elems_to_allocate };
+        ml::arena_pmr char_resource{sizeof(char) * arena_elems_to_allocate};
         std::vector<std::pmr::vector<char>> c_vecs;
 
         for (int i = 0; i < n_placements; ++i) {
-            std::pmr::vector<char> char_vec{ &char_resource };
+            std::pmr::vector<char> char_vec{&char_resource};
             char_vec.reserve(n_reserve);
             c_vecs.emplace_back(std::move(char_vec));
         }
@@ -54,4 +54,6 @@ static void BM_vector_alloc_arena_pmr(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * n_placements);
 }
 
-
+BENCHMARK(BM_vector_alloc_std);
+BENCHMARK(BM_vector_alloc_arena);
+BENCHMARK(BM_vector_alloc_arena_pmr);

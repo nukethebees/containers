@@ -17,6 +17,8 @@ void radix_sort(Iterator begin, Iterator end) {
     auto const num_digits{static_cast<std::size_t>(std::format_to(buffer.begin(), "{}", max_value) - buffer.begin())};
 
     using T = typename Iterator::value_type;
+    using IterDiff = typename Iterator::difference_type;
+
     using Bucket = std::vector<T>;
     std::array<Bucket, num_base> buckets;
 
@@ -25,9 +27,9 @@ void radix_sort(Iterator begin, Iterator end) {
             // Convert to a string
             auto const str{std::format_to(buffer.begin(), "{:040}", *it)};
             // Get the nth character (RHS == 0)
-            char const c{*(str - 1 - digit)};
+            char const c{*(str - static_cast<IterDiff>(1 + digit))};
             // Convert to int
-            int const bucket_idx{c - '0'};
+            auto const bucket_idx{static_cast<std::size_t>(c - '0')};
             // Add the value to the respective bucket
             buckets[bucket_idx].push_back(*it);
         }

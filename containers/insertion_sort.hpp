@@ -23,4 +23,3 @@ void insertion_sort(Iterator begin, Iterator end) {
     }
 }
 }
-

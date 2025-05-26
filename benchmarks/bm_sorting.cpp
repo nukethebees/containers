@@ -13,6 +13,8 @@
 #include "containers/radix_sort.hpp"
 #include "containers/selection_sort.hpp"
 
+#include "compiler_pragmas.hpp"
+
 static constexpr std::size_t n_elems{25000};
 
 template <typename NumT = int>

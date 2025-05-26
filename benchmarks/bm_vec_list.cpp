@@ -52,7 +52,7 @@ static constexpr auto INITIAL_SIZE{sizeof(TP) * arena_elems_to_allocate};
         }                                               \
     }
 
-static void BM_vl_wr_vector_std(benchmark::State& state) {
+static void BM_vec_list_wr_vector_std(benchmark::State& state) {
     for (auto _ : state) {
         std::vector<std::vector<TA>> container{};
         for (int i = 0; i < n_placements; ++i) {
@@ -70,7 +70,7 @@ static void BM_vl_wr_vector_std(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
-static void BM_vl_wr_list_std(benchmark::State& state) {
+static void BM_vec_list_wr_list_std(benchmark::State& state) {
     for (auto _ : state) {
         std::list<std::list<TA>> container{};
 
@@ -89,7 +89,7 @@ static void BM_vl_wr_list_std(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
-static void BM_vl_wr_vector_alloc(benchmark::State& state) {
+static void BM_vec_list_wr_vector_alloc(benchmark::State& state) {
     for (auto _ : state) {
         ml::arena_pmr resource{INITIAL_SIZE};
         std::pmr::vector<std::pmr::vector<TP>> container{&resource};
@@ -109,7 +109,7 @@ static void BM_vl_wr_vector_alloc(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
-static void BM_vl_wr_list_alloc(benchmark::State& state) {
+static void BM_vec_list_wr_list_alloc(benchmark::State& state) {
     for (auto _ : state) {
         ml::arena_pmr resource{INITIAL_SIZE};
         std::pmr::list<std::pmr::list<TP>> container{&resource};
@@ -130,7 +130,7 @@ static void BM_vl_wr_list_alloc(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
 
-static void BM_vl_rd_vector_std(benchmark::State& state) {
+static void BM_vec_list_rd_vector_std(benchmark::State& state) {
     std::vector<std::vector<TA>> container{};
     for (int i = 0; i < n_placements; ++i) {
         container.emplace_back();
@@ -147,7 +147,7 @@ static void BM_vl_rd_vector_std(benchmark::State& state) {
 
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
-static void BM_vl_rd_list_std(benchmark::State& state) {
+static void BM_vec_list_rd_list_std(benchmark::State& state) {
     std::list<std::list<TA>> container{};
 
     for (int i = 0; i < n_placements; ++i) {
@@ -165,7 +165,7 @@ static void BM_vl_rd_list_std(benchmark::State& state) {
 
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
-static void BM_vl_rd_vector_alloc(benchmark::State& state) {
+static void BM_vec_list_rd_vector_alloc(benchmark::State& state) {
     ml::arena_pmr resource{INITIAL_SIZE};
     std::pmr::vector<std::pmr::vector<TP>> container{&resource};
 
@@ -184,7 +184,7 @@ static void BM_vl_rd_vector_alloc(benchmark::State& state) {
 
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
-static void BM_vl_rd_list_alloc(benchmark::State& state) {
+static void BM_vec_list_rd_list_alloc(benchmark::State& state) {
     ml::arena_pmr resource{INITIAL_SIZE};
     std::pmr::list<std::pmr::list<TP>> container{&resource};
 
@@ -204,13 +204,12 @@ static void BM_vl_rd_list_alloc(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * ITER_ELEMS);
 }
 
-//BENCHMARK(BM_vl_wr_vector_std);
-//BENCHMARK(BM_vl_wr_vector_alloc);
-//BENCHMARK(BM_vl_wr_list_std);
-//BENCHMARK(BM_vl_wr_list_alloc);
-//
-//BENCHMARK(BM_vl_rd_vector_std);
-//BENCHMARK(BM_vl_rd_vector_alloc);
-//BENCHMARK(BM_vl_rd_list_std);
-//BENCHMARK(BM_vl_rd_list_alloc);
-//
+BENCHMARK(BM_vec_list_wr_vector_std);
+BENCHMARK(BM_vec_list_wr_vector_alloc);
+BENCHMARK(BM_vec_list_wr_list_std);
+BENCHMARK(BM_vec_list_wr_list_alloc);
+
+BENCHMARK(BM_vec_list_rd_vector_std);
+BENCHMARK(BM_vec_list_rd_vector_alloc);
+BENCHMARK(BM_vec_list_rd_list_std);
+BENCHMARK(BM_vec_list_rd_list_alloc);

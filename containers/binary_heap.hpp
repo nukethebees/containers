@@ -30,15 +30,18 @@ class binary_heap {
     // Access
     template <typename Self>
     auto parent(this Self&& self, size_type i) noexcept -> auto& {
-        return std::forward<Self>(self).data_[parent_index(i)];
+        auto const parent_index{self.parent_index(i)};
+        return std::forward<Self>(self).data_[parent_index];
     }
     template <typename Self>
     auto left_child(this Self&& self, size_type i) noexcept -> auto& {
-        return std::forward<Self>(self).data_[left_child_index(i)];
+        auto const child_index{self.left_child_index(i)};
+        return std::forward<Self>(self).data_[child_index];
     }
     template <typename Self>
     auto right_child(this Self&& self, size_type i) noexcept -> auto& {
-        return std::forward<Self>(self).data_[right_child_index(i)];
+        auto const child_index{self.right_child_index(i)};
+        return std::forward<Self>(self).data_[child_index];
     }
     template <typename Self>
     auto operator[](this Self&& self, size_type i) noexcept -> auto& {

@@ -23,7 +23,7 @@ TEST(span, ptr_size_ctor) {
     int* ptr{nullptr};
     constexpr size_t size{1};
     auto span{ml::span(ptr, size)};
-    EXPECT_EQ(span.size(), size);   
+    EXPECT_EQ(span.size(), size);
 }
 TEST(span, from_array) {
     std::array<int, 5> values{0};
