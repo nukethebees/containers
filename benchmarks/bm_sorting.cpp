@@ -10,12 +10,14 @@
 #include "containers/insertion_sort.hpp"
 #include "containers/merge_sort.hpp"
 #include "containers/quick_sort.hpp"
+#include "containers/radix_sort.hpp"
 #include "containers/selection_sort.hpp"
 
 static constexpr std::size_t n_elems{25000};
 
+template <typename NumT = int>
 static auto create_elems() {
-    static std::vector<int> ints;
+    static std::vector<NumT> ints;
     static bool initialised{false};
 
     if (!initialised) {
@@ -23,7 +25,7 @@ static auto create_elems() {
 
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<int> distr(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        std::uniform_int_distribution<NumT> distr(std::numeric_limits<NumT>::min(), std::numeric_limits<NumT>::max());
 
         for (std::size_t i{0}; i < n_elems; i++) {
             ints.push_back(distr(gen));
@@ -75,6 +77,13 @@ static void BM_sorting_quick(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations());
 }
+static void BM_sorting_radix(benchmark::State& state) {
+    for (auto _ : state) {
+        auto nums{create_elems<unsigned int>()};
+        ml::radix_sort(nums.begin(), nums.end());
+    }
+    state.SetItemsProcessed(state.iterations());
+}
 static void BM_sorting_selection(benchmark::State& state) {
     for (auto _ : state) {
         auto nums{create_elems()};
@@ -89,4 +98,5 @@ BENCHMARK(BM_sorting_heap);
 BENCHMARK(BM_sorting_insertion);
 BENCHMARK(BM_sorting_merge);
 BENCHMARK(BM_sorting_quick);
+BENCHMARK(BM_sorting_radix);
 BENCHMARK(BM_sorting_selection);

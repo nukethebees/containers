@@ -36,6 +36,7 @@ target_sources(containers PUBLIC
   "pmr.hpp"
   "pmr_allocator.hpp"
   "quick_sort.hpp"
+  "radix_sort.hpp"
   "rbset.hpp"
   "selection_sort.hpp"
   "slist.hpp"
