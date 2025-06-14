@@ -4,12 +4,20 @@
 #include <cstddef>
 #include <stdexcept>
 
+#include "contiguous_container_common_methods.hpp"
+#include "iterator_boilerplate.hpp"
 #include "span_iterator.hpp"
 
 namespace ml {
 template <typename T, std::size_t CAPACITY>
-class static_vector {
+class static_vector
+    : public ContiguousIteratorMethods
+    , public ContiguousContainerCommonMethods
+    , public ContiguousContainerCommonCapacityMethods {
   private:
+    friend struct ContiguousContainerCommonMethods;
+    friend struct ContiguousContainerCommonCapacityMethods;
+
     union array_elem_t {
         T value;
 
@@ -34,30 +42,10 @@ class static_vector {
 
     // Access
     template <typename Self>
-    auto at(this Self&& self, std::size_t idx);
-    template <typename Self>
-    auto back(this Self&& self);
-    template <typename Self>
-    auto data(this Self&& self);
-    template <typename Self>
-    auto front(this Self&& self);
-    template <typename Self>
-    auto operator[](this Self&& self, std::size_t idx);
-
-    // Iterators
-    auto begin(this static_vector& self) -> iterator;
-    auto cbegin(this static_vector const& self) -> const_iterator;
-    auto cend(this static_vector const& self) -> const_iterator;
-    auto crbegin(this static_vector const& self) -> const_reverse_iterator;
-    auto crend(this static_vector const& self) -> const_reverse_iterator;
-    auto end(this static_vector& self) -> iterator;
-    auto rbegin(this static_vector& self) -> reverse_iterator;
-    auto rend(this static_vector& self) -> reverse_iterator;
+    auto* data(this Self&& self);
 
     // Capacity
     constexpr auto capacity() const -> size_type;
-    auto empty() const -> size_type;
-    auto size() const -> size_type;
 
     // Modification
     void clear();
@@ -78,79 +66,18 @@ inline static_vector<T, CAPACITY>::~static_vector() {
     }
 }
 
+// Access
 template <typename T, std::size_t CAPACITY>
 template <typename Self>
-inline auto static_vector<T, CAPACITY>::at(this Self&& self, std::size_t idx) {
-    if (idx >= self.size_) {
-        throw std::out_of_range{"static_vector: at: out of range"};
-    }
-    return std::forward<Self>(self).data_[idx].value;
-}
-template <typename T, std::size_t CAPACITY>
-template <typename Self>
-inline auto static_vector<T, CAPACITY>::back(this Self&& self) {
-    return std::forward<Self>(self).data_[self.size_ - 1].value;
-}
-template <typename T, std::size_t CAPACITY>
-template <typename Self>
-inline auto static_vector<T, CAPACITY>::data(this Self&& self) {
-    return std::forward<Self>(self).data_.data();
-}
-template <typename T, std::size_t CAPACITY>
-template <typename Self>
-inline auto static_vector<T, CAPACITY>::front(this Self&& self) {
-    return std::forward<Self>(self).data_[0].value;
-}
-template <typename T, std::size_t CAPACITY>
-template <typename Self>
-inline auto static_vector<T, CAPACITY>::operator[](this Self&& self, std::size_t idx) {
-    return std::forward<Self>(self).data_[idx].value;
+inline auto* static_vector<T, CAPACITY>::data(this Self&& self) {
+    using ptr_t = std::conditional_t<std::is_const_v<std::remove_reference_t<Self>>, T const*, T*>;
+    return reinterpret_cast<ptr_t>(std::forward<Self>(self).data_.data());
 }
 
-template <typename T, std::size_t CAPACITY>
-inline auto static_vector<T, CAPACITY>::begin(this static_vector& self) -> iterator {
-    return iterator(reinterpret_cast<T*>(self.data()));
-}
-template <typename T, std::size_t CAPACITY>
-inline auto static_vector<T, CAPACITY>::cbegin(this static_vector const& self) -> const_iterator {
-    return const_iterator(reinterpret_cast<T const*>(self.data()));
-}
-template <typename T, std::size_t CAPACITY>
-inline auto static_vector<T, CAPACITY>::cend(this static_vector const& self) -> const_iterator {
-    return const_iterator(reinterpret_cast<T const*>(self.data()) + self.size_);
-}
-template <typename T, std::size_t CAPACITY>
-inline auto static_vector<T, CAPACITY>::crbegin(this static_vector const& self) -> const_reverse_iterator {
-    return const_reverse_iterator(self.cend());
-}
-template <typename T, std::size_t CAPACITY>
-inline auto static_vector<T, CAPACITY>::crend(this static_vector const& self) -> const_reverse_iterator {
-    return const_reverse_iterator(self.cbegin());
-}
-template <typename T, std::size_t CAPACITY>
-inline auto static_vector<T, CAPACITY>::end(this static_vector& self) -> iterator {
-    return iterator(reinterpret_cast<T*>(self.data()) + self.size_);
-}
-template <typename T, std::size_t CAPACITY>
-inline auto static_vector<T, CAPACITY>::rbegin(this static_vector& self) -> reverse_iterator {
-    return reverse_iterator(self.end());
-}
-template <typename T, std::size_t CAPACITY>
-inline auto static_vector<T, CAPACITY>::rend(this static_vector& self) -> reverse_iterator {
-    return reverse_iterator(self.begin());
-}
-
+// Capacity
 template <typename T, std::size_t CAPACITY>
 inline constexpr auto static_vector<T, CAPACITY>::capacity() const -> size_type {
     return CAPACITY;
-}
-template <typename T, std::size_t CAPACITY>
-inline auto static_vector<T, CAPACITY>::empty() const -> size_type {
-    return size_ == 0;
-}
-template <typename T, std::size_t CAPACITY>
-inline auto static_vector<T, CAPACITY>::size() const -> size_type {
-    return size_;
 }
 
 template <typename T, std::size_t CAPACITY>

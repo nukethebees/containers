@@ -6,9 +6,9 @@
 #include <memory>
 #include <type_traits>
 
-#include "span_iterator.hpp"
-#include "iterator_boilerplate.hpp"
 #include "contiguous_container_common_methods.hpp"
+#include "iterator_boilerplate.hpp"
+#include "span_iterator.hpp"
 
 #include "preprocessor/platform_def.hpp"
 
