@@ -4,10 +4,11 @@
 #include <cstdint>
 
 #include "span_iterator.hpp"
+#include "iterator_boilerplate.hpp"
 
 namespace ml {
 template <typename T, std::size_t N>
-class array {
+class array : public ContiguousIteratorMethods {
   public:
     using value_type = T;
     using size_type = std::size_t;
@@ -45,12 +46,6 @@ class array {
         return std::forward<Self>(self).data_;
     }
 
-    // Iterators
-    auto begin() -> iterator { return iterator(data_); }
-    auto cbegin() const -> const_iterator { return const_iterator(data_); }
-    auto end() -> iterator { return iterator(data_ + N); }
-    auto cend() const -> const_iterator { return const_iterator(data_ + N); }
-
     // Capacity
     constexpr auto empty() const -> bool { return N == 0; }
     constexpr auto size_bytes() const -> std::size_t { return N * sizeof(value_type); }
@@ -75,7 +70,9 @@ class array<T, 0> {
 
     // Element access
     constexpr auto at(size_type) -> reference { throw std::out_of_range{"Index out of range"}; }
-    constexpr auto operator[](size_type) const -> value_type { throw std::out_of_range{"Index out of range"}; }
+    constexpr auto operator[](size_type) const -> value_type {
+        throw std::out_of_range{"Index out of range"};
+    }
     constexpr auto front() -> reference { throw std::out_of_range{"Array is empty"}; }
     constexpr auto front() const -> const_reference { throw std::out_of_range{"Array is empty"}; }
     constexpr auto back() -> reference { throw std::out_of_range{"Array is empty"}; }

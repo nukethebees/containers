@@ -5,6 +5,7 @@
 #include <iterator>
 #include <type_traits>
 
+#include "iterator_boilerplate.hpp"
 #include "span_iterator.hpp"
 
 namespace ml {
@@ -15,7 +16,7 @@ concept has_data_and_size = requires(T t) {
 };
 
 template <typename T>
-class span {
+class span : public ContiguousIteratorMethods {
   public:
     using element_type = T;
     using value_type = std::remove_cvref_t<T>;
@@ -40,12 +41,6 @@ class span {
     span(U& container) noexcept
         : data_{container.data()}
         , size_{container.size()} {}
-
-    // Iterators
-    auto begin() -> iterator { return iterator(data_); }
-    auto cbegin() const -> const_iterator { return const_iterator(data_); }
-    auto end() -> iterator { return iterator(data_ + size_); }
-    auto cend() const -> const_iterator { return const_iterator(data_ + size_); }
 
     // Element access
     auto front() const -> reference { return *data_; }

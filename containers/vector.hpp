@@ -7,11 +7,13 @@
 #include <type_traits>
 
 #include "span_iterator.hpp"
+#include "iterator_boilerplate.hpp"
+
 #include "preprocessor/platform_def.hpp"
 
 namespace ml {
 template <typename T, typename Allocator = std::allocator<T>>
-class vector {
+class vector : public ContiguousIteratorMethods {
   public:
     using value_type = T;
     using size_type = std::size_t;
@@ -39,16 +41,6 @@ class vector {
     auto&& front(this Self&& self);
     template <typename Self>
     auto&& operator[](this Self&& self, std::size_t idx);
-
-    // Iterators
-    auto begin(this vector& self) -> iterator;
-    auto cbegin(this vector const& self) -> const_iterator;
-    auto cend(this vector const& self) -> const_iterator;
-    auto crbegin(this vector const& self) -> const_reverse_iterator;
-    auto crend(this vector const& self) -> const_reverse_iterator;
-    auto end(this vector& self) -> iterator;
-    auto rbegin(this vector& self) -> reverse_iterator;
-    auto rend(this vector& self) -> reverse_iterator;
 
     // Capacity
     auto capacity(this vector const& self) -> std::size_t;
@@ -121,40 +113,6 @@ template <typename T, typename Allocator>
 template <typename Self>
 inline auto&& vector<T, Allocator>::operator[](this Self&& self, std::size_t idx) {
     return std::forward<Self>(self).data_[idx];
-}
-
-// Iterator
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::begin(this vector& self) -> iterator {
-    return iterator(self.data_);
-}
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::cbegin(this vector const& self) -> const_iterator {
-    return const_iterator(self.data_);
-}
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::cend(this vector const& self) -> const_iterator {
-    return const_iterator(self.data_ + self.size_);
-}
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::crbegin(this vector const& self) -> const_reverse_iterator {
-    return const_reverse_iterator(self.cend());
-}
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::crend(this vector const& self) -> const_reverse_iterator {
-    return const_reverse_iterator(self.cbegin());
-}
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::end(this vector& self) -> iterator {
-    return iterator(self.data_ + self.size_);
-}
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::rbegin(this vector& self) -> reverse_iterator {
-    return reverse_iterator(self.end());
-}
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::rend(this vector& self) -> reverse_iterator {
-    return reverse_iterator(self.begin());
 }
 
 // Capacity

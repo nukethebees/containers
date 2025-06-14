@@ -8,15 +8,17 @@
 #include <utility>
 
 #include "allocator_concepts.hpp"
+#include "iterator_boilerplate.hpp"
+#include "span_iterator.hpp"
+
 #include "preprocessor/noexcept_release_def.hpp"
 #include "preprocessor/platform_def.hpp"
-#include "span_iterator.hpp"
 
 namespace ml {
 // Vector which can extend an existing allocation instead of allocating a new one
 template <typename T, typename Allocator>
     requires (extendable_allocator<Allocator> && can_allocate_bytes<Allocator>)
-class vector2 {
+class vector2 : public ContiguousIteratorMethods {
   public:
     using value_type = T;
     using allocator_type = Allocator;
@@ -69,20 +71,6 @@ class vector2 {
         self.index_check_DEBUG(index);
         return std::forward<Self>(self).data_[index];
     }
-
-    // Iterators
-    auto begin() -> iterator { return iterator(data_); }
-    auto begin() const -> const_iterator { return cbegin(); }
-    auto cbegin() const -> const_iterator { return const_iterator(data_); }
-    auto cend() const -> const_iterator { return const_iterator(data_ + size_); }
-    auto crbegin() const -> const_reverse_iterator { return const_reverse_iterator(cend()); }
-    auto crend() const -> const_reverse_iterator { return const_reverse_iterator(cbegin()); }
-    auto end() -> iterator { return iterator(data_ + size_); }
-    auto end() const -> const_iterator { return cend(); }
-    auto rbegin() -> reverse_iterator { return reverse_iterator(end()); }
-    auto rbegin() const -> const_reverse_iterator { return const_reverse_iterator(end()); }
-    auto rend() -> reverse_iterator { return reverse_iterator(begin()); }
-    auto rend() const -> const_reverse_iterator { return crend(); }
 
     // Capacity
     auto capacity() const noexcept -> size_type { return capacity_; }
