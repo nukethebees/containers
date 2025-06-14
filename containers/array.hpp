@@ -3,12 +3,16 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "span_iterator.hpp"
+#include "contiguous_container_common_methods.hpp"
 #include "iterator_boilerplate.hpp"
+#include "span_iterator.hpp"
 
 namespace ml {
 template <typename T, std::size_t N>
-class array : public ContiguousIteratorMethods {
+class array
+    : public ContiguousIteratorMethods
+    , public ContiguousContainerCommonMethods {
+    friend struct ContiguousContainerCommonMethods;
   public:
     using value_type = T;
     using size_type = std::size_t;
@@ -27,24 +31,6 @@ class array : public ContiguousIteratorMethods {
         requires (sizeof...(U) == N)
     constexpr array(U&&... values)
         : data_{std::forward<U>(values)...} {}
-
-    // Element access
-    constexpr auto at(size_type index) -> reference {
-        if (index >= N) {
-            throw std::out_of_range{"Index out of range"};
-        }
-        return *(data_ + index);
-    }
-    constexpr auto operator[](size_type index) -> reference { return *(data_ + index); }
-    constexpr auto operator[](size_type index) const -> const_reference { return *(data_ + index); }
-    constexpr auto front() -> reference { return *data_; }
-    constexpr auto front() const -> const_reference { return *data_; }
-    constexpr auto back() -> reference { return *(data_ + N - 1); }
-    constexpr auto back() const -> const_reference { return *(data_ + N - 1); }
-    template <typename Self>
-    constexpr auto* data(this Self&& self) {
-        return std::forward<Self>(self).data_;
-    }
 
     // Capacity
     constexpr auto empty() const -> bool { return N == 0; }

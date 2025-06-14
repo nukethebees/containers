@@ -8,12 +8,16 @@
 
 #include "span_iterator.hpp"
 #include "iterator_boilerplate.hpp"
+#include "contiguous_container_common_methods.hpp"
 
 #include "preprocessor/platform_def.hpp"
 
 namespace ml {
 template <typename T, typename Allocator = std::allocator<T>>
-class vector : public ContiguousIteratorMethods {
+class vector
+    : public ContiguousIteratorMethods
+    , public ContiguousContainerCommonMethods {
+    friend struct ContiguousContainerCommonMethods;
   public:
     using value_type = T;
     using size_type = std::size_t;
@@ -30,25 +34,11 @@ class vector : public ContiguousIteratorMethods {
     vector() noexcept;
     ~vector();
 
-    // Element access
-    template <typename Self>
-    auto&& at(this Self&& self, std::size_t idx);
-    template <typename Self>
-    auto&& back(this Self&& self);
-    template <typename Self>
-    auto* data(this Self&& self);
-    template <typename Self>
-    auto&& front(this Self&& self);
-    template <typename Self>
-    auto&& operator[](this Self&& self, std::size_t idx);
-
     // Capacity
     auto capacity(this vector const& self) -> std::size_t;
-    auto empty(this vector const& self) -> bool;
     auto max_size() const -> std::size_t;
     void reserve(this vector& self, std::size_t new_capacity);
     void shrink_to_fit();
-    auto size(this vector const& self) -> std::size_t;
 
     // Modifiers
     void clear(this vector& self);
@@ -81,49 +71,10 @@ inline vector<T, Allocator>::~vector() {
     capacity_ = 0;
 }
 
-// Element access
-template <typename T, typename Allocator>
-template <typename Self>
-inline auto&& vector<T, Allocator>::at(this Self&& self, std::size_t idx) {
-    if (idx >= self.size_) {
-        throw std::out_of_range{"Index out of range"};
-    }
-    return std::forward<Self>(self).data_[idx];
-}
-
-template <typename T, typename Allocator>
-template <typename Self>
-inline auto&& vector<T, Allocator>::back(this Self&& self) {
-    return std::forward<Self>(self).data_[self.size_ - 1];
-}
-
-template <typename T, typename Allocator>
-template <typename Self>
-inline auto* vector<T, Allocator>::data(this Self&& self) {
-    return std::forward<Self>(self).data_;
-}
-
-template <typename T, typename Allocator>
-template <typename Self>
-inline auto&& vector<T, Allocator>::front(this Self&& self) {
-    return std::forward<Self>(self).data_[0];
-}
-
-template <typename T, typename Allocator>
-template <typename Self>
-inline auto&& vector<T, Allocator>::operator[](this Self&& self, std::size_t idx) {
-    return std::forward<Self>(self).data_[idx];
-}
-
 // Capacity
 template <typename T, typename Allocator>
 inline auto vector<T, Allocator>::capacity(this vector const& self) -> std::size_t {
     return self.capacity_;
-}
-
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::empty(this vector const& self) -> bool {
-    return self.size_ == 0;
 }
 
 template <typename T, typename Allocator>
@@ -151,11 +102,6 @@ inline void vector<T, Allocator>::reserve(this vector& self, std::size_t new_cap
 template <typename T, typename Allocator>
 inline void vector<T, Allocator>::shrink_to_fit() {
     return;
-}
-
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::size(this vector const& self) -> std::size_t {
-    return self.size_;
 }
 
 // Modifier
