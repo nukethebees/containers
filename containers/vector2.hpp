@@ -36,9 +36,8 @@ class vector2 {
 
     // Constructors
     vector2() noexcept = default;
-    template <typename U>
-    vector2(U&& allocator)
-        : allocator_{std::forward<U>(allocator)} {}
+    vector2(ml::pmr* resource)
+        : allocator_{resource} {}
     ~vector2() {
         destroy_all_elements();
         allocator_.deallocate(data_, capacity_);

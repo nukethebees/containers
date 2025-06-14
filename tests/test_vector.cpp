@@ -1,8 +1,12 @@
 #include <algorithm>
 #include <cstddef>
 #include <numeric>
+#include <tuple>
 
 #include <gtest/gtest.h>
+
+#include "test_container_single_elem_iterators.hpp"
+#include "vector_container_traits.hpp"
 
 #include "containers/vector.hpp"
 
@@ -111,73 +115,18 @@ TEST(vector, size) {
     values.emplace_back(20);
     EXPECT_EQ(values.size(), 2);
 }
-TEST(vector, range_based_for) {
-    ml::vector<int> values;
-    values.emplace_back(1);
-    values.emplace_back(2);
-    values.emplace_back(3);
 
-    int sum = 0;
-    for (auto const& value : values) {
-        sum += value;
-    }
+template <typename T, typename Allocator>
+struct ContainerTestTraits<ml::vector<T, Allocator>> : vector_container_traits<ml::vector<T, Allocator>> {
+    using Container = ml::vector<T, Allocator>;
+    using vector_container_traits<Container>::add_element;
+    using vector_container_traits<Container>::add_elements;
+    using vector_container_traits<Container>::emplace_element;
+};
 
-    EXPECT_EQ(sum, 6);
-}
-TEST(vector, accumulate) {
-    ml::vector<int> values;
-    values.emplace_back(1);
-    values.emplace_back(2);
-    values.emplace_back(3);
-    int sum = std::accumulate(values.begin(), values.end(), 0);
-    EXPECT_EQ(sum, 6);
-}
-TEST(vector, accumulate_const) {
-    ml::vector<int> values;
-    values.emplace_back(1);
-    values.emplace_back(2);
-    values.emplace_back(3);
-    int sum = std::accumulate(values.cbegin(), values.cend(), 0);
-    EXPECT_EQ(sum, 6);
-}
-TEST(vector, for_sum_reverse) {
-    ml::vector<int> values;
-    values.emplace_back(1);
-    values.emplace_back(2);
-    values.emplace_back(3);
-    int sum = 0;
-    for (auto it = values.rbegin(); it != values.rend(); ++it) {
-        sum += *it;
-    }
-    EXPECT_EQ(sum, 6);
-}
-TEST(vector, accumulate_reverse) {
-    ml::vector<int> values;
-    values.emplace_back(1);
-    values.emplace_back(2);
-    values.emplace_back(3);
-    int sum = std::accumulate(values.rbegin(), values.rend(), 0);
-    EXPECT_EQ(sum, 6);
-}
-TEST(vector, accumulate_const_reverse) {
-    ml::vector<int> values;
-    values.emplace_back(1);
-    values.emplace_back(2);
-    values.emplace_back(3);
-    int sum = std::accumulate(values.crbegin(), values.crend(), 0);
-    EXPECT_EQ(sum, 6);
-}
+using T0 = ml::vector<int, std::allocator<int>>;
+using T1 = ml::vector<int, std::pmr::polymorphic_allocator<int>>;
 
-TEST(vector, pmr_allocator) {
-    ml::vector<int, std::pmr::polymorphic_allocator<int>> values;
-    values.emplace_back(1);
-    values.emplace_back(2);
-    values.emplace_back(3);
-
-    int sum = 0;
-    for (auto const& value : values) {
-        sum += value;
-    }
-
-    EXPECT_EQ(sum, 6);
-}
+using TestTypes = ::testing::Types<ContainerDefinition<T0, []() { return std::make_tuple(T0()); }>,
+                                   ContainerDefinition<T1, []() { return std::make_tuple(T1()); }>>;
+INSTANTIATE_TYPED_TEST_SUITE_P(vector_, ContainerSingleElemIteratorTest, TestTypes);

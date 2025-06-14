@@ -24,6 +24,14 @@ target_sources(tests PRIVATE
   "test_vector2.cpp"
 )
 
+target_sources(tests PUBLIC
+  FILE_SET HEADERS
+  BASE_DIRS ../
+  FILES
+  "test_container_single_elem_iterators.hpp"
+  "test_sorting.hpp"
+)
+
 if (MSVC)
   target_compile_options(tests PRIVATE 
     /FAs

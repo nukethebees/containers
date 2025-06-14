@@ -13,7 +13,7 @@
 #include "containers/radix_sort.hpp"
 #include "containers/selection_sort.hpp"
 
-#include "sorting_tests.hpp"
+#include "test_sorting.hpp"
 
 #include "configure_warning_pragmas.hpp"
 

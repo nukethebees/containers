@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-#include "allocator_concepts.hpp"
+#include "memory_resource_concepts.hpp"
 #include "buffer_mmr.hpp"
 
 namespace ml {

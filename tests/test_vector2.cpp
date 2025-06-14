@@ -1,20 +1,24 @@
 #include <algorithm>
+#include <memory>
 #include <numeric>
 
 #include <gtest/gtest.h>
 
-#include "containers/arena_mmr_allocator.hpp"
+#include "test_container_single_elem_iterators.hpp"
+#include "vector_container_traits.hpp"
+
 #include "containers/arena_mmr.hpp"
-#include "containers/pmr.hpp"
-#include "containers/mmr_allocator.hpp"
-#include "containers/pmr_allocator.hpp"
+#include "containers/arena_mmr_allocator.hpp"
 #include "containers/buffer_pmr.hpp"
+#include "containers/mmr_allocator.hpp"
+#include "containers/pmr.hpp"
+#include "containers/pmr_allocator.hpp"
 #include "containers/vector2.hpp"
 
 #include "configure_warning_pragmas.hpp"
 
 template <typename T>
-using vec_pmr = ml::vector2<T, ml::pmr_allocator<T>>;
+using vec_pmr = ml::vector2<T, ml::pmr_allocator<T, ml::pmr>>;
 
 template <typename T, std::size_t CAPACITY>
 using stack_pmr = ml::buffer_pmr<T, CAPACITY, ml::pmr>;
@@ -97,43 +101,6 @@ TEST(vector2, smr_data_member) {
     intvec values{&resource};
     values.push_back(1);
     EXPECT_EQ(values.data(), &values.front());
-}
-// Iterators
-TEST(vector2, smr_int_accumulate_fwd) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    static constexpr std::size_t n_elems{10};
-    for (std::size_t i{0}; i < n_elems; ++i) {
-        values.push_back(int(i));
-    }
-    EXPECT_EQ(std::accumulate(values.begin(), values.end(), 0), 45);
-}
-TEST(vector2, smr_inc_accumulate_const_fwd) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    static constexpr std::size_t n_elems{10};
-    for (std::size_t i{0}; i < n_elems; ++i) {
-        values.push_back(int(i));
-    }
-    EXPECT_EQ(std::accumulate(values.cbegin(), values.cend(), 0), 45);
-}
-TEST(vector2, smr_inc_accumulate_reverse) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    static constexpr std::size_t n_elems{10};
-    for (std::size_t i{0}; i < n_elems; ++i) {
-        values.push_back(int(i));
-    }
-    EXPECT_EQ(std::accumulate(values.rbegin(), values.rend(), 0), 45);
-}
-TEST(vector2, smr_inc_accumulate_const_reverse) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    static constexpr std::size_t n_elems{10};
-    for (std::size_t i{0}; i < n_elems; ++i) {
-        values.push_back(int(i));
-    }
-    EXPECT_EQ(std::accumulate(values.crbegin(), values.crend(), 0), 45);
 }
 // Capacity
 TEST(vector2, smr_max_size_int) {
@@ -239,3 +206,21 @@ TEST(vector2, smr_pop_back_empty) {
     EXPECT_TRUE(values.empty());
     EXPECT_THROW(values.pop_back(), std::out_of_range);
 }
+
+template <typename T, typename Allocator>
+struct ContainerTestTraits<ml::vector2<T, Allocator>> : vector_container_traits<ml::vector2<T, Allocator>> {
+    using Container = ml::vector2<T, Allocator>;
+    using vector_container_traits<Container>::add_element;
+    using vector_container_traits<Container>::add_elements;
+    using vector_container_traits<Container>::emplace_element;
+};
+
+using T0 = intvec;
+
+using TestTypes = ::testing::Types<ContainerDefinition<T0, []() {
+    auto resource{std::make_unique<stack_pmr<int, 100>>()};
+    auto values{T0{resource.get()}};
+
+    return std::make_tuple(std::move(values), std::move(resource));
+}>>;
+INSTANTIATE_TYPED_TEST_SUITE_P(vector2_, ContainerSingleElemIteratorTest, TestTypes);
