@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "test_container_single_elem_iterators.hpp"
+#include "test_vector.hpp"
 #include "vector_container_traits.hpp"
 
 #include "containers/arena_mmr.hpp"
@@ -34,21 +35,7 @@ using intvec = vec_pmr<int>;
 /*
 smr = stack memory resource
 */
-// Construction
-TEST(vector2, smr_init_empty) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    EXPECT_EQ(values.capacity(), 0);
-    EXPECT_EQ(values.size(), 0);
-    EXPECT_TRUE(values.empty());
-}
 // Element access
-TEST(vector2, smr_at_elem0) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    values.push_back(1);
-    EXPECT_EQ(values.at(0), 1);
-}
 TEST(vector2, smr_at_oob) {
     stack_pmr<int, 100> resource;
     intvec values{&resource};
@@ -60,30 +47,11 @@ TEST(vector2, smr_back_empty) {
     intvec values{&resource};
     EXPECT_THROW(values.back(), std::out_of_range);
 }
-TEST(vector2, smr_back) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    values.push_back(1);
-    values.push_back(2);
-    EXPECT_EQ(values.back(), 2);
-}
 TEST(vector2, smr_front_empty) {
     SKIP_IF_RELEASE;
     stack_pmr<int, 100> resource;
     intvec values{&resource};
     EXPECT_THROW(values.front(), std::out_of_range);
-}
-TEST(vector2, smr_front) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    values.push_back(1);
-    EXPECT_EQ(values.front(), 1);
-}
-TEST(vector2, smr_index_operator) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    values.push_back(1);
-    EXPECT_EQ(values[0], 1);
 }
 TEST(vector2, smr_index_operator_oob) {
     SKIP_IF_RELEASE;
@@ -96,34 +64,14 @@ TEST(vector2, smr_data_member_empty) {
     intvec values{&resource};
     EXPECT_EQ(nullptr, values.data());
 }
-TEST(vector2, smr_data_member) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    values.push_back(1);
-    EXPECT_EQ(values.data(), &values.front());
-}
 // Capacity
 TEST(vector2, smr_max_size_int) {
     stack_pmr<int, 100> resource;
     intvec values{&resource};
-    EXPECT_EQ(values.max_size(), std::numeric_limits<typename intvec::difference_type>::max() / sizeof(int));
+    EXPECT_EQ(values.max_size(),
+              std::numeric_limits<typename intvec::difference_type>::max() / sizeof(int));
 }
 // Modification
-TEST(vector2, smr_clear_elems) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-    static constexpr std::size_t n_elems{10};
-
-    for (std::size_t i{0}; i < n_elems; ++i) {
-        values.push_back(int(i));
-    }
-    EXPECT_EQ(values.size(), n_elems);
-    EXPECT_FALSE(values.empty());
-
-    values.clear();
-    EXPECT_EQ(values.size(), 0);
-    EXPECT_TRUE(values.empty());
-}
 TEST(vector2, smr_emplace_back_struct_multiple) {
     struct TestStruct {
         int a;
@@ -140,30 +88,6 @@ TEST(vector2, smr_emplace_back_struct_multiple) {
 
     for (int i{0}; i < static_cast<int>(n_elems); ++i) {
         values.emplace_back(i, i + 1);
-    }
-
-    EXPECT_EQ(values.size(), n_elems);
-    EXPECT_FALSE(values.empty());
-}
-TEST(vector2, smr_push_back_int) {
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-
-    values.push_back(1);
-
-    EXPECT_EQ(values.capacity(), 1);
-    EXPECT_EQ(values.size(), 1);
-    EXPECT_FALSE(values.empty());
-}
-TEST(vector2, smr_push_back_int_multiple) {
-    // Force multiple extensions
-    stack_pmr<int, 100> resource;
-    intvec values{&resource};
-
-    static constexpr std::size_t n_elems{10};
-
-    for (std::size_t i{0}; i < n_elems; ++i) {
-        values.push_back(int(i));
     }
 
     EXPECT_EQ(values.size(), n_elems);
@@ -208,7 +132,8 @@ TEST(vector2, smr_pop_back_empty) {
 }
 
 template <typename T, typename Allocator>
-struct ContainerTestTraits<ml::vector2<T, Allocator>> : vector_container_traits<ml::vector2<T, Allocator>> {
+struct ContainerTestTraits<ml::vector2<T, Allocator>>
+    : vector_container_traits<ml::vector2<T, Allocator>> {
     using Container = ml::vector2<T, Allocator>;
     using vector_container_traits<Container>::add_element;
     using vector_container_traits<Container>::add_elements;
@@ -224,3 +149,4 @@ using TestTypes = ::testing::Types<ContainerDefinition<T0, []() {
     return std::make_tuple(std::move(values), std::move(resource));
 }>>;
 INSTANTIATE_TYPED_TEST_SUITE_P(vector2_, ContainerSingleElemIteratorTest, TestTypes);
+INSTANTIATE_TYPED_TEST_SUITE_P(vector2_, VectorTest, TestTypes);
