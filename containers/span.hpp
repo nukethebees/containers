@@ -5,6 +5,7 @@
 #include <iterator>
 #include <type_traits>
 
+#include "contiguous_container_common_methods.hpp"
 #include "iterator_boilerplate.hpp"
 #include "span_iterator.hpp"
 
@@ -16,7 +17,10 @@ concept has_data_and_size = requires(T t) {
 };
 
 template <typename T>
-class span : public ContiguousIteratorMethods {
+class span
+    : public ContiguousIteratorMethods
+    , public ContiguousContainerCommonCapacityMethods {
+    friend struct ContiguousContainerCommonCapacityMethods;
   public:
     using element_type = T;
     using value_type = std::remove_cvref_t<T>;
@@ -56,11 +60,6 @@ class span : public ContiguousIteratorMethods {
     auto data(this Self&& self) -> pointer {
         return std::forward<Self>(self).data_;
     }
-
-    // Observers
-    auto size() const -> size_type { return size_; }
-    auto size_bytes() const -> std::size_t { return size_ * sizeof(value_type); }
-    auto empty() const -> bool { return size_ == 0; }
 };
 
 template <typename T>

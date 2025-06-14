@@ -11,8 +11,10 @@ namespace ml {
 template <typename T, std::size_t N>
 class array
     : public ContiguousIteratorMethods
-    , public ContiguousContainerCommonMethods {
+    , public ContiguousContainerCommonMethods
+    , public ContiguousContainerCommonCapacityMethods {
     friend struct ContiguousContainerCommonMethods;
+    friend struct ContiguousContainerCommonCapacityMethods;
   public:
     using value_type = T;
     using size_type = std::size_t;
@@ -33,8 +35,6 @@ class array
         : data_{std::forward<U>(values)...} {}
 
     // Capacity
-    constexpr auto empty() const -> bool { return N == 0; }
-    constexpr auto size_bytes() const -> std::size_t { return N * sizeof(value_type); }
     constexpr auto size() const -> size_type { return N; }
     constexpr auto max_size() const -> size_type { return N; }
 };

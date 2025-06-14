@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "allocator_concepts.hpp"
+#include "contiguous_container_common_methods.hpp"
 #include "iterator_boilerplate.hpp"
 #include "span_iterator.hpp"
 
@@ -18,7 +19,10 @@ namespace ml {
 // Vector which can extend an existing allocation instead of allocating a new one
 template <typename T, typename Allocator>
     requires (extendable_allocator<Allocator> && can_allocate_bytes<Allocator>)
-class vector2 : public ContiguousIteratorMethods {
+class vector2
+    : public ContiguousIteratorMethods
+    , public ContiguousContainerCommonCapacityMethods {
+    friend struct ContiguousContainerCommonCapacityMethods;
   public:
     using value_type = T;
     using allocator_type = Allocator;
@@ -74,12 +78,10 @@ class vector2 : public ContiguousIteratorMethods {
 
     // Capacity
     auto capacity() const noexcept -> size_type { return capacity_; }
-    auto empty() const noexcept -> bool { return size_ == 0; }
     constexpr auto max_size() const noexcept -> size_type {
         return std::numeric_limits<difference_type>::max() / sizeof(int);
     }
     auto full() const noexcept -> bool { return size_ == capacity_; }
-    auto size() const noexcept -> size_type { return size_; }
 
     // Modifiers
     void clear() {

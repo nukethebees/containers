@@ -16,8 +16,10 @@ namespace ml {
 template <typename T, typename Allocator = std::allocator<T>>
 class vector
     : public ContiguousIteratorMethods
-    , public ContiguousContainerCommonMethods {
+    , public ContiguousContainerCommonMethods
+    , public ContiguousContainerCommonCapacityMethods {
     friend struct ContiguousContainerCommonMethods;
+    friend struct ContiguousContainerCommonCapacityMethods;
   public:
     using value_type = T;
     using size_type = std::size_t;

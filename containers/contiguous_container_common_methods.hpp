@@ -3,6 +3,21 @@
 #include <utility>
 
 namespace ml {
+struct ContiguousContainerCommonCapacityMethods {
+    template <typename Self>
+    constexpr auto empty(this Self const& self) {
+        return self.size() == 0;
+    }
+    template <typename Self>
+    constexpr auto size(this Self const& self) {
+        return self.size_;
+    }
+    template <typename Self>
+    constexpr auto size_bytes(this Self const& self) {
+        return self.size() * sizeof(typename Self::value_type);
+    }
+};
+
 struct ContiguousContainerCommonMethods {
     // Access
     template <typename Self>
@@ -29,16 +44,6 @@ struct ContiguousContainerCommonMethods {
     template <typename Self>
     constexpr auto&& operator[](this Self&& self, auto i) {
         return std::forward<Self>(self).data()[i];
-    }
-
-    // Capacity
-    template <typename Self>
-    constexpr auto empty(this Self const& self) {
-        return self.size() == 0;
-    }
-    template <typename Self>
-    constexpr auto size(this Self const& self) {
-        return self.size_;
     }
 };
 }
