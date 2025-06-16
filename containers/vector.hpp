@@ -6,7 +6,7 @@
 #include <memory>
 #include <type_traits>
 
-#include "contiguous_container_common_methods.hpp"
+#include "contiguous_container_mixins.hpp"
 #include "iterator_boilerplate.hpp"
 #include "span_iterator.hpp"
 

@@ -22,6 +22,7 @@ target_sources(containers PUBLIC
   "bubble_sort.hpp"
   "bucket_sort.hpp"
   "buffer_mmr.hpp"
+  "contiguous_container_mixins.hpp"
   "buffer_pmr.hpp"
   "dlist.hpp"
   "heap_sort.hpp"
