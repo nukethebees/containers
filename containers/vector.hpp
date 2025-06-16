@@ -34,6 +34,8 @@ class vector
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     vector() noexcept;
+    vector(Allocator const& alloc)
+        : alloc{alloc} {}
     ~vector();
 
     // Capacity
