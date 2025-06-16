@@ -10,6 +10,7 @@
 #include "allocator_concepts.hpp"
 #include "contiguous_container_common_methods.hpp"
 #include "iterator_boilerplate.hpp"
+#include "pmr.hpp"
 #include "span_iterator.hpp"
 
 #include "preprocessor/noexcept_release_def.hpp"
