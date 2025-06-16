@@ -10,6 +10,9 @@
 #include "vector_container_traits.hpp"
 
 #include "containers/vector.hpp"
+#include "containers/pmr_allocator.hpp"
+#include "containers/new_delete_pmr.hpp"
+#include "containers/buffer_pmr.hpp"
 
 #include "configure_warning_pragmas.hpp"
 
@@ -51,6 +54,20 @@ using TT0 = ContainerDefinition<T0, []() { return std::make_tuple(T0()); }>;
 using T1 = ml::vector<int, std::pmr::polymorphic_allocator<int>>;
 using TT1 = ContainerDefinition<T1, []() { return std::make_tuple(T1()); }>;
 
-using TestTypes = ::testing::Types<TT0, TT1>;
+using T2 = ml::vector<int, ml::pmr_allocator<int>>;
+using TT2 = ContainerDefinition<T2, []() {
+    return std::make_tuple(T2(ml::get_new_delete_pmr<ml::pmr>()));
+}>;
+
+using T3 = ml::vector<int, ml::pmr_allocator<int>>;
+using TT3 = ContainerDefinition<T3, []() {
+    using Resource = ml::buffer_pmr<int, 1000, ml::pmr>;
+    auto resource{std::make_unique<Resource>()};
+    auto values{T3{resource.get()}};
+
+    return std::make_tuple(std::move(values), std::move(resource));
+}>;
+
+using TestTypes = ::testing::Types<TT0, TT1, TT2, TT3>;
 INSTANTIATE_TYPED_TEST_SUITE_P(vector_, ContainerSingleElemIteratorTest, TestTypes);
 INSTANTIATE_TYPED_TEST_SUITE_P(vector_, VectorTest, TestTypes);
