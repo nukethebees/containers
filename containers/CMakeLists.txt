@@ -27,6 +27,7 @@ target_sources(containers PUBLIC
   "dlist.hpp"
   "heap_sort.hpp"
   "insertion_sort.hpp"
+  "iterator_boilerplate.hpp"
   "linked_vector.hpp"
   "linked_vector_iterator.hpp"
   "memory_resource_concepts.hpp"
