@@ -4,8 +4,8 @@
 #include <cstddef>
 #include <memory_resource>
 
-#include "pmr.hpp"
 #include "memory_resource_concepts.hpp"
+#include "pmr.hpp"
 
 namespace ml {
 // A copy of the std polymorphic allocator from C++20
@@ -32,35 +32,43 @@ class pmr_allocator {
     pmr_allocator() = delete;
     pmr_allocator(ResourceT* resource)
         : resource_{resource} {}
-    // Copy/move constructors
+
     pmr_allocator(pmr_allocator const&) noexcept = default;
     template <typename U>
     pmr_allocator(pmr_allocator<U, ResourceT> const& other) noexcept
         : resource_{other.resource()} {}
     pmr_allocator(pmr_allocator&&) noexcept = default;
-    // Assignment operators
+
     auto operator=(pmr_allocator const&) noexcept -> pmr_allocator& = default;
     auto operator=(pmr_allocator&&) noexcept -> pmr_allocator& = default;
 
     // Allocation
-    auto allocate(size_type n) -> T* { return static_cast<T*>(resource_->allocate(n * sizeof(T), alignof(T))); }
-    auto allocate_bytes(size_type n, size_type alignment) -> void* { return resource_->allocate(n, alignment); }
+    auto allocate(size_type n) -> T* {
+        return static_cast<T*>(resource_->allocate(n * sizeof(T), alignof(T)));
+    }
+    auto allocate_bytes(size_type n, size_type alignment) -> void* {
+        return resource_->allocate(n, alignment);
+    }
     // Deallocation
     void deallocate(T* p, size_type n) noexcept {
         if (p) {
             resource_->deallocate(p, n * sizeof(T), alignof(T));
         }
     }
-    void deallocate_bytes(void* p, size_type n, size_type alignment) { resource_->deallocate(p, n, alignment); }
+    void deallocate_bytes(void* p, size_type n, size_type alignment) {
+        resource_->deallocate(p, n, alignment);
+    }
     // Extension
     auto extend(T* ptr, size_type old_elems, size_type new_elems) -> T* {
         if constexpr (extendable_memory_resource<ResourceT>) {
-            return static_cast<T*>(resource_->extend(ptr, old_elems * sizeof(T), new_elems * sizeof(T), alignof(T)));
+            return static_cast<T*>(
+                resource_->extend(ptr, old_elems * sizeof(T), new_elems * sizeof(T), alignof(T)));
         } else {
             return resource_->allocate(new_elems * sizeof(T), alignof(T));
         }
     }
-    auto extend_bytes(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment) -> void* {
+    auto extend_bytes(void* ptr, size_type old_bytes, size_type new_bytes, size_type alignment)
+        -> void* {
         if constexpr (extendable_memory_resource<ResourceT>) {
             return resource_->extend(ptr, old_bytes, new_bytes, alignment);
         } else {
@@ -86,7 +94,9 @@ class pmr_allocator {
     // Misc
     auto select_on_container_copy_construction() const noexcept -> pmr_allocator { return *this; }
     auto resource() const noexcept -> ResourceT* { return resource_; }
-    auto max_size() const noexcept -> size_type { return std::numeric_limits<size_type>::max() / sizeof(T); }
+    auto max_size() const noexcept -> size_type {
+        return std::numeric_limits<size_type>::max() / sizeof(T);
+    }
 
     // Comparison
     auto operator<=>(pmr_allocator const&) const noexcept = default;
