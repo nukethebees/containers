@@ -50,6 +50,7 @@ target_sources(containers PUBLIC
   "slist.hpp"
   "span.hpp"
   "span_iterator.hpp"
+  "stack_pmr.hpp"
   "static_vector.hpp"
   "vector.hpp"
   "vector2.hpp"
