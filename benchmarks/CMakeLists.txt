@@ -7,7 +7,12 @@ target_sources(benchmarks PRIVATE
   "main.cpp"
   "bm_vector.cpp" 
   "bm_vector_stackbuf.cpp" 
-  "bm_mixed_vector.cpp" "bm_vec_list.cpp" "bm_vector2.cpp" "bm_sorting.cpp")
+  "bm_mixed_vector.cpp" 
+  "bm_vec_list.cpp" 
+  "bm_vector2.cpp" 
+  "bm_sorting.cpp"
+  "bm_stack_pmr.cpp"
+)
 
 target_link_libraries(benchmarks PRIVATE
   benchmark::benchmark 
