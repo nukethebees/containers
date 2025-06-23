@@ -117,6 +117,13 @@ inline auto stack_pmr::create_frame() -> unique_frame_ptr {
     return unique_frame_ptr{frame, [](stack_pmr_frame* frame) { frame->~stack_pmr_frame(); }};
 }
 inline void stack_pmr::pop_frame(stack_pmr_frame* frame) {
+    if (frame != current_) {
+        throw std::runtime_error("Cannot pop non-current frame.");
+    }
+    if (!frame) {
+        return;
+    }
+
     current_ = frame->previous_;
     size_ = frame->previous_size_;
     return;

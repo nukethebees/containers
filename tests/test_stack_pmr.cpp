@@ -78,3 +78,14 @@ TEST(stack_pmr, older_frame_try_alloc) {
         }
     }
 }
+TEST(stack_pmr, pop_out_of_order) {
+    ml::stack_pmr stack;
+    stack.reserve(1 << 10);
+    {
+        auto frame0(stack.create_frame());
+        {
+            auto frame1(stack.create_frame());
+            ASSERT_THROW(stack.pop_frame(frame0.get()), std::runtime_error);
+        }
+    }
+}
