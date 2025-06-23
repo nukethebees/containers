@@ -43,6 +43,14 @@ class stack_pmr {
     void pop_frame(stack_pmr_frame* frame);
 
     // Allocation
+    [[nodiscard]] auto allocate(stack_pmr_frame* frame, size_type n_bytes, size_type alignment)
+        -> void* {
+        if (frame != current_) {
+            throw std::runtime_error("Non-current frame tried to allocate.");
+        }
+        return allocate(n_bytes, alignment);
+    }
+  private:
     [[nodiscard]] auto allocate(size_type n_bytes, size_type alignment) -> void* {
         auto const cur_size{size_};
         auto remaining{remaining_capacity()};
@@ -55,14 +63,7 @@ class stack_pmr {
         size_ = (capacity_ - remaining) + n_bytes;
         return new_start;
     }
-    [[nodiscard]] auto allocate(stack_pmr_frame* frame, size_type n_bytes, size_type alignment)
-        -> void* {
-        if (frame != current_) {
-            throw std::runtime_error("Non-current frame tried to allocate.");
-        }
-        return allocate(n_bytes, alignment);
-    }
-  private:
+
     std::unique_ptr<std::byte[]> buffer_{nullptr};
     size_type size_{0};
     size_type capacity_{0};
