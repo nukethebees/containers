@@ -22,7 +22,7 @@ target_sources(tests PRIVATE
   "test_static_vector.cpp"  
   "test_vector.cpp"
   "test_vector2.cpp"
-)
+ "test_stack_pmr.cpp")
 
 target_sources(tests PUBLIC
   FILE_SET HEADERS
