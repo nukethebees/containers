@@ -55,6 +55,13 @@ class stack_pmr {
         size_ = (capacity_ - remaining) + n_bytes;
         return new_start;
     }
+    [[nodiscard]] auto allocate(stack_pmr_frame* frame, size_type n_bytes, size_type alignment)
+        -> void* {
+        if (frame != current_) {
+            throw std::runtime_error("Non-current frame tried to allocate.");
+        }
+        return allocate(n_bytes, alignment);
+    }
   private:
     std::unique_ptr<std::byte[]> buffer_{nullptr};
     size_type size_{0};
@@ -86,7 +93,7 @@ class stack_pmr_frame : public std::pmr::memory_resource {
     auto& operator=(stack_pmr_frame&&) = delete;
 
     auto do_allocate(size_type n_bytes, size_type alignment) -> void* override final {
-        return stack_->allocate(n_bytes, alignment);
+        return stack_->allocate(this, n_bytes, alignment);
     }
     void do_deallocate(void* /*ptr*/,
                        size_type /*n_bytes*/,

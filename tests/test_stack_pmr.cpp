@@ -53,17 +53,28 @@ TEST(stack_pmr, three_frames) {
     ASSERT_EQ(0, stack.size());
 
     {
-        auto frame(stack.create_frame());
+        auto frame0(stack.create_frame());
         ASSERT_EQ(sizeof(ml::stack_pmr_frame), stack.size());
         {
-            auto frame(stack.create_frame());
+            auto frame1(stack.create_frame());
             ASSERT_EQ(sizeof(ml::stack_pmr_frame) * 2, stack.size());
             {
-                auto frame(stack.create_frame());
+                auto frame2(stack.create_frame());
                 ASSERT_EQ(sizeof(ml::stack_pmr_frame) * 3, stack.size());
             }
         }
     }
 
     ASSERT_EQ(0, stack.size());
+}
+TEST(stack_pmr, older_frame_try_alloc) {
+    ml::stack_pmr stack;
+    stack.reserve(1 << 10);
+    {
+        auto frame0(stack.create_frame());
+        {
+            auto frame1(stack.create_frame());
+            ASSERT_THROW((void)frame0->allocate(8, 8), std::runtime_error);
+        }
+    }
 }
