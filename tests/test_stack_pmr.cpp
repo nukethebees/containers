@@ -10,3 +10,13 @@ TEST(stack_pmr, resource_init) {
     ml::stack_pmr stack;
     ASSERT_EQ(stack.capacity(), 0);
 }
+TEST(stack_pmr, reserve_buffer) {
+    ml::stack_pmr stack;
+    stack.reserve(1 << 10);
+    ASSERT_EQ(stack.capacity(), 1 << 10);
+}
+TEST(stack_pmr, reserve_twice) {
+    ml::stack_pmr stack;
+    stack.reserve(1);
+    ASSERT_THROW(stack.reserve(1), std::runtime_error);
+}
