@@ -2,7 +2,7 @@
 
 project (containers
     LANGUAGES CXX
-    VERSION 0.3.1
+    VERSION 0.4.0
 )
 
 set(CMAKE_CXX_STANDARD 23)
