@@ -25,18 +25,45 @@ TEST(stack_pmr, reserve_twice) {
 TEST(stack_pmr, create_frame) {
     ml::stack_pmr stack;
     stack.reserve(1 << 10);
-    auto* frame(stack.create_frame());
-    ASSERT_NE(frame, nullptr);
+    auto frame(stack.create_frame());
+    ASSERT_NE(frame.get(), nullptr);
 }
 
 TEST(stack_pmr, vector_ints) {
     ml::stack_pmr stack;
     stack.reserve(1 << 10);
-    auto* frame(stack.create_frame());
+    ASSERT_EQ(0, stack.size());
 
-    std::pmr::vector<int> vec{frame};
-    for (int i{0}; i < 5; ++i) {
-        vec.push_back(i);
-        ASSERT_EQ(i, vec.back());
+    {
+        auto frame(stack.create_frame());
+        ASSERT_EQ(sizeof(ml::stack_pmr_frame), stack.size());
+
+        std::pmr::vector<int> vec{frame.get()};
+        for (int i{0}; i < 5; ++i) {
+            vec.push_back(i);
+            ASSERT_EQ(i, vec.back());
+        }
     }
+
+    ASSERT_EQ(0, stack.size());
+}
+TEST(stack_pmr, three_frames) {
+    ml::stack_pmr stack;
+    stack.reserve(1 << 10);
+    ASSERT_EQ(0, stack.size());
+
+    {
+        auto frame(stack.create_frame());
+        ASSERT_EQ(sizeof(ml::stack_pmr_frame), stack.size());
+        {
+            auto frame(stack.create_frame());
+            ASSERT_EQ(sizeof(ml::stack_pmr_frame) * 2, stack.size());
+            {
+                auto frame(stack.create_frame());
+                ASSERT_EQ(sizeof(ml::stack_pmr_frame) * 3, stack.size());
+            }
+        }
+    }
+
+    ASSERT_EQ(0, stack.size());
 }

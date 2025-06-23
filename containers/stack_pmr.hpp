@@ -12,6 +12,8 @@ namespace ml {
 using stack_frame_id = uint16_t;
 class stack_pmr_frame;
 
+using unique_frame_ptr = std::unique_ptr<stack_pmr_frame, void (*)(stack_pmr_frame*)>;
+
 class stack_pmr {
   public:
     using size_type = std::size_t;
@@ -37,7 +39,8 @@ class stack_pmr {
     }
 
     // Frames
-    auto create_frame() -> stack_pmr_frame*;
+    auto create_frame() -> unique_frame_ptr;
+    void pop_frame(stack_pmr_frame* frame);
 
     // Allocation
     [[nodiscard]] auto allocate(size_type n_bytes, size_type alignment) -> void* {
@@ -52,7 +55,6 @@ class stack_pmr {
         size_ = (capacity_ - remaining) + n_bytes;
         return new_start;
     }
-    void deallocate(void* /*alloc*/, size_type /*n_bytes*/, size_type /*alignment*/) { return; }
   private:
     std::unique_ptr<std::byte[]> buffer_{nullptr};
     size_type size_{0};
@@ -63,13 +65,19 @@ class stack_pmr {
 class stack_pmr_frame : public std::pmr::memory_resource {
   public:
     using size_type = std::size_t;
+    friend class stack_pmr;
 
     stack_pmr_frame() = delete;
-    stack_pmr_frame(stack_pmr* stack, stack_pmr_frame* previous)
+    stack_pmr_frame(stack_pmr* stack, stack_pmr_frame* previous, size_type previous_size)
         : stack_{stack}
-        , previous_{previous} {}
+        , previous_{previous}
+        , previous_size_{previous_size} {}
 
-    ~stack_pmr_frame() override = default;
+    ~stack_pmr_frame() override {
+        if (stack_) {
+            stack_->pop_frame(this);
+        }
+    }
 
     stack_pmr_frame(stack_pmr_frame const&) = delete;
     stack_pmr_frame(stack_pmr_frame&&) = delete;
@@ -91,12 +99,18 @@ class stack_pmr_frame : public std::pmr::memory_resource {
   private:
     stack_pmr* stack_{nullptr};
     stack_pmr_frame* previous_{nullptr};
+    size_type previous_size_{0};
 };
-
-inline auto stack_pmr::create_frame() -> stack_pmr_frame* {
+inline auto stack_pmr::create_frame() -> unique_frame_ptr {
+    auto old_size{size()};
     void* frame_address{allocate(sizeof(stack_pmr_frame), alignof(stack_pmr_frame))};
-    auto* frame{new (frame_address) stack_pmr_frame{this, current_}};
+    auto* frame{new (frame_address) stack_pmr_frame{this, current_, old_size}};
     current_ = frame;
-    return current_;
+    return unique_frame_ptr{frame, [](stack_pmr_frame* frame) { frame->~stack_pmr_frame(); }};
+}
+inline void stack_pmr::pop_frame(stack_pmr_frame* frame) {
+    current_ = frame->previous_;
+    size_ = frame->previous_size_;
+    return;
 }
 }
