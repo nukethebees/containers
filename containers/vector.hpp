@@ -33,119 +33,123 @@ class vector
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    vector() noexcept;
+    // Ctor
+    vector() noexcept
+        : alloc{} {}
     vector(Allocator const& alloc)
         : alloc{alloc} {}
-    ~vector();
+    // Copy ctor
+    vector(vector const& other, Allocator const& alloc)
+        : alloc{alloc} {
+        reserve(other.capacity_);
+        for (auto const& item : other) {
+            push_back(item);
+        }
+    }
+    vector(vector const& other)
+        : vector(other, other.alloc) {}
+    // Move ctor
+    vector(vector&& other)
+        : data_{other.data_}
+        , size_{other.size_}
+        , capacity_{other.capacity_}
+        , alloc{std::move(other.alloc)} {
+        other.data_ = nullptr;
+        other.size_ = 0;
+        other.capacity_ = 0;
+    }
+
+    // Copy assignment
+    auto& operator=(vector const& other) {
+        clear();
+        for (auto const& item : other) {
+            push_back(item);
+        }
+    }
+    // Move assignment
+    auto& operator=(vector&& other) {
+        clear();
+        alloc = std::move(other.alloc);
+        data_ = other.data_;
+        size_ = other.size_;
+        capacity_ = other.capacity_;
+
+        other.data_ = nullptr;
+        other.size_ = 0;
+        other.capacity_ = 0;
+    }
+
+    ~vector() {
+        for (auto i{0uz}; i < size_; ++i) {
+            data_[i].~T();
+        }
+        alloc.deallocate(data_, capacity_);
+        data_ = nullptr;
+        size_ = 0;
+        capacity_ = 0;
+    }
 
     // Capacity
-    auto capacity(this vector const& self) -> std::size_t;
-    auto max_size() const -> std::size_t;
-    void reserve(this vector& self, std::size_t new_capacity);
-    void shrink_to_fit();
+    auto capacity(this vector const& self) -> std::size_t { return self.capacity_; }
+
+    auto max_size() const -> std::size_t { return std::numeric_limits<std::size_t>::max(); }
+
+    void reserve(this vector& self, std::size_t new_capacity) {
+        if (new_capacity <= self.capacity_) {
+            return;
+        }
+
+        auto* new_data{self.alloc.allocate(new_capacity)};
+
+        for (auto i{0uz}; i < self.size_; i++) {
+            new (new_data + i) T{std::move(self.data_[i])};
+        }
+
+        self.alloc.deallocate(self.data_, self.capacity_);
+        self.data_ = new_data;
+        self.capacity_ = new_capacity;
+    }
+
+    void shrink_to_fit() { return; }
 
     // Modifiers
-    void clear(this vector& self);
+    void clear(this vector& self) {
+        for (auto i{0uz}; i < self.size_; ++i) {
+            self.data_[i].~T();
+        }
+        self.size_ = 0;
+    }
+
     template <typename... Args>
-    void emplace_back(this vector& self, Args&&... args);
+    void emplace_back(this vector& self, Args&&... args) {
+        auto const new_size{self.size_ + 1};
+
+        if (new_size >= self.capacity_) {
+            self.grow();
+        }
+
+        new (self.data_ + self.size_) T{std::forward<Args>(args)...};
+        ++self.size_;
+    }
+
     template <typename U>
         requires std::constructible_from<T, U>
-    void push_back(this vector& self, U&& value);
+    void push_back(this vector& self, U&& value) {
+        auto const new_size{self.size_ + 1};
+        if (new_size >= self.capacity_) {
+            self.grow();
+        }
+        new (self.data_ + self.size_) T{std::forward<U>(value)};
+        ++self.size_;
+    }
   private:
     T* data_{nullptr};
     std::size_t size_{0};
     std::size_t capacity_{0};
     NO_UNIQUE_ADDRESS Allocator alloc;
 
-    void grow(this vector& self);
+    void grow(this vector& self) { self.reserve(self.capacity_ ? self.capacity_ * 2uz : 1uz); }
 };
-
-template <typename T, typename Allocator>
-inline vector<T, Allocator>::vector() noexcept
-    : alloc{} {}
-
-template <typename T, typename Allocator>
-inline vector<T, Allocator>::~vector() {
-    for (auto i{0uz}; i < size_; ++i) {
-        data_[i].~T();
-    }
-    alloc.deallocate(data_, capacity_);
-    data_ = nullptr;
-    size_ = 0;
-    capacity_ = 0;
-}
-
-// Capacity
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::capacity(this vector const& self) -> std::size_t {
-    return self.capacity_;
-}
-
-template <typename T, typename Allocator>
-inline auto vector<T, Allocator>::max_size() const -> std::size_t {
-    return std::numeric_limits<std::size_t>::max();
-}
-
-template <typename T, typename Allocator>
-inline void vector<T, Allocator>::reserve(this vector& self, std::size_t new_capacity) {
-    if (new_capacity <= self.capacity_) {
-        return;
-    }
-
-    auto* new_data{self.alloc.allocate(new_capacity)};
-
-    for (auto i{0uz}; i < self.size_; i++) {
-        new (new_data + i) T{std::move(self.data_[i])};
-    }
-
-    self.alloc.deallocate(self.data_, self.capacity_);
-    self.data_ = new_data;
-    self.capacity_ = new_capacity;
-}
-
-template <typename T, typename Allocator>
-inline void vector<T, Allocator>::shrink_to_fit() {
-    return;
-}
-
-// Modifier
-template <typename T, typename Allocator>
-inline void vector<T, Allocator>::clear(this vector& self) {
-    for (auto i{0uz}; i < self.size_; ++i) {
-        self.data_[i].~T();
-    }
-    self.size_ = 0;
-}
-
-template <typename T, typename Allocator>
-template <typename... Args>
-inline void vector<T, Allocator>::emplace_back(this vector& self, Args&&... args) {
-    auto const new_size{self.size_ + 1};
-
-    if (new_size >= self.capacity_) {
-        self.grow();
-    }
-
-    new (self.data_ + self.size_) T{std::forward<Args>(args)...};
-    ++self.size_;
-}
-
-template <typename T, typename Allocator>
-template <typename U>
-    requires std::constructible_from<T, U>
-inline void vector<T, Allocator>::push_back(this vector& self, U&& value) {
-    auto const new_size{self.size_ + 1};
-    if (new_size >= self.capacity_) {
-        self.grow();
-    }
-    new (self.data_ + self.size_) T{std::forward<U>(value)};
-    ++self.size_;
-}
-
-template <typename T, typename Allocator>
-inline void vector<T, Allocator>::grow(this vector& self) {
-    self.reserve(self.capacity_ ? self.capacity_ * 2uz : 1uz);
-}
 
 }
 
